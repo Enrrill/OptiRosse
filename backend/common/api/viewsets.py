@@ -1,6 +1,8 @@
 from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from backend.common.api.mixins import AuditoriaMixin
 from backend.common.api.pagination import StandardResultsSetPagination
 from backend.common.api.response import api_response
@@ -8,7 +10,7 @@ from backend.common.api.response import api_response
 
 class BaseModelViewSet(AuditoriaMixin, ModelViewSet):
     pagination_class = StandardResultsSetPagination
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     ordering = ('-creado_en',)
 
     def create(self, request, *args, **kwargs):
@@ -36,5 +38,5 @@ class BaseModelViewSet(AuditoriaMixin, ModelViewSet):
 
 class BaseReadOnlyModelViewSet(ReadOnlyModelViewSet):
     pagination_class = StandardResultsSetPagination
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     ordering = ('-creado_en',)

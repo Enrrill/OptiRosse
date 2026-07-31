@@ -15,7 +15,7 @@ Construir la API REST completa de OptiRosse trabajando **app por app**, de menor
 - **URLs**: `/api/v1/<app>/...`; cada app con su `urls.py`, incluido en `backend/config/urls.py`.
 - **Permisos**: por rol (`RolUsuario`), con clases base reutilizables.
 - **Auditoría**: `RegistroAuditoria` se escribe vía `AuditoriaService` (o signals), nunca dentro de las views.
-- **Dependencias nuevas**: `djangorestframework-simplejwt`. (Opcional al final: `drf-spectacular` para docs.)
+- **Dependencias nuevas**: `djangorestframework-simplejwt`, `django-filter`. (Opcional al final: `drf-spectacular` para docs.)
 
 ## Convención de capas por app
 
@@ -108,14 +108,28 @@ Modelos ya existen (`Usuario`, `RegistroAuditoria`). Detalle de implementación:
 - **Dificultad**: media (autenticación + permisos), pero es la base de todo lo demás.
 - **Done**: verificación por curl del flujo completo (login por identificador, claims, me, CRUD admin, 403 vendedor, refresh, logout, cambio de contraseña) y auditoría registrada.
 
-## Fase 2 — clients (CRUD simple)
+## Fase 2 — clients (CRUD simple) ✅ implementada
 
-- `ClienteOptica` CRUD completo con `BaseModelViewSet`:
-  - `serializers/cliente.py`, `filters.py` (búsqueda por razón social/RIF, filtro `activo`), paginación.
-- `permissions.py`: lectura para cualquier rol autenticado; escritura para `ADMINISTRADOR`.
-- Sin `services` (CRUD puro, sin reglas de negocio).
+Plantilla para los CRUDs simples (inventario, métodos de pago). Detalle:
+
+### Infra compartida
+- Dependencia `django-filter`: `DjangoFilterBackend` añadido a `REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS']` (settings) y a `filter_backends` de `BaseModelViewSet`/`BaseReadOnlyModelViewSet` → todos los CRUD futuros filtran.
+- `common/api/permissions.py` → nueva fábrica `es_rol_o_lectura(*roles)`: lectura para cualquier rol autenticado, escritura solo para los roles dados. (Reutilizada en inventario/finanzas.)
+
+### App clients
+- `serializers/cliente.py` → `ClienteOpticaSerializer`: `read_only_fields` de timestamps, `UniqueValidator` en `identificacion_fiscal` (mensaje en español), validación de no-negatividad en `limite_credito`/`dias_credito`.
+- `filters.py` → `ClienteOpticaFilter(FilterSet)` con `activo` (`BooleanFilter`).
+- `permissions.py` → `EscrituraAdministradorOLectura = es_rol_o_lectura(RolUsuario.ADMINISTRADOR)`.
+- `views/cliente.py` → `ClienteOpticaViewSet(BaseModelViewSet)`:
+  - `get_queryset`: en `list`, solo `activo=True` por defecto (salvo `?activo=false`); en detalle/update/delete queryset completo → permite reactivar inactivos.
+  - `destroy` sobreescrito → **soft delete** (`activo=False`, auditoría `desactivar`), mismo patrón que `UsuarioViewSet`.
+  - `search_fields`: razón social, nombre comercial, identificación fiscal, correo.
+- `urls.py`: `SimpleRouter` → `/api/v1/clientes/`.
+
+### Rutas
+`/api/v1/clientes/` (CRUD completo; lista solo activos; `?activo=false`, `?search=`, `?ordering=`, `?page=`, `?page_size=`).
 - **Dificultad**: baja.
-- **Sirve como plantilla** para los CRUDs simples de inventario y métodos de pago.
+- **Done**: verificación por curl (create/duplicado/validaciones 400, vendedor 403/lectura 200, sin token 401, soft delete + reactivación, filtro `activo`, search, auditoría `crear/actualizar/desactivar`) y `makemigrations` sin cambios (modelo intacto).
 
 ## Fase 3 — inventory (FKs + filtros)
 
