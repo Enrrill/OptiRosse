@@ -36,6 +36,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin, TimeStampedModel, ActivoMixin)
     USERNAME_FIELD = 'nombre_usuario'
     REQUIRED_FIELDS = ['correo']
 
+    @property
+    def is_active(self):
+        return self.activo
+
+    @property
+    def is_staff(self):
+        return self.is_superuser or self.rol == RolUsuario.ADMINISTRADOR
+
     class Meta:
         verbose_name = 'usuario'
         verbose_name_plural = 'usuarios'

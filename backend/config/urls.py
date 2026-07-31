@@ -22,6 +22,7 @@ from backend.common.api.errors import ruta_no_encontrada
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('backend.common.api.urls')),
+    path('api/v1/', include('backend.apps.core.urls')),
     re_path(r'.*', ruta_no_encontrada, name='ruta-no-encontrada'),
 ]
 

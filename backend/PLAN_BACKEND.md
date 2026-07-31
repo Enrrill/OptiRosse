@@ -77,17 +77,36 @@ Configurar la infraestructura que usan todas las apps.
 - **Dificultad**: media.
 - **Entregable**: convención de capas lista para consumir.
 
-## Fase 1 — core (auth + usuarios)
+## Fase 1 — core (auth + usuarios) ✅ implementada
 
-Modelos ya existen (`Usuario`, `RegistroAuditoria`).
+Modelos ya existen (`Usuario`, `RegistroAuditoria`). Detalle de implementación:
 
-- `services.py` → `AuthService`: login, refresh, logout, `me`.
-- `views/auth.py`: APIViews explícitas (`login`, `refresh`, `me`, `logout`) — naturaleza no-CRUD.
-- CRUD `Usuario`: ViewSet restringido a `ADMINISTRADOR`, con permiso `EsAdministrador`.
-- `permissions.py`: `EsAdministrador`, `EsRol(...)`, `SoloLectura`.
-- `AuditoriaService` base + mixin de auditoría (validar aquí con `Usuario`).
-- Rutas: `/api/v1/auth/...`, `/api/v1/usuarios/`.
+### Corrección previa (modelo, sin migración)
+- `Usuario` no tenía `is_active`/`is_staff` → simplejwt (`default_user_authentication_rule`) accede a `user.is_active` y el login fallaría. Se añadieron **propiedades** (no campos):
+  - `is_active` → `self.activo`
+  - `is_staff` → `self.is_superuser or rol == RolUsuario.ADMINISTRADOR`
+  - Bonus: arregla el login del admin de Django.
+
+### Infra compartida (`backend/common/api/`)
+- `tokens.py` → `TokenObtainPairSerializer` custom:
+  - Campo `identificador` (nombre_usuario **o** correo, `__iexact`), maneja `DoesNotExist`/`MultipleObjectsReturned`.
+  - `validate`: `authenticate(nombre_usuario, password)` + `USER_AUTHENTICATION_RULE` + `update_last_login`.
+  - `get_token`: claims `rol` y `nombre` (nombre completo, fallback a `nombre_usuario`). Se conservan al refrescar (simplejwt copia claims del refresh al access).
+- `permissions.py` → `es_rol(*roles)` (fábrica que devuelve una clase; compara `user.rol`) y `SoloLectura` (SAFE_METHODS).
+- `mixins.py` → `_registrar_auditoria` implementado: lazy import de `AuditoriaService`, extrae user/IP de `self.request`, `tabla_afectada = instancia._meta.db_table`. Lo usan todos los ViewSets futuros.
+
+### App core
+- `services.py` → `AuthService`: `login`, `refresh`, `logout` (blacklist; `TokenError` → `ApiError` 400), `cambiar_contrasena` (valida `check_password`, validadores de Django y **revoca los refresh tokens** vía `OutstandingToken`), `me`. `AuditoriaService.registrar(...)`.
+- `serializers/usuario.py` → `UsuarioSerializer`: password write_only, obligatoria en create, `validate_password`, `UniqueValidator` en `nombre_usuario`/`correo`, `set_password` en create/update.
+- `views/auth.py`: APIViews explícitas (`login`, `refresh`, `logout`, `me`, `cambiar-contrasena`) — naturaleza no-CRUD; delegan en `AuthService`.
+- `views/usuarios.py`: CRUD `Usuario` con `EsAdministrador`; `destroy` sobreescrito → **soft delete** (`activo=False`).
+- `permissions.py`: `EsAdministrador = EsRol(RolUsuario.ADMINISTRADOR)`.
+- `urls.py`: `SimpleRouter` → `usuarios/` + `auth/...`.
+
+### Rutas
+`/api/v1/auth/login|refresh|logout|me|cambiar-contrasena/`, `/api/v1/usuarios/`.
 - **Dificultad**: media (autenticación + permisos), pero es la base de todo lo demás.
+- **Done**: verificación por curl del flujo completo (login por identificador, claims, me, CRUD admin, 403 vendedor, refresh, logout, cambio de contraseña) y auditoría registrada.
 
 ## Fase 2 — clients (CRUD simple)
 
