@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -26,6 +27,8 @@ INSTALLED_APPS = [
 
     # Third party
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
 
     # Custom apps
@@ -67,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'backend.config.wsgi.application'
 
 
 # Database
@@ -123,3 +126,39 @@ STATIC_URL = 'static/'
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+# Django REST Framework
+_REST_FRAMEWORK_RENDERERS = [
+    'backend.common.api.response.EnvelopeJSONRenderer',
+]
+
+if DEBUG:
+    _REST_FRAMEWORK_RENDERERS.append('rest_framework.renderers.BrowsableAPIRenderer')
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_RENDERER_CLASSES': _REST_FRAMEWORK_RENDERERS,
+    'DEFAULT_PAGINATION_CLASS': 'backend.common.api.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 20,
+    'EXCEPTION_HANDLER': 'backend.common.api.exceptions.api_exception_handler',
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+}
+
+# Simple JWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'UPDATE_LAST_LOGIN': True,
+}
