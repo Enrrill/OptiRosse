@@ -131,13 +131,29 @@ Plantilla para los CRUDs simples (inventario, métodos de pago). Detalle:
 - **Dificultad**: baja.
 - **Done**: verificación por curl (create/duplicado/validaciones 400, vendedor 403/lectura 200, sin token 401, soft delete + reactivación, filtro `activo`, search, auditoría `crear/actualizar/desactivar`) y `makemigrations` sin cambios (modelo intacto).
 
-## Fase 3 — inventory (FKs + filtros)
+## Fase 3 — inventory (FKs + filtros) ✅ implementada
 
-- `Categoria`: CRUD ViewSet simple (validación de unicidad tipo + nombre).
-- `Producto`: CRUD ViewSet + filtros por categoría, marca, tipo.
-- `VarianteProducto`: CRUD ViewSet con serializers anidados (crear variantes desde el producto), filtros por producto, alertas de stock (`stock <= alerta_stock_minimo`), búsqueda por SKU/código de barras.
-- `services.py` → `StockService`: `validar_disponibilidad(variante, cantidad)` y `ajustar_stock(...)` — **base que usará orders en la Fase 4**.
-- **Dificultad**: media. Primera app con relaciones FK y lógica de stock.
+### Cambios de modelo (migración `0002`)
+- `Categoria(ActivoMixin)` → `activo` + `UniqueConstraint(tipo_producto, nombre)`.
+- `VarianteProducto(ActivoMixin)` → `activo` + `CheckConstraint` de no-negatividad en `stock`, `alerta_stock_minimo`, `precio_al_mayor`, `precio_costo`.
+- `Categoria` **no** tiene timestamps: el viewset define `ordering = ('nombre',)` (el default `-creado_en` de la base fallaría). Sin `TimeStampedModel` deliberadamente.
+
+### App inventory
+- `serializers/`:
+  - `categoria.py` → `CategoriaSerializer` (con `tipo_producto_display`) + `CategoriaResumenSerializer` para el detalle anidado en productos.
+  - `variante.py` → `VarianteProductoSerializer` (standalone: `UniqueValidator` en SKU, `validate_codigo_barras` con exclusión de instancia) + `VarianteEnProductoSerializer` (anidado: **sin** validador de unicidad porque DRF lo auto-genera y rompe el update en listas anidadas; los checks de unicidad los hace `ProductoSerializer`). `id` escribible en el anidado para distinguir update/create.
+  - `producto.py` → `ProductoSerializer` con `variantes` anidadas escribibles: `create`/`update` dentro de `transaction.atomic()`; update = upsert (items con `id` se actualizan, sin `id` se crean) y las **omitidas se desactivan** (`activo=False`); `validate` rechaza SKU/código de barras duplicados dentro del payload.
+- `filters.py` → `CategoriaFilter`, `ProductoFilter` (`?categoria=`, `?tipo=` por `categoria__tipo_producto`, `?marca=` icontains), `VarianteProductoFilter` (`?producto=`, `?producto__categoria=`, `?stock_bajo=true` → `stock <= alerta_stock_minimo`).
+- `permissions.py` → `EscrituraInventarioOLectura` y `EscrituraInventario` = `es_rol_o_lectura/es_rol(ADMINISTRADOR, ALMACEN)`.
+- `services.py` → `StockService` (base para orders Fase 4):
+  - `validar_disponibilidad(variante, cantidad)` → `ApiError(409, code='stock_insuficiente')`.
+  - `ajustar_stock(variante, delta, motivo, usuario, direccion_ip)` → `transaction.atomic` + `select_for_update`, `update(stock=F('stock')+delta)` atómico y auditoría `ajuste_stock` con `{'delta', 'motivo'}`.
+- `views/` → `CategoriaViewSet`, `ProductoViewSet` (queryset `select_related('categoria').prefetch_related('variantes')`), `VarianteProductoViewSet` (`select_related('producto', 'producto__categoria')`), `AjustarStockView` (APIView `POST /variantes/{id}/ajustar-stock/`). Los tres ViewSets sobrescriben `destroy` → **soft delete** y listan solo activos por defecto.
+
+### Rutas
+`/api/v1/categorias/`, `/api/v1/productos/`, `/api/v1/variantes/` (CRUD completo, soft delete, `?activo=`, search, paginación) + `POST /api/v1/variantes/{id}/ajustar-stock/`.
+- **Dificultad**: media.
+- **Done**: verificación por curl (create/duplicados 400, sku duplicado en payload, update anidado upsert + desactivación de omitidas, filtros `tipo/categoria/marca/producto/stock_bajo`, search, ajuste stock ± y 409 `stock_insuficiente`, permisos vendedor/almacén/sin token, soft deletes + reactivación, auditoría `crear/desactivar/ajuste_stock`), `check` y `makemigrations` sin pendientes.
 
 ## Fase 4 — orders (negocio, nested writes, estados) ⭐ mayor salto de complejidad
 

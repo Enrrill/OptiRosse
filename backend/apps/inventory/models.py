@@ -1,10 +1,11 @@
 from django.db import models
+from django.db.models import Q
 
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
 from backend.apps.core.choices import TipoProducto
 
 
-class Categoria(models.Model):
+class Categoria(ActivoMixin):
     nombre = models.CharField('nombre', max_length=100)
     tipo_producto = models.CharField('tipo de producto', max_length=20, choices=TipoProducto.choices)
 
@@ -12,6 +13,12 @@ class Categoria(models.Model):
         verbose_name = 'categoría'
         verbose_name_plural = 'categorías'
         db_table = 'categorias'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['tipo_producto', 'nombre'],
+                name='categorias_unicas_tipo_nombre',
+            )
+        ]
 
     def __str__(self):
         return f'{self.nombre} ({self.get_tipo_producto_display()})'
@@ -37,7 +44,7 @@ class Producto(TimeStampedModel, ActivoMixin):
         return f'{self.marca} {self.codigo_modelo}'
 
 
-class VarianteProducto(models.Model):
+class VarianteProducto(ActivoMixin):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='variantes', verbose_name='producto')
     sku = models.CharField('SKU', max_length=100, unique=True)
     codigo_barras = models.CharField('código de barras', max_length=100, unique=True, blank=True, null=True)
@@ -59,6 +66,16 @@ class VarianteProducto(models.Model):
         verbose_name = 'variante de producto'
         verbose_name_plural = 'variantes de producto'
         db_table = 'variantes_producto'
+        constraints = [
+            models.CheckConstraint(condition=Q(stock__gte=0), name='variantes_stock_no_negativo'),
+            models.CheckConstraint(
+                condition=Q(alerta_stock_minimo__gte=0), name='variantes_alerta_stock_minimo_no_negativa'
+            ),
+            models.CheckConstraint(
+                condition=Q(precio_al_mayor__gte=0), name='variantes_precio_mayor_no_negativo'
+            ),
+            models.CheckConstraint(condition=Q(precio_costo__gte=0), name='variantes_precio_costo_no_negativo'),
+        ]
 
     def __str__(self):
         return f'{self.producto} - {self.sku}'
