@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OptiRosse - Gestión de Usuarios</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&family=Manrope:wght@100..900&display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "secondary-fixed": "#c4e7ff",
+                "surface": "#f8f9ff",
+                "on-secondary-fixed": "#001e2c",
+                "surface-variant": "#d3e4fe",
+                "tertiary-container": "#9c2a6c",
+                "on-surface": "#0b1c30",
+                "on-primary-container": "#dac5ff",
+                "on-primary": "#ffffff",
+                "inverse-on-surface": "#eaf1ff",
+                "on-tertiary-container": "#ffbcd9",
+                "surface-container-highest": "#d3e4fe",
+                "primary-fixed": "#ebddff",
+                "primary-container": "#6d28d9",
+                "error-container": "#ffdad6",
+                "on-primary-fixed-variant": "#5b00c5",
+                "outline": "#7b7486",
+                "on-error": "#ffffff",
+                "secondary-container": "#40c2fd",
+                "on-secondary-container": "#004d6a",
+                "tertiary-fixed-dim": "#ffafd3",
+                "on-primary-fixed": "#250059",
+                "tertiary-fixed": "#ffd8e7",
+                "on-tertiary-fixed-variant": "#85145a",
+                "on-background": "#0b1c30",
+                "primary-fixed-dim": "#d3bbff",
+                "surface-container-high": "#dce9ff",
+                "surface-tint": "#7331df",
+                "error": "#ba1a1a",
+                "surface-container-lowest": "#ffffff",
+                "surface-bright": "#f8f9ff",
+                "secondary": "#00668a",
+                "tertiary": "#7e0b54",
+                "surface-dim": "#cbdbf5",
+                "surface-container-low": "#eff4ff",
+                "on-secondary": "#ffffff",
+                "on-secondary-fixed-variant": "#004c69",
+                "surface-container": "#e5eeff",
+                "on-surface-variant": "#4a4455",
+                "inverse-surface": "#213145",
+                "outline-variant": "#ccc3d7",
+                "secondary-fixed-dim": "#7bd0ff",
+                "on-tertiary-fixed": "#3d0026",
+                "background": "#f8f9ff",
+                "on-tertiary": "#ffffff",
+                "primary": "#5300b7",
+                "on-error-container": "#93000a",
+                "inverse-primary": "#d3bbff"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "16px",
+                "xl": "24px",
+                "full": "9999px"
+              },
+              "spacing": {
+                "sm": "12px",
+                "margin-mobile": "16px",
+                "lg": "48px",
+                "xs": "4px",
+                "md": "24px",
+                "gutter": "24px",
+                "base": "8px",
+                "xl": "80px",
+                "margin-desktop": "64px"
+              },
+              "fontFamily": {
+                "body-md": ["Inter"],
+                "display-lg": ["Manrope"],
+                "headline-md": ["Manrope"],
+                "headline-lg": ["Manrope"],
+                "body-lg": ["Inter"],
+                "label-sm": ["JetBrains Mono"]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background-color: rgba(248, 249, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface overflow-hidden">
+<!-- SIDEBAR NAVIGATION -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-surface border-r border-outline-variant flex flex-col h-full py-md px-sm z-50">
+<!-- Brand Header -->
+<div class="mb-lg px-sm">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-3xl">lens_blur</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary leading-tight">OptiRosse</h1>
+<p class="text-[10px] font-label-sm text-outline tracking-widest uppercase">v1.2.0 Professional</p>
+</div>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-medium">Clientes</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-medium">Inventario</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-medium">Prescripciones</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-medium">Pedidos</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-medium">Finanzas</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-medium">Documentos</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-primary font-bold bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined">manage_accounts</span>
+<span class="font-medium">Admin Usuarios</span>
+</a>
+</nav>
+<!-- Footer Actions -->
+<div class="mt-auto pt-md border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Configuración</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-error hover:bg-error-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-medium">Cerrar sesión</span>
+</a>
+</div>
+</aside>
+<!-- TOP NAVIGATION BAR -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant flex justify-between items-center px-md w-auto z-40">
+<div class="flex items-center gap-md flex-1">
+<h2 class="font-headline-md text-headline-md font-bold text-primary">Gestión de Usuarios</h2>
+<div class="relative w-96 max-w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-primary focus:bg-white transition-all" placeholder="Buscar por nombre, correo o ID..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-sm cursor-pointer hover:bg-surface-container-low p-1 pr-3 rounded-full transition-all">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary-container">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a senior administrator for an optical clinic, clean minimalist lighting, wearing premium eyewear, modern corporate background with blue and violet highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSK-wVzsK94KyhyiOxk5mg5pH2SRBQ8LaIeHvv5UOTkt7O4S1KfkxA5XsE9r-ryb_P-tWJJu_6439zukcszRXD4ZqJZ0AIxNy9ownjxhMZfaf1qLyJ51LaP32SAE4_wIC-_dL7pou3_kUIYjSKVKjTeE2HOTheLWOwGbsaxuBWu8EipgJ2Tev-ljP7HkdHLyDdR1xGqwQkCd3X7Iy-gPrmC2rwYfFfDC7OvsBu0hV3SC0vRX18xFOVfw"/>
+</div>
+<span class="font-medium text-body-md">Admin</span>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT CANVAS -->
+<main class="ml-64 pt-16 h-screen overflow-y-auto">
+<div class="p-md lg:p-margin-desktop space-y-md">
+<!-- TOOLBAR / FILTERS -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md bg-white p-md rounded-xl shadow-sm border border-outline-variant">
+<div class="flex flex-wrap items-center gap-sm">
+<div class="flex items-center gap-xs px-3 py-2 bg-surface rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-sm text-outline">filter_list</span>
+<select class="bg-transparent border-none text-body-md focus:ring-0 p-0 pr-8">
+<option value="">Todos los Roles</option>
+<option value="admin">Administrador</option>
+<option value="b2b">Vendedor B2B</option>
+<option value="almacen">Almacén</option>
+<option value="tecnico">Técnico de Taller</option>
+<option value="contabilidad">Contabilidad</option>
+</select>
+</div>
+<div class="flex items-center gap-xs px-3 py-2 bg-surface rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-sm text-outline">calendar_today</span>
+<span class="text-body-md">Fecha: Últimos 30 días</span>
+</div>
+</div>
+<button class="flex items-center justify-center gap-xs bg-primary text-on-primary px-6 py-3 rounded-full font-headline-md hover:opacity-90 active:scale-95 transition-all shadow-md shadow-primary/20">
+<span class="material-symbols-outlined">person_add</span>
+<span>Nuevo usuario</span>
+</button>
+</div>
+<!-- DATA TABLE CARD -->
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-md py-4 font-bold text-sm uppercase tracking-wider text-outline">Usuario</th>
+<th class="px-md py-4 font-bold text-sm uppercase tracking-wider text-outline">Nombre completo</th>
+<th class="px-md py-4 font-bold text-sm uppercase tracking-wider text-outline">Correo</th>
+<th class="px-md py-4 font-bold text-sm uppercase tracking-wider text-outline">Rol</th>
+<th class="px-md py-4 font-bold text-sm uppercase tracking-wider text-outline">Estado</th>
+<th class="px-md py-4 font-bold text-sm uppercase tracking-wider text-outline text-right">Creado</th>
+<th class="px-md py-4 font-bold text-sm uppercase tracking-wider text-outline text-center">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1: Admin -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center border border-primary-container/30">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="User profile avatar icon, professional portrait of a woman in business attire, modern optical office setting with soft bokeh, purple and light blue color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQIpWCwoSg2Oxqok7urm9L--2UIEc14E8WUxa2Ner-O99eRy9YxY6c52PI1TfY3fVq37qxdZ9BQioiZFWWb7OgxRfk6eq33KqosGcGbwzUblef4AKH6q0FjdzVloIXniLf1VkT7N51pHCn5uioVClOFgknowDq5Nt5BtsuOvPfCUdmWaaMmCjvVCH39TegsYpAmZogs2X5SGJ33OhJkWjPLPGByubTgEhFzssbCAijxG4XVBDSIoBZDA"/>
+</div>
+<span class="font-label-sm">#USR-882</span>
+</div>
+</td>
+<td class="px-md py-4 font-semibold">Elena Rodríguez</td>
+<td class="px-md py-4 text-on-surface-variant">e.rodriguez@optirosse.com</td>
+<td class="px-md py-4">
+<span class="px-3 py-1 rounded-full text-[11px] font-label-sm bg-primary-container text-on-primary-container uppercase">Administrador</span>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="text-sm font-medium">Activo</span>
+</div>
+</td>
+<td class="px-md py-4 text-right font-label-sm">12/01/2024</td>
+<td class="px-md py-4">
+<div class="flex items-center justify-center gap-3">
+<button class="p-2 text-primary hover:bg-primary-fixed rounded-lg transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-outline hover:bg-surface-container-highest rounded-lg transition-all" title="Desactivar">
+<span class="material-symbols-outlined">person_off</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Sales -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container/10 flex items-center justify-center border border-secondary-container/30">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="User profile avatar icon, professional portrait of a man smiling in a high-tech optical warehouse, soft bright blue lighting, modern corporate vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWUxDzBLhr1OLMNtbIFw9M8c1Ejpp94pY6atvmgYYxmCPP5vBoLt1wxU6LrZMsbUHEzupPA7NZ7wuNS330xvIdAXf3ItxYLJ50ZpwlmIuWGxxJKrjN5Pijj5ysR7vadW77RgDRPRbQlHrulWfj3LEaraT-EV9_RlLwSzltpJzib-Zm9Zrr-1t7T0izlDRJCc0mUpPBvVJVK-RN1qEwO1t-8eZ60EAHFqmCA8SXNQNdRwfeA6EL0AUxVQ"/>
+</div>
+<span class="font-label-sm">#USR-741</span>
+</div>
+</td>
+<td class="px-md py-4 font-semibold">Marco Ferrero</td>
+<td class="px-md py-4 text-on-surface-variant">m.ferrero@optirosse.com</td>
+<td class="px-md py-4">
+<span class="px-3 py-1 rounded-full text-[11px] font-label-sm bg-secondary-container text-on-secondary-container uppercase">Vendedor B2B</span>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-sm font-medium">Activo</span>
+</div>
+</td>
+<td class="px-md py-4 text-right font-label-sm">25/01/2024</td>
+<td class="px-md py-4">
+<div class="flex items-center justify-center gap-3">
+<button class="p-2 text-primary hover:bg-primary-fixed rounded-lg transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-outline hover:bg-surface-container-highest rounded-lg transition-all" title="Desactivar">
+<span class="material-symbols-outlined">person_off</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Warehouse -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Modern geometric avatar icon representing a warehouse worker, subtle gray and navy tones, high-end professional graphic design for a corporate dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtOAMSSsG-SDwKnMfxDIfiz16D_M_2pjMnyR13V_3Q5qbfT39deU_EbKHLhNPET2EZgavWHhHy6fpCn7Sm-LXRxMfjaZNV5wg-hJ50YeojhIsAdR84enMumZAgtBZ_rw0WVdcIrXvYD6H2mM74gBopP6YUGZ19lKiqSVObBCKphLv6O1hAOFzVWdSp0bH_MQUfOj1hj_8y27tPqzwj1S5lCrdqd3uJC5_p10hOExeLsIhXZdQoLR5bJw"/>
+</div>
+<span class="font-label-sm">#USR-612</span>
+</div>
+</td>
+<td class="px-md py-4 font-semibold">Julian Sanz</td>
+<td class="px-md py-4 text-on-surface-variant">j.sanz@optirosse.com</td>
+<td class="px-md py-4">
+<span class="px-3 py-1 rounded-full text-[11px] font-label-sm bg-surface-variant text-on-surface-variant uppercase">Almacén</span>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2 text-outline">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="text-sm font-medium">Inactivo</span>
+</div>
+</td>
+<td class="px-md py-4 text-right font-label-sm">05/02/2024</td>
+<td class="px-md py-4">
+<div class="flex items-center justify-center gap-3">
+<button class="p-2 text-primary hover:bg-primary-fixed rounded-lg transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-primary bg-primary-fixed rounded-lg transition-all" title="Activar">
+<span class="material-symbols-outlined">person_check</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Technician -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center border border-orange-200">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="User avatar icon, technical specialist in an optical lab, wearing a white coat and precision goggles, bright studio lighting, soft orange and clean white aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnHhMlrzaYMcSAqQ4aecAgFXrzWbnM3qvNSRl-HTm2xmzFiZFrW1eM8cQ9vttiYaYEJvI8rveWHL-6-j7k68TDQZSUyo2ga_txP4wNw-WMUTJhJIaBKIayQEmtd8tVG80NIsWcadH8GmIRndLQMBUS7mdjb18g3QKuqtUMWFWN-z1Q7Sv8Zm2VqP_XqFMww_dHdF62f5bwk7CvMAZSvh3ntWMPZSTshdNIz-9rg3a9xJrx0Yx0gXX01A"/>
+</div>
+<span class="font-label-sm">#USR-502</span>
+</div>
+</td>
+<td class="px-md py-4 font-semibold">Carla Méndez</td>
+<td class="px-md py-4 text-on-surface-variant">c.mendez@optirosse.com</td>
+<td class="px-md py-4">
+<span class="px-3 py-1 rounded-full text-[11px] font-label-sm bg-orange-100 text-orange-800 border border-orange-200 uppercase">Técnico de Taller</span>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-sm font-medium">Activo</span>
+</div>
+</td>
+<td class="px-md py-4 text-right font-label-sm">18/02/2024</td>
+<td class="px-md py-4">
+<div class="flex items-center justify-center gap-3">
+<button class="p-2 text-primary hover:bg-primary-fixed rounded-lg transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-outline hover:bg-surface-container-highest rounded-lg transition-all" title="Desactivar">
+<span class="material-symbols-outlined">person_off</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Accounting -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center border border-green-200">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="User profile photo, professional woman accountant, minimalist office with financial charts in the background, high-key lighting, soft green and neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvhq-8j-3aPMTs7rLovNUGHd1mt4j2xS3YLfEbUeLCQboyRBgEd4fdd_soEt2KDWsYsP7zy-1t2YpmvwOU46jsPSGJyFgdfhkYupt4YMXl8PAT94U5ZRr0gT13gXQTSfse2dB7YVo5g-RhvsiEC7sLweuoUgqewDqQN6ZbBS7lzGzWLBhCywvoyzbqRI6uC9RqiRDI-lhoTxJcTDIglkN31BR0ui9L_JY4Dlrs_2_6LMhFmlrCcNkWxA"/>
+</div>
+<span class="font-label-sm">#USR-429</span>
+</div>
+</td>
+<td class="px-md py-4 font-semibold">David López</td>
+<td class="px-md py-4 text-on-surface-variant">d.lopez@optirosse.com</td>
+<td class="px-md py-4">
+<span class="px-3 py-1 rounded-full text-[11px] font-label-sm bg-green-100 text-green-800 border border-green-200 uppercase">Contabilidad</span>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-sm font-medium">Activo</span>
+</div>
+</td>
+<td class="px-md py-4 text-right font-label-sm">01/03/2024</td>
+<td class="px-md py-4">
+<div class="flex items-center justify-center gap-3">
+<button class="p-2 text-primary hover:bg-primary-fixed rounded-lg transition-all" title="Editar">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-outline hover:bg-surface-container-highest rounded-lg transition-all" title="Desactivar">
+<span class="material-symbols-outlined">person_off</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination Placeholder -->
+<div class="p-md bg-surface-container-lowest border-t border-outline-variant flex items-center justify-between">
+<p class="text-sm text-outline">Mostrando 5 de 42 usuarios registrados</p>
+<div class="flex items-center gap-1">
+<button class="p-1 px-3 border border-outline-variant rounded-lg text-sm hover:bg-surface transition-all">Anterior</button>
+<button class="p-1 px-3 bg-primary text-on-primary rounded-lg text-sm">1</button>
+<button class="p-1 px-3 border border-outline-variant rounded-lg text-sm hover:bg-surface transition-all">2</button>
+<button class="p-1 px-3 border border-outline-variant rounded-lg text-sm hover:bg-surface transition-all">3</button>
+<span class="px-2 text-outline">...</span>
+<button class="p-1 px-3 border border-outline-variant rounded-lg text-sm hover:bg-surface transition-all">Siguiente</button>
+</div>
+</div>
+</div>
+<!-- OPTICAL PREVIEWER / QUICK INSIGHT -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<div class="lg:col-span-2 bg-gradient-to-br from-primary-container to-secondary p-md rounded-xl text-on-primary flex flex-col justify-center min-h-[160px] relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-headline-md text-headline-md font-bold mb-2">Auditoría de Acceso</h3>
+<p class="text-on-primary-container max-w-md">Monitorea los cambios de rol y registros de actividad para mantener la integridad de los datos ópticos. Recuerda revisar los permisos del Almacén mensualmente.</p>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-[160px] opacity-10 rotate-12">shield_person</span>
+</div>
+<div class="bg-white border border-outline-variant p-md rounded-xl shadow-sm">
+<h4 class="font-bold text-outline uppercase text-xs tracking-widest mb-4">Resumen de Usuarios</h4>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-body-md">Administradores</span>
+<span class="font-label-sm bg-primary-fixed text-primary px-2 py-0.5 rounded">04</span>
+</div>
+<div class="w-full bg-surface-container-low h-1.5 rounded-full">
+<div class="bg-primary h-1.5 rounded-full" style="width: 20%"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-body-md">Técnicos de Taller</span>
+<span class="font-label-sm bg-secondary-fixed text-secondary px-2 py-0.5 rounded">18</span>
+</div>
+<div class="w-full bg-surface-container-low h-1.5 rounded-full">
+<div class="bg-secondary h-1.5 rounded-full" style="width: 65%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Interactions Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Simple row hover effect enhancements
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                row.addEventListener('click', () => {
+                    // Simulating selection
+                    rows.forEach(r => r.classList.remove('bg-primary-fixed/20'));
+                    row.classList.add('bg-primary-fixed/20');
+                });
+            });
+
+            // Search bar interaction
+            const searchInput = document.querySelector('input[type="text"]');
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('shadow-md');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('shadow-md');
+            });
+        });
+    </script>
+</body></html>

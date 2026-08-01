@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OptiRosse - Gestión de Usuarios</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&family=Manrope:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#c4e7ff",
+                    "surface": "#f8f9ff",
+                    "on-secondary-fixed": "#001e2c",
+                    "surface-variant": "#d3e4fe",
+                    "tertiary-container": "#9c2a6c",
+                    "on-surface": "#0b1c30",
+                    "on-primary-container": "#dac5ff",
+                    "on-primary": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary-container": "#ffbcd9",
+                    "surface-container-highest": "#d3e4fe",
+                    "primary-fixed": "#ebddff",
+                    "primary-container": "#6d28d9",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#5b00c5",
+                    "outline": "#7b7486",
+                    "on-error": "#ffffff",
+                    "secondary-container": "#40c2fd",
+                    "on-secondary-container": "#004d6a",
+                    "tertiary-fixed-dim": "#ffafd3",
+                    "on-primary-fixed": "#250059",
+                    "tertiary-fixed": "#ffd8e7",
+                    "on-tertiary-fixed-variant": "#85145a",
+                    "on-background": "#0b1c30",
+                    "primary-fixed-dim": "#d3bbff",
+                    "surface-container-high": "#dce9ff",
+                    "surface-tint": "#7331df",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "secondary": "#00668a",
+                    "tertiary": "#7e0b54",
+                    "surface-dim": "#cbdbf5",
+                    "surface-container-low": "#eff4ff",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#004c69",
+                    "surface-container": "#e5eeff",
+                    "on-surface-variant": "#4a4455",
+                    "inverse-surface": "#213145",
+                    "outline-variant": "#ccc3d7",
+                    "secondary-fixed-dim": "#7bd0ff",
+                    "on-tertiary-fixed": "#3d0026",
+                    "background": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "primary": "#5300b7",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#d3bbff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "16px",
+                    "xl": "24px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "margin-mobile": "16px",
+                    "lg": "48px",
+                    "xs": "4px",
+                    "md": "24px",
+                    "gutter": "24px",
+                    "base": "8px",
+                    "xl": "80px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "display-lg": ["Manrope"],
+                    "headline-md": ["Manrope"],
+                    "headline-lg": ["Manrope"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .modal-overlay {
+            background: rgba(11, 28, 48, 0.4);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface overflow-hidden">
+<!-- SIDE NAV BAR (Shared Component) -->
+<aside class="fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface flex flex-col py-md px-sm shadow-sm z-50">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">OptiRosse</h1>
+<p class="font-label-sm text-label-sm text-outline opacity-70">v1.2.0</p>
+</div>
+<nav class="flex-1 space-y-xs">
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-body-md text-body-md">Clients</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md">Inventory</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-body-md text-body-md">Prescriptions</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-body-md text-body-md">Orders</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Finances</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-body-md text-body-md">Documents</span>
+</a>
+<!-- ACTIVE NAVIGATION: Admin Users -->
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-primary font-bold bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">manage_accounts</span>
+<span class="font-body-md text-body-md">Admin Users</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-md space-y-xs">
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- TOP BAR (Shared Component) -->
+<header class="fixed top-0 right-0 left-64 h-16 flex justify-between items-center px-md bg-surface/80 backdrop-blur-md border-b border-outline-variant z-40 shadow-sm">
+<div class="flex items-center gap-md flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-primary-container font-body-md text-body-md" placeholder="Buscar administrador..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all cursor-pointer">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all cursor-pointer relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
+<div class="flex items-center gap-sm cursor-pointer group">
+<div class="text-right hidden lg:block">
+<p class="font-body-md text-body-md font-bold text-on-surface">Admin Global</p>
+<p class="text-[12px] text-outline">admin@optirosse.com</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="Professional headshot of a corporate administrator in a modern office, soft lighting, high-end commercial photography style, clean and sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq8Bqp3fDRySE--5IlmRAaPpR1q3LPF7kN3uvpuu3WKI2MRSayrr4Si6onGtvA_fkv7u26cKxH8tmDUPZGvKd8azw4hSijPG69YOOBq84XTOwcSgmyGW-NnjLg3DffdNNL1kwSO4Oxe6IiDjaIbw90EmrCfm8f80bKC2GfXmNbDXbcCBBI2qjISpkucw8emKmkE-Gxqu_R-YVuA03nxcwUkiUG_TieW7uAwfqJSyALNXHYryBAKCWYSw"/>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT AREA -->
+<main class="ml-64 pt-16 min-h-screen p-md">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Gestión de Usuarios</h2>
+<p class="text-on-surface-variant font-body-md">Administra los permisos y accesos del personal administrativo.</p>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-md py-sm rounded-lg font-headline-md text-md transition-all active:scale-95 flex items-center gap-sm">
+<span class="material-symbols-outlined">person_add</span>
+                    Nuevo Usuario
+                </button>
+</div>
+<!-- Bento-style Grid of Users (Simulating Background Context) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- User Card Sample -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="flex items-start justify-between mb-md">
+<div class="flex items-center gap-md">
+<img class="w-14 h-14 rounded-full object-cover" data-alt="Portrait of a young medical professional woman with glasses, smiling warmly, bright clinical office background with soft bokeh, corporate professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvYz5a4CTWiuyW2zrCs0CohisHwPylSheLHv1HVfNhMnQ1GoaXPVZnkHz8ob7Ol1XP4F2iRpU9p6ECN0rhEulqIpA4BTeXoqTyh1wpMC_hfsyPdcNP2rnTFnIfh3kFOiP0Rf5FZBwSkLXbpzO_dYNOwZhuepuWb2EnvLUW_ISHIYN_Nvz0Rub13O8avAEAjaV722XlqVSGikrEOHdIgzdy-qNieRlpXoa_iEf4hZ4j25KLEyHK99pQfw"/>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Dra. Lucía Méndez</h3>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Oftalmóloga Senior</p>
+</div>
+</div>
+<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-label-sm text-[10px] uppercase font-bold">Activo</span>
+</div>
+<div class="space-y-sm mb-md">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">mail</span>
+<span class="font-body-md text-body-md">l.mendez@optirosse.com</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">event</span>
+<span class="font-body-md text-body-md">Último acceso: Hace 2 horas</span>
+</div>
+</div>
+<div class="flex gap-sm border-t border-outline-variant pt-md">
+<button class="flex-1 py-2 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container font-body-md">Editar</button>
+<button class="flex-1 py-2 rounded-lg bg-error-container text-on-error-container hover:opacity-80 font-body-md" onclick="openModal()">Desactivar</button>
+</div>
+</div>
+<!-- Repeating User Cards for background richness -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md shadow-sm opacity-60">
+<div class="flex items-start justify-between mb-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl text-outline">person</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Roberto Salas</h3>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Inventario</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md shadow-sm opacity-60">
+<div class="flex items-start justify-between mb-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl text-outline">person</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Elena Guerra</h3>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Atención Cliente</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- MODAL OVERLAY & CONTAINER (Task Implementation) -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-md opacity-0 pointer-events-none transition-all duration-300" id="deleteModal">
+<!-- Backdrop -->
+<div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
+<!-- Modal Card -->
+<div class="relative glass-panel w-full max-w-md rounded-xl shadow-2xl p-lg transform scale-95 transition-transform duration-300 border border-white/40">
+<div class="flex flex-col items-center text-center">
+<!-- Warning Icon -->
+<div class="w-16 h-16 bg-error-container rounded-full flex items-center justify-center mb-md shadow-inner">
+<span class="material-symbols-outlined text-on-error-container text-4xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">¿Desactivar este usuario?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl leading-relaxed px-sm">
+                    El usuario ya no podrá acceder a la plataforma, pero sus registros históricos se mantendrán. ¿Deseas continuar?
+                </p>
+<div class="flex flex-col sm:flex-row gap-md w-full">
+<button class="flex-1 order-2 sm:order-1 px-md py-sm rounded-lg border border-outline text-on-surface hover:bg-surface-container-high transition-colors font-headline-md text-md" onclick="closeModal()">
+                        Cancelar
+                    </button>
+<button class="flex-1 order-1 sm:order-2 px-md py-sm rounded-lg bg-inverse-surface text-on-primary hover:bg-error transition-all font-headline-md text-md shadow-lg shadow-error/10" onclick="confirmDeactivate()">
+                        Desactivar
+                    </button>
+</div>
+</div>
+<!-- Close icon button -->
+<button class="absolute top-4 right-4 p-2 text-outline hover:text-on-surface rounded-full transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        const modal = document.getElementById('deleteModal');
+        const modalContent = modal.querySelector('.relative');
+
+        function openModal() {
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100', 'pointer-events-auto');
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeModal() {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('opacity-100', 'pointer-events-auto');
+            modalContent.classList.add('scale-95');
+            modalContent.classList.remove('scale-100');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function confirmDeactivate() {
+            // Simulated interaction
+            const btn = event.currentTarget;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Procesando...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                closeModal();
+                alert('Usuario desactivado correctamente.');
+                btn.innerHTML = 'Desactivar';
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        // Auto-open for demo purposes
+        window.onload = () => {
+            setTimeout(openModal, 800);
+        };
+    </script>
+</body></html>

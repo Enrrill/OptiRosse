@@ -1,113 +1,277 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/manrope";
+@import "@fontsource/jetbrains-mono";
+@import "material-symbols";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* ============ Material 3 — color roles (OptiRosse) ============ */
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-on-primary-fixed: var(--on-primary-fixed);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  --color-on-primary-fixed-variant: var(--on-primary-fixed-variant);
+
+  --color-secondary: var(--secondary);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-secondary-fixed: var(--secondary-fixed);
+  --color-on-secondary-fixed: var(--on-secondary-fixed);
+  --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+  --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
+
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-tertiary-fixed: var(--tertiary-fixed);
+  --color-on-tertiary-fixed: var(--on-tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+  --color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
+
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+
+  --color-background: var(--background);
+  --color-on-background: var(--on-background);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-surface-variant: var(--surface-variant);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-inverse-primary: var(--inverse-primary);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-surface-tint: var(--surface-tint);
+
+  /* ============ shadcn aliases (mapeadas a Material 3) ============ */
+  --color-background: var(--background);
+  --color-foreground: var(--on-background);
+  --color-card: var(--surface-container-lowest);
+  --color-card-foreground: var(--on-surface);
+  --color-popover: var(--surface-container-lowest);
+  --color-popover-foreground: var(--on-surface);
+  --color-secondary: var(--secondary-container);
+  --color-secondary-foreground: var(--on-secondary-container);
+  --color-muted: var(--surface-container-low);
+  --color-muted-foreground: var(--on-surface-variant);
+  --color-accent: var(--secondary-container);
+  --color-accent-foreground: var(--on-secondary-container);
+  --color-destructive: var(--error);
+  --color-destructive-foreground: var(--on-error);
+  --color-border: var(--outline-variant);
+  --color-input: var(--outline-variant);
+  --color-ring: var(--primary);
+
+  /* ============ Tipografía ============ */
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Manrope Variable", "Manrope", var(--font-sans);
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-label-sm: "JetBrains Mono", ui-monospace, monospace;
+
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 1.2;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 800;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.3;
+  --text-headline-lg--font-weight: 700;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 1.4;
+  --text-headline-md--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--font-weight: 400;
+
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 1;
+  --text-label-sm--letter-spacing: 0.05em;
+  --text-label-sm--font-weight: 500;
+
+  /* ============ Geometría ============ */
+  --radius-sm: 4px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* ============ Espaciado (escala de los prototipos) ============ */
+  --spacing-xs: 4px;
+  --spacing-sm: 12px;
+  --spacing-base: 8px;
+  --spacing-md: 24px;
+  --spacing-gutter: 24px;
+  --spacing-lg: 48px;
+  --spacing-xl: 80px;
+}
 
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --primary: #5300b7;
+  --on-primary: #ffffff;
+  --primary-container: #6d28d9;
+  --on-primary-container: #dac5ff;
+  --primary-fixed: #ebddff;
+  --on-primary-fixed: #250059;
+  --primary-fixed-dim: #d3bbff;
+  --on-primary-fixed-variant: #5b00c5;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --secondary: #00668a;
+  --on-secondary: #ffffff;
+  --secondary-container: #40c2fd;
+  --on-secondary-container: #004d6a;
+  --secondary-fixed: #c4e7ff;
+  --on-secondary-fixed: #001e2c;
+  --secondary-fixed-dim: #7bd0ff;
+  --on-secondary-fixed-variant: #004c69;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --tertiary: #7e0b54;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #9c2a6c;
+  --on-tertiary-container: #ffbcd9;
+  --tertiary-fixed: #ffd8e7;
+  --on-tertiary-fixed: #3d0026;
+  --tertiary-fixed-dim: #ffafd3;
+  --on-tertiary-fixed-variant: #85145a;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  --background: #f8f9ff;
+  --on-background: #0b1c30;
+  --surface: #f8f9ff;
+  --on-surface: #0b1c30;
+  --surface-variant: #d3e4fe;
+  --on-surface-variant: #4a4455;
+  --surface-dim: #cbdbf5;
+  --surface-bright: #f8f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container: #e5eeff;
+  --surface-container-high: #dce9ff;
+  --surface-container-highest: #d3e4fe;
+  --inverse-surface: #213145;
+  --inverse-on-surface: #eaf1ff;
+  --inverse-primary: #d3bbff;
+  --outline: #7b7486;
+  --outline-variant: #ccc3d7;
+  --surface-tint: #7331df;
+}
+
+.dark {
+  --primary: #d3bbff;
+  --on-primary: #3d0069;
+  --primary-container: #6d28d9;
+  --on-primary-container: #dac5ff;
+  --primary-fixed: #ebddff;
+  --on-primary-fixed: #250059;
+  --primary-fixed-dim: #d3bbff;
+  --on-primary-fixed-variant: #5b00c5;
+
+  --secondary: #7bd0ff;
+  --on-secondary: #00344a;
+  --secondary-container: #40c2fd;
+  --on-secondary-container: #004d6a;
+  --secondary-fixed: #c4e7ff;
+  --on-secondary-fixed: #001e2c;
+  --secondary-fixed-dim: #7bd0ff;
+  --on-secondary-fixed-variant: #004c69;
+
+  --tertiary: #ffb1ce;
+  --on-tertiary: #5d0039;
+  --tertiary-container: #9c2a6c;
+  --on-tertiary-container: #ffd8e7;
+  --tertiary-fixed: #ffd8e7;
+  --on-tertiary-fixed: #3d0026;
+  --tertiary-fixed-dim: #ffafd3;
+  --on-tertiary-fixed-variant: #85145a;
+
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+
+  --background: #213145;
+  --on-background: #eaf1ff;
+  --surface: #213145;
+  --on-surface: #eaf1ff;
+  --surface-variant: #46586e;
+  --on-surface-variant: #c6c6d4;
+  --surface-dim: #16242f;
+  --surface-bright: #46586e;
+  --surface-container-lowest: #161e28;
+  --surface-container-low: #213145;
+  --surface-container: #26364a;
+  --surface-container-high: #30425a;
+  --surface-container-highest: #3b4e68;
+  --inverse-surface: #eaf1ff;
+  --inverse-on-surface: #213145;
+  --inverse-primary: #5300b7;
+  --outline: #8e9099;
+  --outline-variant: #46586e;
+  --surface-tint: #d3bbff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--outline-variant);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--outline);
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+@utility bg-login-gradient {
+  background: linear-gradient(135deg, #6d28d9 0%, #38bdf8 100%);
 }
 
-body {
-  margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+@utility bg-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
 }

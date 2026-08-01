@@ -1,0 +1,380 @@
+<!DOCTYPE html><html class="light" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;family=Manrope:wght@100..900&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffd8e7",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-primary-fixed": "#250059",
+                        "primary-fixed": "#ebddff",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffafd3",
+                        "surface-tint": "#7331df",
+                        "on-secondary-fixed": "#001e2c",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9ff",
+                        "secondary-container": "#40c2fd",
+                        "primary-fixed-dim": "#d3bbff",
+                        "on-surface": "#0b1c30",
+                        "secondary": "#00668a",
+                        "on-primary-container": "#dac5ff",
+                        "surface-variant": "#d3e4fe",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#3d0026",
+                        "on-primary-fixed-variant": "#5b00c5",
+                        "surface": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "tertiary": "#7e0b54",
+                        "outline-variant": "#ccc3d7",
+                        "on-tertiary-container": "#ffbcd9",
+                        "on-background": "#0b1c30",
+                        "primary-container": "#6d28d9",
+                        "on-surface-variant": "#4a4455",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-primary": "#d3bbff",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed-variant": "#85145a",
+                        "inverse-surface": "#213145",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-fixed": "#c4e7ff",
+                        "secondary-fixed-dim": "#7bd0ff",
+                        "primary": "#5300b7",
+                        "on-secondary-container": "#004d6a",
+                        "on-secondary-fixed-variant": "#004c69",
+                        "tertiary-container": "#9c2a6c",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline": "#7b7486"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "16px",
+                        "xl": "24px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "xl": "80px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "lg": "48px",
+                        "base": "8px",
+                        "sm": "12px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-effect {
+            background: rgba(33, 49, 69, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .collapsed-width { width: 72px; }
+        .main-expanded { margin-left: 72px; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-white overflow-hidden">
+<!-- Sidebar Collapsed -->
+<aside class="fixed left-0 top-0 h-screen collapsed-width bg-surface dark:bg-inverse-surface border-r border-outline-variant dark:border-outline flex flex-col py-md px-2 z-50 transition-all duration-300">
+<div class="flex flex-col items-center gap-base mb-lg">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: &quot;FILL&quot; 1;">visibility</span>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-sm items-center">
+<!-- Active Tab: Dashboard -->
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-surface-container-high dark:bg-surface-container-highest text-primary dark:text-primary-fixed-dim transition-all group relative" title="Dashboard">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">dashboard</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Dashboard</span>
+</button>
+<!-- Nav Items from JSON Mapping -->
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors group relative" title="Clientes">
+<span class="material-symbols-outlined">groups</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Clientes</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors group relative" title="Inventario">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Inventario</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors group relative" title="Recetas">
+<span class="material-symbols-outlined">description</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Recetas</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors group relative" title="Pedidos">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Pedidos</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors group relative" title="Finanzas">
+<span class="material-symbols-outlined">payments</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Finanzas</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors group relative" title="Documentos">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Documentos</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors group relative" title="Usuarios Admin">
+<span class="material-symbols-outlined">manage_accounts</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">Admin Users</span>
+</button>
+</nav>
+<div class="flex flex-col gap-sm items-center pb-md">
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low transition-colors group relative">
+<span class="material-symbols-outlined">settings</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Configuración</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-error hover:bg-error-container/20 transition-colors group relative">
+<span class="material-symbols-outlined">logout</span>
+<span class="absolute left-14 bg-inverse-surface text-inverse-on-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Cerrar Sesión</span>
+</button>
+</div>
+</aside>
+<!-- Top Bar -->
+<header class="fixed top-0 right-0 left-0 main-expanded h-16 glass-effect flex justify-between items-center px-md z-40 transition-all duration-300" style="--mouse-x: 342px; --mouse-y: 45px;">
+<div class="flex items-center gap-md">
+<h1 class="font-headline-md text-headline-md text-primary font-bold">Dashboard</h1>
+
+</div>
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-all text-on-surface-variant" id="themeToggle">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-all text-on-surface-variant relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface"></span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/50 mx-2"></div>
+<div class="flex items-center gap-sm group cursor-pointer hover:bg-surface-container-low p-1 rounded-lg transition-all">
+<div class="text-right hidden sm:block">
+<p class="text-body-md font-semibold leading-tight">Dr. Santiago Rossi</p>
+<p class="text-label-sm text-on-surface-variant">Oftalmólogo Senior</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary object-cover" data-alt="A professional headshot of a Hispanic male ophthalmologist in his late 40s wearing a clean white clinical lab coat and modern eyewear. He has a friendly, professional expression and is set against a clean, blurred medical office background with soft daylight. The aesthetic is high-end, clean, and clinical, using a palette of blues and soft whites to match a professional B2B medical platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqtZDEc5TNc7FpKfZWae0g4L1U_69Qg1Ghm2eBG_5-JZOcjI20-C_7OqyaE1lHhTNkwhoRTLFphrKOzzJyLzk7f4AowfcmaRn_vqAgJKhh9EMMPjuqfW3HFEWLLywX1UVBCBrkngItq0Z8z9fxxpxqjQpDMybqFwO_cWjxkGGUlNLCP9bs-tZXa8kwZDBG3ui8IZ9qpGqhQT-UshT5bG7O8NIIPVv4E1tWrFY8bH4KTYxa5lWl0zXvDA">
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="main-expanded pt-16 h-screen overflow-y-auto transition-all duration-300">
+<div class="p-md md:p-lg space-y-md">
+<!-- Quick Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="md:col-span-2 p-md rounded-xl bg-white dark:bg-inverse-surface shadow-sm border border-outline-variant dark:border-outline relative overflow-hidden group">
+
+<div class="relative z-10">
+<span class="text-label-sm text-primary-container font-bold bg-primary-fixed px-2 py-1 rounded">RENDIMIENTO</span>
+<h2 class="text-display-lg font-display-lg mt-sm">248 <span class="text-headline-md text-on-surface-variant font-normal">Pacientes</span></h2>
+<p class="text-body-md text-on-surface-variant mt-xs">+12% respecto al mes anterior</p>
+<div class="mt-md flex gap-2">
+<span class="px-3 py-1 bg-secondary-container/20 text-secondary text-label-sm rounded-full">Optometría</span>
+<span class="px-3 py-1 bg-tertiary-container/20 text-tertiary text-label-sm rounded-full">Contactología</span>
+</div>
+</div>
+</div>
+<div class="p-md rounded-xl bg-white dark:bg-inverse-surface shadow-sm border border-outline-variant dark:border-outline">
+<div class="w-10 h-10 bg-secondary-container/20 text-secondary rounded-lg flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<p class="text-on-surface-variant text-label-sm">INVENTARIO BAJO</p>
+<h3 class="text-headline-md font-headline-md mt-xs">18 SKUs</h3>
+<button class="mt-md text-primary font-semibold text-body-md hover:underline flex items-center gap-1">
+                        Ver órdenes <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="p-md rounded-xl bg-primary text-white shadow-lg shadow-primary/20 relative overflow-hidden">
+<div class="relative z-10">
+<p class="text-white/80 text-label-sm">POR COBRAR</p>
+<h3 class="text-headline-md font-headline-md mt-xs">$12,450.00</h3>
+<div class="mt-lg">
+<button class="bg-white text-primary px-md py-2 rounded-full font-bold text-body-md hover:bg-surface-container-low transition-colors w-full">
+                                Gestionar Cobros
+                            </button>
+</div>
+</div>
+<div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+</div>
+</div>
+<!-- Optical Previewer & Recent Orders Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Optical Previewer Placeholder -->
+<div class="lg:col-span-2 rounded-xl bg-surface-container dark:bg-surface-container-low p-md border border-outline-variant/50 relative min-h-[400px] flex flex-col">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-md text-headline-md">Visualizador de Armazones</h3>
+<div class="flex gap-2">
+<button class="p-2 bg-white dark:bg-inverse-surface rounded-lg shadow-sm border border-outline-variant hover:border-primary transition-all">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="p-2 bg-white dark:bg-inverse-surface rounded-lg shadow-sm border border-outline-variant hover:border-primary transition-all">
+<span class="material-symbols-outlined">3d_rotation</span>
+</button>
+</div>
+</div>
+<div class="flex-1 flex items-center justify-center relative bg-gradient-to-br from-white to-surface-container-high dark:from-inverse-surface dark:to-surface-container rounded-lg border border-white/50 overflow-hidden">
+<!-- Simulated Studio Lighting Gradient -->
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,0.4),transparent)] pointer-events-none"></div>
+<img class="max-w-[80%] drop-shadow-2xl" data-alt="A high-definition product photograph of premium designer eyeglasses with matte black titanium frames, showcased in a minimalist studio setting with soft side-lighting. The glasses are floating slightly above a white reflective surface with a subtle shadow. The background is a clean, neutral gradient. The image style is commercial, professional, and sophisticated, emphasizing material texture and clarity of the lenses." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6lvYg6953-cDyJCtaNJ-Kd7nxGkCODmm1y0NgWNANDqqDTclWSV-t292tJDSLGsq6GBYRmG0VPk3ilWKZZ7p09NOYX_54pHAD0GtLFLPYUeUOQ_628oYJ365TzoA1SgiqOXxARDHojo9cG4UaHdt4Ypq5d-xng4cVqQHAIl92DC_AbRVApL_3L92uaWr3qspjBM9KBetC-357NJaQnO8zc64Xspq8m6T-R1-vZqsPQ-lcNlJrHBtzxw">
+</div>
+<div class="mt-md flex justify-between items-center">
+<div>
+<h4 class="font-bold text-body-lg">Moderna Opti-Titanium X1</h4>
+<p class="text-on-surface-variant text-body-md">Ref: #OPT-2024-BLK</p>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-black border border-white"></div>
+<div class="w-6 h-6 rounded-full bg-slate-400 border border-white"></div>
+<div class="w-6 h-6 rounded-full bg-amber-800 border border-white"></div>
+</div>
+<button class="bg-secondary-container text-on-secondary-container px-md py-2 rounded-full font-bold text-body-md hover:opacity-90">Pedir Muestra</button>
+</div>
+</div>
+</div>
+<!-- Recent Activity/Recetas -->
+<div class="rounded-xl bg-white dark:bg-inverse-surface border border-outline-variant shadow-sm flex flex-col">
+<div class="p-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-bold text-body-lg">Recetas Recientes</h3>
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</div>
+<div class="flex-1 divide-y divide-outline-variant/30 overflow-y-auto">
+<!-- Receta Item -->
+<div class="p-md hover:bg-surface-container-low transition-colors cursor-pointer flex gap-md">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center font-bold">
+                                ML
+                            </div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="font-semibold text-body-md">Maria Lopez</p>
+<span class="text-label-sm text-on-surface-variant">Hace 1h</span>
+</div>
+<p class="text-label-sm text-on-surface-variant">Progresivos Digitales</p>
+<div class="mt-2 flex gap-1">
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded uppercase font-bold">Enviado</span>
+</div>
+</div>
+</div>
+<!-- Receta Item -->
+<div class="p-md hover:bg-surface-container-low transition-colors cursor-pointer flex gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold">
+                                JR
+                            </div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="font-semibold text-body-md">Juan Rodriguez</p>
+<span class="text-label-sm text-on-surface-variant">Hace 3h</span>
+</div>
+<p class="text-label-sm text-on-surface-variant">Monofocal Blue Block</p>
+<div class="mt-2 flex gap-1">
+<span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded uppercase font-bold">Laboratorio</span>
+</div>
+</div>
+</div>
+<!-- Receta Item -->
+<div class="p-md hover:bg-surface-container-low transition-colors cursor-pointer flex gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold">
+                                AC
+                            </div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="font-semibold text-body-md">Ana Castillo</p>
+<span class="text-label-sm text-on-surface-variant">Ayer</span>
+</div>
+<p class="text-label-sm text-on-surface-variant">Lentes de Contacto (Toric)</p>
+<div class="mt-2 flex gap-1">
+<span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded uppercase font-bold">Entregado</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-sm bg-surface-container-low">
+<button class="w-full py-2 text-center text-primary font-semibold text-body-md">Ver todas las recetas</button>
+</div>
+</div>
+</div>
+<!-- Financial Insights Area -->
+<div class="p-lg rounded-xl bg-inverse-surface text-white relative overflow-hidden">
+
+<div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-lg">
+<div class="max-w-md">
+<h2 class="text-headline-lg font-headline-lg">Optimice su flujo de caja</h2>
+<p class="text-body-lg text-white/70 mt-sm">Nuevas herramientas de financiamiento para clientes integradas directamente en el panel de pagos. Aumente sus ventas ofreciendo cuotas sin interés.</p>
+<div class="mt-md flex gap-md">
+<button class="bg-primary-fixed-dim text-primary-fixed-variant px-lg py-3 rounded-full font-bold transition-transform hover:scale-105 active:scale-95">Configurar Ahora</button>
+<button class="text-white border border-white/30 px-lg py-3 rounded-full font-bold hover:bg-white/10 transition-colors">Más Información</button>
+</div>
+</div>
+<div class="hidden lg:block bg-white/5 backdrop-blur-xl p-md rounded-xl border border-white/10">
+<div class="flex items-center gap-md mb-md">
+<div class="w-12 h-12 bg-secondary-container/30 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-fixed">trending_up</span>
+</div>
+<div>
+<p class="text-label-sm text-white/50 uppercase">Proyección Mensual</p>
+<p class="text-headline-md font-bold">$42,800.00</p>
+</div>
+</div>
+<div class="w-48 h-2 bg-white/10 rounded-full overflow-hidden">
+<div class="w-[72%] h-full bg-secondary-container"></div>
+</div>
+<p class="text-label-sm text-white/50 mt-2">72% de la meta alcanzada</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            themeToggle.innerHTML = isDark ? 
+                '<span class="material-symbols-outlined">light_mode</span>' : 
+                '<span class="material-symbols-outlined">dark_mode</span>';
+        });
+
+        // Interactive hover effects for "Glass" cards
+        document.querySelectorAll('.glass-effect').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+
+
+</body></html>

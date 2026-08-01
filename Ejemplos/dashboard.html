@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OptiRosse - Dashboard Corporativo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#e5eeff",
+                        "outline": "#7b7486",
+                        "primary": "#5300b7",
+                        "tertiary": "#7e0b54",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-container": "#ffbcd9",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffd8e7",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#3d0026",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#0b1c30",
+                        "secondary-container": "#40c2fd",
+                        "on-background": "#0b1c30",
+                        "tertiary-fixed-dim": "#ffafd3",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-secondary-fixed": "#001e2c",
+                        "background": "#f8f9ff",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-fixed": "#c4e7ff",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#4a4455",
+                        "surface-tint": "#7331df",
+                        "surface": "#f8f9ff",
+                        "on-tertiary-fixed-variant": "#85145a",
+                        "inverse-surface": "#213145",
+                        "secondary": "#00668a",
+                        "on-secondary-fixed-variant": "#004c69",
+                        "on-primary-container": "#dac5ff",
+                        "surface-bright": "#f8f9ff",
+                        "outline-variant": "#ccc3d7",
+                        "on-secondary-container": "#004d6a",
+                        "on-primary-fixed-variant": "#5b00c5",
+                        "primary-container": "#6d28d9",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "on-primary-fixed": "#250059",
+                        "tertiary-container": "#9c2a6c",
+                        "secondary-fixed-dim": "#7bd0ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-primary": "#d3bbff",
+                        "primary-fixed-dim": "#d3bbff",
+                        "primary-fixed": "#ebddff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "16px",
+                        "xl": "24px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "80px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px",
+                        "base": "8px",
+                        "sm": "12px",
+                        "lg": "48px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Manrope"],
+                        "headline-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .dark .glass-card {
+            background: rgba(33, 49, 69, 0.7);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+        .shadow-premium {
+            box-shadow: 0 10px 30px -10px rgba(83, 0, 183, 0.1);
+        }
+        body {
+            background-color: #f8f9ff;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface dark:bg-inverse-surface text-on-surface transition-colors duration-300 overflow-x-hidden">
+<!-- App Shell Sidebar -->
+<aside class="fixed left-0 top-0 h-screen w-64 border-r border-outline-variant dark:border-outline bg-surface dark:bg-inverse-surface flex flex-col h-full py-md px-sm z-50" id="sidebar">
+<div class="mb-lg px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">OptiRosse</h1>
+<p class="text-xs text-on-surface-variant dark:text-surface-variant uppercase tracking-widest font-label-sm">v1.2.0</p>
+</div>
+<nav class="flex-1 space-y-xs overflow-y-auto">
+<!-- Active Navigation -->
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-primary dark:text-primary-fixed-dim font-bold bg-surface-container-high dark:bg-surface-container-highest transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-body-md text-body-md">Clients</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md">Inventory</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-body-md text-body-md">Prescriptions</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-body-md text-body-md">Orders</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Finances</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-body-md text-body-md">Documents</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">manage_accounts</span>
+<span class="font-body-md text-body-md">Admin Users</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant dark:border-outline pt-md space-y-xs">
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-md border-b border-outline-variant dark:border-outline flex justify-between items-center px-md w-full z-40">
+<div class="flex items-center gap-md">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-outline material-symbols-outlined">search</span>
+<input class="bg-surface-container-low dark:bg-surface-container-highest border-none rounded-full pl-10 pr-md py-2 w-80 focus:ring-2 focus:ring-primary font-body-md text-on-surface" placeholder="Buscar clientes, recetas..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-2 hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-full transition-all text-on-surface" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-full transition-all text-on-surface relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-primary font-body-md font-semibold px-md py-sm hover:bg-surface-container-low rounded-full">Help</button>
+<div class="flex items-center gap-sm pl-md border-l border-outline-variant">
+<div class="text-right">
+<p class="font-body-md font-bold leading-tight">Dr. Rossi</p>
+<p class="text-xs text-on-surface-variant">Admin</p>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-primary bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional close-up portrait of an optician in a clinical but modern environment, wearing premium eyewear and a crisp white coat. The lighting is bright and high-key, highlighting the clarity and high-end professional atmosphere of the OptiRosse brand. Soft focused optical equipment in the background suggests expertise and technology." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJKCz1CBu64JQgr01-afjRERz7qCMRzV8dtb0pVBy-4q0qu4pvOsUZT0j1QKNJ_gZqimjsHriLUoE3qijtUUMv_PKjtAVGDLAdeVRzY-uVJS85VPXZprQaEsCEWJ0HjY5i3as2ZeNFiMGFAmKAFWXBQYEaOv5fmzFdbMN3gb_353uCGrSFyG4J7KBQHWOieylOo_yAP2vrCQ5OYqe_wqrLF1EMWUDxn21ApmLX0Kjq83FjUHizeEGY4A"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 pt-16 min-h-screen p-md">
+<!-- Welcome Section -->
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Panel de Control</h2>
+<p class="text-on-surface-variant font-body-md">Resumen de actividad para hoy, 24 de Mayo.</p>
+</div>
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
+<!-- Confirmed Orders -->
+<div class="p-md rounded-xl bg-primary-container text-on-primary-container shadow-premium flex flex-col justify-between h-40 group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined bg-white/20 p-2 rounded-lg">inventory</span>
+<span class="font-label-sm">+12% vs ayer</span>
+</div>
+<div>
+<p class="font-label-sm uppercase tracking-widest opacity-80">Pedidos confirmados</p>
+<h3 class="font-headline-lg text-headline-lg leading-none mt-xs">142</h3>
+</div>
+</div>
+<!-- In Workshop -->
+<div class="p-md rounded-xl bg-secondary-container text-on-secondary-container shadow-premium flex flex-col justify-between h-40 group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined bg-white/20 p-2 rounded-lg">build</span>
+<span class="font-label-sm">8 urgentes</span>
+</div>
+<div>
+<p class="font-label-sm uppercase tracking-widest opacity-80">En taller</p>
+<h3 class="font-headline-lg text-headline-lg leading-none mt-xs">34</h3>
+</div>
+</div>
+<!-- Low Stock -->
+<div class="p-md rounded-xl glass-card shadow-sm flex flex-col justify-between h-40 border-l-4 border-amber-500 hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-amber-500 bg-amber-500/10 p-2 rounded-lg" style="font-variation-settings: 'FILL' 1;">warning</span>
+<a class="text-primary font-label-sm hover:underline" href="#">Ver inventario</a>
+</div>
+<div>
+<p class="font-label-sm uppercase tracking-widest text-on-surface-variant">Stock bajo</p>
+<h3 class="font-headline-lg text-headline-lg leading-none mt-xs text-on-surface">18 <span class="text-body-md font-normal text-on-surface-variant">items</span></h3>
+</div>
+</div>
+<!-- Pending Payments -->
+<div class="p-md rounded-xl bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 shadow-premium flex flex-col justify-between h-40 hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined bg-green-500/20 p-2 rounded-lg">account_balance_wallet</span>
+<span class="font-label-sm">Pendiente cobro</span>
+</div>
+<div>
+<p class="font-label-sm uppercase tracking-widest opacity-80">Pagos pendientes</p>
+<h3 class="font-headline-lg text-headline-lg leading-none mt-xs">$2,450</h3>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="mb-lg">
+<h4 class="text-on-surface-variant font-label-sm uppercase tracking-widest mb-md">Accesos Rápidos</h4>
+<div class="flex flex-wrap gap-md">
+<button class="bg-secondary-container hover:bg-secondary-container/80 text-on-secondary-container px-lg py-md rounded-full font-headline-md font-bold flex items-center gap-sm transition-all active:scale-95 shadow-premium">
+<span class="material-symbols-outlined">add_circle</span>
+                    Nuevo pedido
+                </button>
+<button class="border border-primary text-primary hover:bg-primary/5 px-lg py-md rounded-full font-headline-md font-bold flex items-center gap-sm transition-all active:scale-95">
+<span class="material-symbols-outlined">payments</span>
+                    Registrar pago
+                </button>
+<button class="border border-primary text-primary hover:bg-primary/5 px-lg py-md rounded-full font-headline-md font-bold flex items-center gap-sm transition-all active:scale-95">
+<span class="material-symbols-outlined">library_add</span>
+                    Nueva variante
+                </button>
+</div>
+</div>
+<!-- Data Tables Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Latest Orders -->
+<div class="glass-card rounded-xl p-md shadow-sm">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-md text-on-surface">Últimos pedidos</h3>
+<button class="text-primary font-label-sm hover:underline">Ver todos</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="border-b border-outline-variant">
+<th class="py-sm font-label-sm text-on-surface-variant uppercase">N.º pedido</th>
+<th class="py-sm font-label-sm text-on-surface-variant uppercase">Cliente</th>
+<th class="py-sm font-label-sm text-on-surface-variant uppercase text-center">Estado</th>
+<th class="py-sm font-label-sm text-on-surface-variant uppercase text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-md font-label-sm text-primary">#ORD-9021</td>
+<td class="py-md font-body-md font-semibold text-on-surface">Sofia Martinez</td>
+<td class="py-md text-center">
+<span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-label-sm">Procesando</span>
+</td>
+<td class="py-md text-right font-body-md font-bold">$120.00</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-md font-label-sm text-primary">#ORD-9020</td>
+<td class="py-md font-body-md font-semibold text-on-surface">Carlos Ruiz</td>
+<td class="py-md text-center">
+<span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-label-sm">Enviado</span>
+</td>
+<td class="py-md text-right font-body-md font-bold">$215.50</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-md font-label-sm text-primary">#ORD-9019</td>
+<td class="py-md font-body-md font-semibold text-on-surface">Elena Sol</td>
+<td class="py-md text-center">
+<span class="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-label-sm">Taller</span>
+</td>
+<td class="py-md text-right font-body-md font-bold">$89.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Latest Payments -->
+<div class="glass-card rounded-xl p-md shadow-sm">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-md text-on-surface">Últimos pagos</h3>
+<button class="text-primary font-label-sm hover:underline">Ver reporte</button>
+</div>
+<ul class="space-y-sm">
+<li class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-body-md font-bold text-on-surface">Javier Gomez</p>
+<p class="text-xs text-on-surface-variant font-label-sm">Tarjeta Crédito • Hace 2 min</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-body-md font-bold text-on-surface">+$450.00</p>
+<span class="text-[10px] uppercase font-label-sm text-green-600">Completado</span>
+</div>
+</li>
+<li class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-body-md font-bold text-on-surface">Marta Lopez</p>
+<p class="text-xs text-on-surface-variant font-label-sm">Transferencia • Hace 1 hora</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-body-md font-bold text-on-surface">+$125.00</p>
+<span class="text-[10px] uppercase font-label-sm text-amber-600">Pendiente</span>
+</div>
+</li>
+<li class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-body-md font-bold text-on-surface">Robert King</p>
+<p class="text-xs text-on-surface-variant font-label-sm">Efectivo • Hace 3 horas</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-body-md font-bold text-on-surface">+$320.00</p>
+<span class="text-[10px] uppercase font-label-sm text-green-600">Completado</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</main>
+<!-- Welcome Toast -->
+<div class="fixed top-20 right-8 z-[100] transform translate-x-[150%] transition-transform duration-700 ease-out" id="welcome-toast">
+<div class="bg-surface-container-highest dark:bg-inverse-surface border border-primary/20 p-md rounded-xl shadow-2xl flex items-center gap-md max-w-sm backdrop-blur-xl">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined">waving_hand</span>
+</div>
+<div>
+<h4 class="font-headline-md text-sm text-primary">¡Hola, Dr. Rossi!</h4>
+<p class="font-body-md text-xs text-on-surface-variant">Bienvenido de nuevo a OptiRosse.</p>
+</div>
+<button class="p-1 hover:bg-black/5 rounded-full text-on-surface-variant" onclick="hideToast()">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+<script>
+        // Trigger Toast on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const toast = document.getElementById('welcome-toast');
+                toast.style.transform = 'translateX(0)';
+            }, 1000);
+            
+            // Auto hide after 5 seconds
+            setTimeout(hideToast, 6000);
+        });
+
+        function hideToast() {
+            const toast = document.getElementById('welcome-toast');
+            toast.style.transform = 'translateX(150%)';
+        }
+
+        // Micro-interactions for table rows
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('mousedown', () => {
+                row.style.transform = 'scale(0.995)';
+            });
+            row.addEventListener('mouseup', () => {
+                row.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

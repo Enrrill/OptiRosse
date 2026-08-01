@@ -2,7 +2,9 @@
 
 Diseño de UI por módulo (aprovechando al máximo la API de `backend/PLAN_BACKEND.md`) + prompts listos para **Google Stitch** (https://stitch.withgoogle.com).
 
-Flujo de trabajo: se genera el diseño de cada módulo en Stitch con su prompt → se me pasa el resultado → yo implemento el frontend (React 19 + Vite 8 + Tailwind v4).
+Flujo de trabajo: se genera el diseño de cada módulo en Stitch con su prompt → se me pasa el resultado → yo implemento el frontend (React 19 + Vite 8 + **TypeScript** + Tailwind v4 + **shadcn/ui** con tokens **Material 3**).
+
+**Dependencias** (verificadas en npm): `react-router` 8 · `@tanstack/react-query` 5 · `axios` 1 · `react-hook-form` 7 + `zod` 4 (+ `@hookform/resolvers` 5) · `zustand` 5 · `material-symbols` · `sonner` · `dayjs` · fuentes `@fontsource` (Manrope/Inter/JetBrains Mono) · primitivas `@radix-ui/*` (vía shadcn). Dev: `typescript`, `vite-tsconfig-paths`, `typescript-eslint`. Proxy de Vite `/api` → backend `:8000`.
 
 ---
 
@@ -70,33 +72,99 @@ Regla general: **lectura para todos los roles autenticados, escritura solo para 
 
 ---
 
-## Sistema de diseño (base de TODOS los módulos)
+## Sistema de diseño (base de TODOS los módulos) — tokens Material 3
 
-Aplicar en cada prompt de Stitch:
+Adoptado de los prototipos en `Ejemplos/`. Se aplica en cada prompt de Stitch y en el código (definido con `@theme` de Tailwind v4 en `src/index.css`).
 
-### Paleta (colores del logo OptiRosse)
-- **Primario**: morado `#6D28D9` (violet-700), hover `#5B21B6`, claro `#8B5CF6`.
-- **Acento**: azul claro `#38BDF8` (sky-400) / `#0EA5E9`.
-- **Neutros claro**: fondo `#F8FAFC`, superficie `#FFFFFF`, borde `#E2E8F0`, texto `#0F172A`, texto suave `#64748B`.
-- **Neutros oscuro**: fondo `#0B1120`, superficie `#111A2E`, borde `#1E293B`, texto `#E2E8F0`, texto suave `#94A3B8`.
-- **Semánticos**: éxito `#16A34A`, advertencia `#D97706`, error `#DC2626`, info `#0EA5E9`.
-- Soporte **claro y oscuro con toggle** (persistir preferencia en localStorage; respetar `prefers-color-scheme`).
+### Paleta (Material 3 sobre colores del logo OptiRosse)
+- **Primario / roles de color**:
+  - `primary` `#5300B7` · `on-primary` `#FFFFFF` · `primary-container` `#6D28D9` (morado del logo) · `on-primary-container` `#DAC5FF`.
+  - `secondary-container` `#40C2FD` (azul del logo, ~#38BDF8) · `secondary` `#00668A` · `on-secondary-container` `#004D6A`.
+  - `tertiary-container` `#9C2A6C` · `tertiary` `#7E0B54`.
+- **Superficies (neutros claro)**:
+  - `background`/`surface` `#F8F9FF` · `surface-bright` `#F8F9FF` · `surface-container-lowest` `#FFFFFF` · `surface-container-low` `#EFF4FF` · `surface-container` `#E5EEFF` · `surface-container-high` `#DCE9FF` · `surface-container-highest` `#D3E4FE`.
+  - `on-surface` `#0B1C30` · `on-surface-variant` `#4A4455` · `outline` `#7B7486` · `outline-variant` `#CCC3D7`.
+- **Superficies (oscuro)**: los ejemplos mapean `inverse-surface` `#213145`, `inverse-on-surface` `#EAF1FF`, `primary-fixed-dim` `#D3BBFF`, `surface-variant`, `surface-container-highest` como fondos/superficies del tema oscuro. El toggle `.dark` en `<html>` alterna los tokens vía CSS variables.
+- **Semánticos**: `error` `#BA1A1A` · `error-container` `#FFDAD6` · `on-error-container` `#93000A` · éxito/advertencia/info usan `secondary-container`/`tertiary`/`error` y variantes `*-fixed`.
+- Soporte **claro y oscuro con toggle** (persistir en localStorage; respetar `prefers-color-scheme` al primer arranque).
 
 ### Tipografía y geometría
-- Fuente: Inter (o sistema). Headings semibold, body regular 14–16px.
-- Radios: `rounded-lg` (tarjetas/tablas) y `rounded-full` (badges/avatares).
-- Sombras suaves (`shadow-sm`), sin gradientes estridentes.
+- **Manrope** (display/headings, 600/700/800), **Inter** (body, 400/500), **JetBrains Mono** (labels `label-sm`, códigos, mono) — self-hosted con `@fontsource` (sin CDN en runtime).
+- **Iconos**: Material Symbols Outlined (`material-symbols` npm), componente `<Icon name="...">` con eje `FILL`.
+- Radios: `rounded-lg` (tarjetas/tablas) y `rounded-xl` (paneles grandes), `rounded-full` (badges/avatares/píldoras).
+- Escala de espaciado (de los ejemplos): `xs` 4px · `sm` 12px · `base` 8px · `md`/`gutter` 24px · `lg` 48px · `xl` 80px · `margin-mobile` 16px · `margin-desktop` 64px.
 - Densidad media (B2B): tablas compactas, 40px de alto en inputs/botones estándar.
 
 ### Patrones transversales (componentes reutilizables)
-- **AppShell**: sidebar izquierda (nav por rol) + topbar (título de sección, usuario, toggle tema) + contenido.
-- **Tablas de listado**: cabecera sticky, filas con hover, **filtros + buscador + paginación** arriba, badge de estado, acciones por fila (ver/editar/desactivar).
-- **Badges de estado** con colores semánticos.
-- **Formularios**: labels arriba, validación en campo (rojo + mensaje del envelope), errores del servidor mapeados a cada campo, botones Guardar/Cancelar.
-- **Modales** de confirmación para acciones destructivas (desactivar, cancelar pedido, rechazar pago).
-- **Toasts** para `message` de éxito/error.
+- **AppShell**: sidebar izquierda fija (`w-64`, colapsable a 72px con tooltips) + topbar `h-16` sticky con blur (`backdrop-blur`) + área de contenido (`ml-* pt-16`).
+- **Tablas de listado** (`DataTable` genérico): card con thead `surface-container-low` (labels en `label-sm` uppercase tracking-wider), filas con hover, **toolbar de filtros + buscador + paginación**, badge de estado, acciones por fila (iconos).
+- **Badges de estado** con colores semánticos (mapa central en `lib/constants/choices.ts`).
+- **Formularios**: en **drawer derecho** (`max-w-xl`, cabecera/acciones sticky, secciones con encabezado de icono) o página según módulo; labels arriba; validación en campo (rojo + mensaje); **errores del envelope mapeados a cada campo** (`setError`); botones Guardar/Cancelar.
+- **Modales de confirmación** para acciones destructivas (desactivar, cancelar pedido, rechazar pago): overlay con `backdrop-blur`, ícono de alerta en círculo `error-container`, animación scale/opacity.
+- **Toasts** (sonner) para `message` de éxito/error.
 - **Estados**: loading (spinner/skeleton), empty (ícono + "No hay resultados" + acción), error (mensaje + reintentar).
-- **Cambiar contraseña / logout** siempre accesibles (menú de usuario).
+- **Cambiar contraseña / logout** siempre accesibles (menú de usuario en la topbar).
+
+---
+
+## Arquitectura del frontend
+
+**Stack**: React 19 + Vite 8 + TypeScript + Tailwind v4 + shadcn/ui (Radix) + TanStack Query + Zustand + react-hook-form/zod + axios.
+
+### Estructura de carpetas (features/modular)
+
+```
+src/
+  main.tsx                  # bootstrap: providers + router
+  index.css                 # @theme tokens Material 3 + @custom-variant dark + vars shadcn
+  app/
+    router.tsx              # createBrowserRouter con rutas lazy
+    providers.tsx           # QueryClientProvider + ThemeProvider + AuthProvider + Toaster
+  lib/
+    utils.ts                # cn() (clsx + tailwind-merge)
+    api/
+      client.ts             # axios: baseURL /api/v1, Bearer, 401→refresh→retry, unwrap envelope
+      endpoints.ts          # rutas centralizadas por recurso/acción
+      errors.ts             # ApiError { message, errors, status, code }
+    format.ts               # moneda (Intl), fechas (dayjs es), porcentajes
+    constants/
+      choices.ts            # roles/estados/tipos → { label, badgeClass }
+      nav.ts                # items de navegación por rol
+      query.ts              # defaults de react-query (staleTime, retry, keepPreviousData)
+  store/
+    useAuth.ts              # zustand persist: user, tokens, login/logout/refresh
+    useUI.ts                # zustand: sidebar colapsada, tema
+    useToast.ts             # envoltura de sonner
+  components/
+    layout/                 # AppShell, Sidebar, Topbar, UserMenu
+    data/                   # DataTable, Pagination, StatusBadge, EmptyState, SkeletonRows, PageHeader
+    forms/                  # FieldError, SectionCard, MoneyInput
+    ui/                     # primitivas shadcn (Button, Input, Dialog, Drawer, Select, Tabs, Switch, DropdownMenu, Tooltip, Popover, Checkbox, Label, Textarea, Badge)
+  hooks/
+    useApi.ts               # useApiQuery / useApiMutation (react-query + ApiError)
+    usePagination.ts
+    useDebounce.ts
+  features/                 # UNA carpeta por módulo (página + subcomponentes locales)
+    auth/ dashboard/ users/ clients/ inventory/ prescriptions/
+    orders/ finance/ documents/ profile/ errors/
+  types/
+    api.ts                  # Envelope<T>, Paginated<T>
+    models.ts               # interfaces por entidad
+```
+
+**Reglas de composición**:
+- `features/` solo importa de `lib/`, `store/`, `components/`, `hooks/` y `types/`. **Un feature nunca importa de otro feature**.
+- Los componentes compartidos viven en `components/`; los datos/constantes de negocio en `lib/`; el estado global en `store/`.
+- Cada módulo expone página(s) + sus subcomponentes locales en su propia carpeta (evita duplicidad y facilita escalar).
+
+### Infraestructura clave (anti-duplicación)
+- **`lib/api/client.ts`**: instancia axios con `baseURL=/api/v1`; request interceptor añade `Authorization: Bearer <access>`; response interceptor **desenvuelve el envelope** → devuelve `{ data, meta, message }` o lanza `ApiError`; en `401` → `auth/refresh` → reintenta (si falla → logout); para generar documento usa `responseType:'blob'` (excepción binaria al envelope).
+- **`lib/api/errors.ts`**: `ApiError` con `{ message, errors, status, code }`; helper que normaliza `errors` (objeto `{campo:[msgs]}` o array `[{code, detail}]`) para mapeo a campos y toast.
+- **`hooks/useApi.ts`**: `useApiQuery`/`useApiMutation` sobre react-query con defaults de `lib/constants/query.ts` (staleTime, retry, `placeholderData: keepPreviousData` para paginación) → las páginas no repiten configuración.
+- **`components/data/DataTable.tsx`**: tabla genérica por configuración de columnas + estado loading/empty/error + orden + paginación → evita repetir markup de tabla en los 8 módulos.
+- **`lib/constants/choices.ts`**: mapas centralizados `rol/estado/tipo → { label, badgeClass }` (badges nunca duplicados).
+- **Formularios**: RHF + zod; helper que mapea `errors` del envelope a `setError` por campo; `FieldError` muestra el mensaje bajo el input.
+- **Auth**: store zustand con persistencia en localStorage (access/refresh/user), `login`, `logout`, refresh automático; rutas protegidas (`ProtectedRoute`) y por rol (`RoleRoute`).
 
 ---
 
@@ -360,16 +428,22 @@ Aplicar en cada prompt de Stitch:
 
 ---
 
-## Guía de implementación (orden sugerido)
+## Guía de implementación (roadmap página por página)
 
-1. Login + AppShell + routing + auth context (refresh automático) → esqueleto navegable.
-2. Dashboard.
-3. Clientes.
-4. Inventario (categorías → productos → variantes/stock).
-5. Recetas.
-6. Pedidos (lista → detalle → crear/editar → acciones → documentos).
-7. Finanzas (métodos → pagos → libro mayor).
-8. Documentos (plantillas + generación).
-9. Perfil + errores + pulido (tema, empty states, accesibilidad).
+El frontend se implementa por fases. Cada fase entrega una **página navegable y funcional** (diseño Stitch → implementación). Orden recomendado:
 
-Dependencia clave: el frontend consume el envelope (no `response.data` de DRF en crudo); al implementar se creará un cliente HTTP compartido con interceptor de auth y manejo central de `errors`/`message`.
+| Fase | Entregable | Endpoints | Componentes a construir |
+|---|---|---|---|
+| **0. Fundación** | Migrar a TypeScript, instalar deps, proxy `/api`, alias `@/`, `@theme` Material 3, shadcn init, `lib/api/client.ts`, providers, limpiar boilerplate (App.css/assets) | — | `Icon`, `cn`, `lib/api/*`, `types/*`, `lib/constants/*` |
+| **1. Auth + Shell + Perfil** | Login · AppShell (sidebar colapsable + topbar + menú usuario) · rutas protegidas/por rol · Perfil (cambiar contraseña, logout) | `auth/login`, `auth/refresh`, `auth/me`, `auth/cambiar-contrasena`, `auth/logout` | `AppShell`, `Sidebar`, `Topbar`, `UserMenu`, `ProtectedRoute`, `RoleRoute`, shadcn `ui/*` |
+| **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `pedidos/?estado=&page_size=1`, `variantes/?stock_bajo=true&page_size=1`, `pagos/?estado=pendiente&page_size=1` | **`DataTable`**, `Pagination`, `StatusBadge`, `EmptyState`, `SkeletonRows`, `PageHeader` |
+| **3. Clientes** | Lista + detalle (crédito) + formulario drawer + desactivar | `clientes/` CRUD, `?search=` | `ConfirmDialog`, `Drawer`, `SectionCard`, `FieldError` |
+| **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) |
+| **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal |
+| **6. Recetas** | Lista + formulario OD/OI | `recetas/` CRUD | — |
+| **7. Pedidos** | Lista con filtros · detalle (stepper + transiciones por rol + documentos) · crear/editar (líneas + totales en vivo) | `pedidos/` CRUD, `{id}/confirmar/`, `{id}/cambiar-estado/` | `OrderStepper`, selector de variante, `OrderActions` |
+| **8. Finanzas** | Métodos de pago · Pagos (aprobar/rechazar con motivo) · Libro mayor (solo lectura) | `metodos-pago/`, `pagos/`, `{id}/aprobar|rechazar/`, `libro-mayor/` | — |
+| **9. Documentos** | Plantillas (editor HTML/CSS admin + preview) · diálogo generar + descarga blob | `plantillas/` CRUD, `{id}/generar/` | editor de código ligero |
+| **10. Pulido** | Empty states en todas las listas, páginas 403/404/500, auditoría dark mode y accesibilidad | — | `ErrorPages` |
+
+**Principios por fase**: cada página consume el envelope (no `response.data` de DRF en crudo) vía `useApi`; los errores se mapean a campos/toast; las acciones se muestran/ocultan según el rol de `auth/me`; los estados de carga/vacío/error se heredan de `DataTable`/`EmptyState`.

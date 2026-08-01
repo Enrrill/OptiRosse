@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Iniciar sesión | OptiRosse</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#ffafd3",
+                      "on-tertiary-fixed": "#3d0026",
+                      "on-error-container": "#93000a",
+                      "surface": "#f8f9ff",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#004c69",
+                      "surface-container-high": "#dce9ff",
+                      "tertiary-fixed": "#ffd8e7",
+                      "on-secondary-fixed": "#001e2c",
+                      "inverse-primary": "#d3bbff",
+                      "surface-container-low": "#eff4ff",
+                      "on-primary-fixed": "#250059",
+                      "outline": "#7b7486",
+                      "on-primary-fixed-variant": "#5b00c5",
+                      "on-tertiary-fixed-variant": "#85145a",
+                      "background": "#f8f9ff",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#dac5ff",
+                      "surface-container": "#e5eeff",
+                      "on-tertiary-container": "#ffbcd9",
+                      "primary-container": "#6d28d9",
+                      "on-surface": "#0b1c30",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#004d6a",
+                      "on-primary": "#ffffff",
+                      "outline-variant": "#ccc3d7",
+                      "surface-variant": "#d3e4fe",
+                      "secondary-fixed-dim": "#7bd0ff",
+                      "tertiary-container": "#9c2a6c",
+                      "primary": "#5300b7",
+                      "secondary-container": "#40c2fd",
+                      "primary-fixed-dim": "#d3bbff",
+                      "surface-container-highest": "#d3e4fe",
+                      "surface-bright": "#f8f9ff",
+                      "on-error": "#ffffff",
+                      "inverse-surface": "#213145",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-secondary": "#ffffff",
+                      "tertiary": "#7e0b54",
+                      "on-background": "#0b1c30",
+                      "on-surface-variant": "#4a4455",
+                      "surface-tint": "#7331df",
+                      "secondary": "#00668a",
+                      "secondary-fixed": "#c4e7ff",
+                      "primary-fixed": "#ebddff",
+                      "error": "#ba1a1a",
+                      "surface-dim": "#cbdbf5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "8px",
+                      "margin-desktop": "64px",
+                      "margin-mobile": "16px",
+                      "lg": "48px",
+                      "md": "24px",
+                      "gutter": "24px",
+                      "xl": "80px",
+                      "xs": "4px",
+                      "sm": "12px"
+              },
+              "fontFamily": {
+                      "label-sm": ["JetBrains Mono"],
+                      "body-md": ["Inter"],
+                      "headline-md": ["Manrope"],
+                      "headline-lg-mobile": ["Manrope"],
+                      "display-lg": ["Manrope"],
+                      "headline-lg": ["Manrope"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                      "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-login-gradient {
+            background: linear-gradient(135deg, #6D28D9 0%, #38BDF8 100%);
+        }
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .bg-pattern {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-surface min-h-screen font-body-md text-on-surface overflow-x-hidden">
+<div class="flex flex-col md:flex-row min-h-screen">
+<!-- Left Side: Visual/Gradient Panel -->
+<div class="hidden md:flex md:w-1/2 lg:w-3/5 bg-login-gradient relative items-center justify-center overflow-hidden">
+<div class="absolute inset-0 bg-pattern opacity-30"></div>
+<!-- Large decorative logo -->
+<div class="relative z-10 w-3/4 opacity-10 pointer-events-none transform -rotate-12 translate-x-[-10%] translate-y-[10%]">
+<img alt="" class="w-full h-auto" src="https://lh3.googleusercontent.com/aida/AP1WRLtk7YLbpXx4F_4uS3b6spkP-O7_5o1hjG1poLOaJeoxKzgcAzCS2qHU3seI1HBROfSvvaIQXqU3kSI9SqQWrC0bRlUw-2JdNXYV0hKeNvqMaADuOqgr6OgVj8C8yl9i5LJy2aHwLEDfVRKBVUEy_3L_9F6gAeqmxOvyaqnlxX580h4jJIhGLpgy8weGcs6RbNO1URzrBj0LNIFaxKKl8RmUepcvr7nTk8WqelrXndObn-mXChV7AgbkqNQ"/>
+</div>
+<div class="relative z-20 text-center px-lg">
+<h1 class="font-display-lg text-display-lg text-white mb-md">Soluciones Ópticas <br/><span class="opacity-80">Empresariales</span></h1>
+<p class="text-white/80 text-body-lg max-w-md mx-auto">La plataforma líder para la gestión B2B de ópticas y laboratorios.</p>
+</div>
+</div>
+<!-- Right Side: Login Content -->
+<div class="flex-grow flex flex-col items-center justify-center px-margin-mobile md:px-lg py-xl bg-surface-container-lowest">
+<div class="w-full max-w-[480px]">
+<!-- Logo Section -->
+<div class="flex flex-col items-center mb-lg">
+<div class="w-20 h-20 mb-sm flex items-center justify-center">
+<img alt="OptiRosse Logo" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtk7YLbpXx4F_4uS3b6spkP-O7_5o1hjG1poLOaJeoxKzgcAzCS2qHU3seI1HBROfSvvaIQXqU3kSI9SqQWrC0bRlUw-2JdNXYV0hKeNvqMaADuOqgr6OgVj8C8yl9i5LJy2aHwLEDfVRKBVUEy_3L_9F6gAeqmxOvyaqnlxX580h4jJIhGLpgy8weGcs6RbNO1URzrBj0LNIFaxKKl8RmUepcvr7nTk8WqelrXndObn-mXChV7AgbkqNQ"/>
+</div>
+<h2 class="font-headline-md text-headline-md font-extrabold text-primary tracking-tight">OptiRosse</h2>
+</div>
+<!-- Headers -->
+<div class="text-center mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Iniciar sesión</h1>
+<p class="text-on-surface-variant text-body-md">Óptica B2B — plataforma de gestión</p>
+</div>
+<!-- Form -->
+<form class="space-y-md" onsubmit="return false">
+<!-- Username -->
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block">Usuario o correo electrónico</label>
+<div class="relative">
+<input class="w-full px-md py-sm bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container transition-all outline-none text-on-surface" placeholder="ejemplo@optirosse.com" type="text"/>
+</div>
+</div>
+<!-- Password -->
+<div class="space-y-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block">Contraseña</label>
+</div>
+<div class="relative">
+<input class="w-full px-md py-sm bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container transition-all outline-none text-on-surface" id="password-input" placeholder="••••••••" type="password"/>
+<button class="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined" id="password-toggle-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Submit Button with Spinner -->
+<button class="w-full py-md bg-primary-container text-on-primary-container font-headline-md text-body-lg rounded-lg flex items-center justify-center gap-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-md mt-base" type="submit">
+<div class="spinner"></div>
+<span>Iniciar sesión</span>
+</button>
+<!-- Error Message -->
+<div class="flex items-center gap-xs text-error justify-center py-xs animate-pulse">
+<span class="material-symbols-outlined text-[18px]">error</span>
+<span class="text-label-sm font-medium">Credenciales incorrectas, por favor intente de nuevo</span>
+</div>
+<!-- Forgot Password -->
+<div class="text-center pt-xs">
+<a class="text-secondary font-medium hover:underline text-body-md transition-all" href="#">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+</div>
+</form>
+<!-- Footer (Inside right panel for visibility) -->
+<footer class="mt-xl pt-lg border-t border-outline-variant/30">
+<div class="text-on-surface-variant/60 font-label-sm text-label-sm text-center">
+                        © 2024 OptiRosse Optical Solutions.<br class="md:hidden"/> All rights reserved.
+                    </div>
+</footer>
+</div>
+</div>
+</div>
+<!-- Theme Toggle Floating -->
+<button class="fixed bottom-md right-md bg-surface p-sm rounded-full shadow-lg border border-outline-variant/30 flex items-center justify-center text-primary-container z-50" onclick="toggleDarkMode()">
+<span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+</button>
+<script>
+        function togglePassword() {
+            const input = document.getElementById('password-input');
+            const icon = document.getElementById('password-toggle-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.textContent = 'dark_mode';
+            } else {
+                html.classList.add('dark');
+                icon.textContent = 'light_mode';
+            }
+        }
+    </script>
+</body></html>
