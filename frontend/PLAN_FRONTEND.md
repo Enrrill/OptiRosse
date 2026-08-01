@@ -432,18 +432,18 @@ src/
 
 El frontend se implementa por fases. Cada fase entrega una **página navegable y funcional** (diseño Stitch → implementación). Orden recomendado:
 
-| Fase | Entregable | Endpoints | Componentes a construir |
-|---|---|---|---|
-| **0. Fundación** | Migrar a TypeScript, instalar deps, proxy `/api`, alias `@/`, `@theme` Material 3, shadcn init, `lib/api/client.ts`, providers, limpiar boilerplate (App.css/assets) | — | `Icon`, `cn`, `lib/api/*`, `types/*`, `lib/constants/*` |
-| **1. Auth + Shell + Perfil** | Login · AppShell (sidebar colapsable + topbar + menú usuario) · rutas protegidas/por rol · Perfil (cambiar contraseña, logout) | `auth/login`, `auth/refresh`, `auth/me`, `auth/cambiar-contrasena`, `auth/logout` | `AppShell`, `Sidebar`, `Topbar`, `UserMenu`, `ProtectedRoute`, `RoleRoute`, shadcn `ui/*` |
-| **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `pedidos/?estado=&page_size=1`, `variantes/?stock_bajo=true&page_size=1`, `pagos/?estado=pendiente&page_size=1` | **`DataTable`**, `Pagination`, `StatusBadge`, `EmptyState`, `SkeletonRows`, `PageHeader` |
-| **3. Clientes** | Lista + detalle (crédito) + formulario drawer + desactivar | `clientes/` CRUD, `?search=` | `ConfirmDialog`, `Drawer`, `SectionCard`, `FieldError` |
-| **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) |
-| **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal |
-| **6. Recetas** | Lista + formulario OD/OI | `recetas/` CRUD | — |
-| **7. Pedidos** | Lista con filtros · detalle (stepper + transiciones por rol + documentos) · crear/editar (líneas + totales en vivo) | `pedidos/` CRUD, `{id}/confirmar/`, `{id}/cambiar-estado/` | `OrderStepper`, selector de variante, `OrderActions` |
-| **8. Finanzas** | Métodos de pago · Pagos (aprobar/rechazar con motivo) · Libro mayor (solo lectura) | `metodos-pago/`, `pagos/`, `{id}/aprobar|rechazar/`, `libro-mayor/` | — |
-| **9. Documentos** | Plantillas (editor HTML/CSS admin + preview) · diálogo generar + descarga blob | `plantillas/` CRUD, `{id}/generar/` | editor de código ligero |
-| **10. Pulido** | Empty states en todas las listas, páginas 403/404/500, auditoría dark mode y accesibilidad | — | `ErrorPages` |
+| Fase | Entregable | Endpoints | Componentes a construir | Estado |
+|---|---|---|---|---|
+| **0. Fundación** | Migrar a TypeScript, instalar deps, proxy `/api`, alias `@/`, `@theme` Material 3, shadcn init, `lib/api/client.ts`, providers, limpiar boilerplate (App.css/assets) | — | `Icon`, `cn`, `lib/api/*`, `types/*`, `lib/constants/*` | ✅ Implementada |
+| **1. Auth + Shell + Perfil** | Login · AppShell (sidebar colapsable + topbar + menú usuario) · rutas protegidas/por rol · Perfil (cambiar contraseña, logout) | `auth/login`, `auth/refresh`, `auth/me`, `auth/cambiar-contrasena`, `auth/logout` | `AppShell`, `Sidebar`, `Topbar`, `UserMenu`, `ProtectedRoute`, `RoleRoute`, shadcn `ui/*` | ✅ Implementada |
+| **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `pedidos/?estado=&page_size=1`, `variantes/?stock_bajo=true&page_size=1`, `pagos/?estado=pendiente&page_size=1` | **`DataTable`**, `Pagination`, `StatusBadge`, `EmptyState`, `SkeletonRows`, `PageHeader` | ⏳ Pendiente |
+| **3. Clientes** | Lista + detalle (crédito) + formulario drawer + desactivar | `clientes/` CRUD, `?search=` | `ConfirmDialog`, `Drawer`, `SectionCard`, `FieldError` | ⏳ Pendiente |
+| **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) | ⏳ Pendiente |
+| **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal | ⏳ Pendiente |
+| **6. Recetas** | Lista + formulario OD/OI | `recetas/` CRUD | — | ⏳ Pendiente |
+| **7. Pedidos** | Lista con filtros · detalle (stepper + transiciones por rol + documentos) · crear/editar (líneas + totales en vivo) | `pedidos/` CRUD, `{id}/confirmar/`, `{id}/cambiar-estado/` | `OrderStepper`, selector de variante, `OrderActions` | ⏳ Pendiente |
+| **8. Finanzas** | Métodos de pago · Pagos (aprobar/rechazar con motivo) · Libro mayor (solo lectura) | `metodos-pago/`, `pagos/`, `{id}/aprobar|rechazar/`, `libro-mayor/` | — | ⏳ Pendiente |
+| **9. Documentos** | Plantillas (editor HTML/CSS admin + preview) · diálogo generar + descarga blob | `plantillas/` CRUD, `{id}/generar/` | editor de código ligero | ⏳ Pendiente |
+| **10. Pulido** | Empty states en todas las listas, páginas 403/404/500, auditoría dark mode y accesibilidad | — | `ErrorPages` | ⏳ Pendiente |
 
 **Principios por fase**: cada página consume el envelope (no `response.data` de DRF en crudo) vía `useApi`; los errores se mapean a campos/toast; las acciones se muestran/ocultan según el rol de `auth/me`; los estados de carga/vacío/error se heredan de `DataTable`/`EmptyState`.
