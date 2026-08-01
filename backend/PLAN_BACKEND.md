@@ -181,7 +181,7 @@ Plantilla para los CRUDs simples (inventario, métodos de pago). Detalle:
 - **Dificultad**: alta. Aquí se justifica la capa `services` y el envelope (errores de negocio con códigos).
 - **Done**: verificación E2E (44 checks: numeración secuencial, IVA 16%, upsert de detalles, stock descontado/restaurado, transiciones por rol con 403, 409 en transiciones inválidas/terminales, rollback ante `stock_insuficiente`, filtros, soft delete, auditoría) + `check` y `makemigrations` sin pendientes.
 
-## Fase 5 — finance (consistencia transaccional) ⭐ el más difícil
+## Fase 5 — finance (consistencia transaccional) ✅ implementada ⭐ el más difícil
 
 ### Modelo contable (decisión: consistencia completa)
 - El saldo del cliente (cuentas por cobrar) se deriva del **saldo corrido** del `LibroMayor` (`saldo_posterior` del último asiento por `-id`). `ClienteOptica` no guarda saldo.
@@ -210,12 +210,31 @@ Plantilla para los CRUDs simples (inventario, métodos de pago). Detalle:
 - **Dificultad**: muy alta. Lógica contable + consistencia ACID (saldo corrido con lock, validaciones de referencia y sobre-pago, transiciones de pago, reversos de asiento).
 - **Done**: verificación E2E (crear pago pendiente sin asiento, aprobar → asiento CREDITO con `saldo_posterior` correcto, rechazar con `motivo_rechazo` y sin asiento, 409 `referencia_requerida`/`pago_excede_pedido`/`pago_estado_invalido`/`pago_no_editable`/`pago_no_eliminable`, confirmar pedido → asiento DEBITO, cancelar → reverso con `asiento_origen`, `libro-mayor` solo lectura con 403 a vendedor, soft delete de métodos, permisos y auditoría) + `check` y `makemigrations` sin pendientes.
 
-## Fase 6 — document_engine (render + cross-app)
+## Fase 6 — document_engine (render + cross-app) ✅ implementada
 
-- `PlantillaDocumento`: CRUD ViewSet simple.
-- `services.py` → `DocumentoService`: toma `PlantillaDocumento` + contexto (datos de `Pedido`, `Pago`, `ClienteOptica` según `TipoDocumento`), renderiza HTML/CSS y genera el documento (HTML en v1; PDF con weasyprint se evalúa después).
-- Endpoint de generación: `POST /plantillas/{id}/generar` (APIView, delega en el servicio).
-- **Dificultad**: alta por integración cross-app y renderizado.
+Decisión de motor PDF: **WeasyPrint (backend)**. Las plantillas viven en BD como HTML+CSS (`PlantillaDocumento.contenido_html` + `estilos_css`) y WeasyPrint las convierte a PDF con soporte completo de CSS de impresión (`@page`, numeración, saltos de página). El frontend solo descarga el documento generado. Alternativa documentada: `xhtml2pdf` (pura-Python sin deps de sistema, CSS pobre) como fallback si no se pueden instalar librerías del sistema.
+
+### Dependencia nueva
+- `weasyprint==69.0` (compatible Python 3.12) en `requirements.txt`. Requiere librerías de sistema: pango, cairo, harfbuzz, gdk-pixbuf, libffi (presentes en el entorno dev).
+- `PlantillaDocumento` **no requiere migración** — el modelo ya existía desde `0001_initial` (se creó como base de la fase y quedó intacto).
+
+### App document_engine
+- `services.py` → `DocumentoService`:
+  - `_contexto_pedido` / `_contexto_pago`: construyen el contexto de la plantilla con **solo primitivas/serializados** (nunca objetos ORM) usando `select_related` por modelo (`Pedido`→`cliente/usuario/receta`, `Pago`→`cliente/pedido/metodo_pago`). `FACTURA`/`NOTA_ENTREGA`/`ORDEN_TRABAJO` consumen `Pedido` (cliente, detalles con variante+producto, subtotal/impuesto/total, receta OD/OI); `RECIBO_PAGO` consume `Pago` (cliente, método, monto, tasa, referencia, pedido asociado).
+  - `_renderizar_html`: motor de templates de Django; inyecta `estilos_css` dentro de `<style>`; contexto solo primitivas → las plantillas solo leen lo expuesto (seguridad). `TemplateSyntaxError` → `ApiError` 400 `plantilla_invalida`.
+  - `_renderizar_pdf`: `weasyprint.HTML(string=html).write_pdf()`; errores de la librería → `ApiError` 400 `documento_render_invalido`.
+  - `generar(...)`: resuelve el objeto según `tipo_documento` (404 `objeto_no_encontrado`), renderiza, convierte si `formato=pdf`, auditoría `generar_documento` con `{tipo_documento, formato, objeto, nombre_archivo}`; devuelve `DocumentoGenerado` (dataclass con `contenido`, `nombre_archivo`, `content_type`).
+- `serializers/plantilla.py` → `PlantillaDocumentoSerializer` (read-only `actualizado_en`, `tipo_documento_display`, validación de `contenido_html` no vacío) + `GenerarDocumentoSerializer` (`objeto_id` int obligatorio, `formato` `html|pdf` default `html`).
+- `filters.py` → `PlantillaDocumentoFilter` (`activo`, `tipo_documento`).
+- `permissions.py` → `EscrituraPlantillaOLectura = es_rol_o_lectura(ADMINISTRADOR)`, `PuedeGenerarDocumento = es_rol(ADMINISTRADOR, CONTABILIDAD, VENDEDOR_B2B)`.
+- `views/plantilla.py` → `PlantillaDocumentoViewSet(BaseModelViewSet)` (soft delete `desactivar`, lista solo activas por defecto, `ordering=('tipo_documento',)`, `search_fields=('nombre',)`).
+- `views/generar.py` → `GenerarDocumentoView` (APIView `POST`): valida plantilla activa (409 `plantilla_inactiva`), delega en `DocumentoService.generar` y responde el **archivo binario** (`Content-Disposition: attachment; filename=...`, `application/pdf` o `text/html`) — excepción deliberada al envelope JSON (es un binario, no JSON).
+- `urls.py`: router `plantillas/` + `POST plantillas/{pk}/generar/`. Include en `config/urls.py`.
+
+### Rutas
+`/api/v1/plantillas/` (CRUD, soft delete, `?activo=`, search), `POST /api/v1/plantillas/{id}/generar/` (body `{objeto_id, formato}`).
+- **Dificultad**: alta (integración cross-app, seguridad de plantillas, respuesta binaria fuera del envelope).
+- **Done**: verificación E2E (CRUD + soft delete de plantilla con admin, vendedor lee/403 escribe, generar HTML factura con contexto completo, generar PDF con content-type y bytes válidos, orden de trabajo con receta, recibo de pago, 404 plantilla/objeto, plantilla con error de sintaxis → 400, auditoría `generar_documento`) + `check` y `makemigrations` sin pendientes.
 
 ## Fase 7 — Pulido transversal (opcional)
 
