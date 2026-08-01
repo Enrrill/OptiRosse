@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/v1/', include('backend.apps.clients.urls')),
     path('api/v1/', include('backend.apps.inventory.urls')),
     path('api/v1/', include('backend.apps.orders.urls')),
+    path('api/v1/', include('backend.apps.finance.urls')),
     re_path(r'.*', ruta_no_encontrada, name='ruta-no-encontrada'),
 ]
 

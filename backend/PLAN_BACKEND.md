@@ -155,24 +155,60 @@ Plantilla para los CRUDs simples (inventario, métodos de pago). Detalle:
 - **Dificultad**: media.
 - **Done**: verificación por curl (create/duplicados 400, sku duplicado en payload, update anidado upsert + desactivación de omitidas, filtros `tipo/categoria/marca/producto/stock_bajo`, search, ajuste stock ± y 409 `stock_insuficiente`, permisos vendedor/almacén/sin token, soft deletes + reactivación, auditoría `crear/desactivar/ajuste_stock`), `check` y `makemigrations` sin pendientes.
 
-## Fase 4 — orders (negocio, nested writes, estados) ⭐ mayor salto de complejidad
+## Fase 4 — orders (negocio, nested writes, estados) ✅ implementada ⭐ mayor salto de complejidad
 
-- `RecetaOptica`: CRUD ViewSet simple.
-- `Pedido`: **combina ViewSet con services** (aplicar la decisión de combinar técnicas):
-  - Serializer principal con `DetallePedido` anidado (create/update nested dentro de `transaction.atomic()`).
-  - `services.py` → `PedidoService`: genera `numero_pedido` secuencial, calcula `subtotal/impuesto/total`, valida y descuenta stock (usando `StockService`), y maneja transiciones de `EstadoPedido` (máquina de estados: `borrador → confirmado → en_taller → listo_para_despacho → enviado`, más `cancelado`).
-  - Endpoints custom en `views/pedido.py`: `POST /pedidos/{id}/confirmar`, `POST /pedidos/{id}/cambiar-estado` (APIViews que delegan en `PedidoService`).
+### Cambios de modelo (migración `0002`)
+- `RecetaOptica(ActivoMixin)` → `activo` (soft delete).
+- `Pedido`: `indexes = [Index(fields=['estado'])]`.
+- `DetallePedido`: `CheckConstraint` `detalles_cantidad_positiva` (`cantidad >= 1`).
+- Nuevo `ContadorPedido` (fila única pk=1, `ultimo_numero`) → numeración secuencial `PED-{n:06d}`.
+
+### App orders
+- `services.py` → `PedidoService`:
+  - `_siguiente_numero()`: `select_for_update().get_or_create(pk=1)` dentro de `transaction.atomic()`.
+  - `_calcular_totales()`: subtotal / impuesto (IVA `IMPUESTO_RATE = Decimal('0.16')` en settings) / total con `ROUND_HALF_UP`.
+  - `crear` y `actualizar` (solo borrador; upsert de detalles con `id` escribible; re-cálculo de totales) dentro de `transaction.atomic()`.
+  - `confirmar` (valida + descuenta stock vía `StockService` ordenando variantes por id), `cambiar_estado` (delega cancelación a `cancelar`), `cancelar` (restaura stock si fue descontado), `eliminar_borrador`.
+  - Máquina de estados `TransicionesPedido`: `borrador → confirmado → en_taller → listo_para_despacho → enviado`, más `cancelado`; validación de transición y de rol por paso (403 `transicion_no_permitida`, 409 `transicion_invalida`); auditoría con `estado_anterior/estado_nuevo/motivo`.
+- `serializers/`: `receta.py` (validación de rangos OD/OI), `detalle.py` (`DetalleEnPedidoSerializer` con `id` escribible y precio por defecto `variante.precio_al_mayor`), `pedido.py` (nested writable, read-only `numero_pedido/usuario/estado/subtotal/impuesto/total`, validaciones de variantes duplicadas y receta ya usada).
+- `filters.py`: `RecetaOpticaFilter` (`activo`), `PedidoFilter` (`estado`, `cliente`, `usuario`, `numero_pedido`, `fecha_creado`).
+- `permissions.py`: `EscrituraRecetaOLectura`, `EscrituraPedidoOLectura`, `PuedeConfirmarPedido`, `PuedeTransicionarPedido`.
+- `views/`: `RecetaOpticaViewSet` (soft delete, lista solo activas), `PedidoViewSet` (`select_related` + `prefetch_related`, `update` limpia `_prefetched_objects_cache`, `destroy` delega en `eliminar_borrador`), `ConfirmarPedidoView` y `CambiarEstadoPedidoView` (APIViews → `PedidoService`).
+- `urls.py`: router `recetas/` y `pedidos/` + `POST pedidos/{id}/confirmar/` y `POST pedidos/{id}/cambiar-estado/`.
+
+### Rutas
+`/api/v1/recetas/`, `/api/v1/pedidos/`, `POST /api/v1/pedidos/{id}/confirmar/`, `POST /api/v1/pedidos/{id}/cambiar-estado/`.
 - **Dificultad**: alta. Aquí se justifica la capa `services` y el envelope (errores de negocio con códigos).
+- **Done**: verificación E2E (44 checks: numeración secuencial, IVA 16%, upsert de detalles, stock descontado/restaurado, transiciones por rol con 403, 409 en transiciones inválidas/terminales, rollback ante `stock_insuficiente`, filtros, soft delete, auditoría) + `check` y `makemigrations` sin pendientes.
 
 ## Fase 5 — finance (consistencia transaccional) ⭐ el más difícil
 
-- `MetodoPago`: CRUD ViewSet simple (usar la plantilla de clients).
-- `Pago`: ViewSet + `services.py` → `PagoService`:
-  - Registro de pago **y asiento de `LibroMayor` en la misma transacción** (nunca asientos sueltos).
-  - Transición de estados `pendiente → aprobado/rechazado` con validaciones (monto vs saldo del pedido, referencia requerida si `MetodoPago.requiere_referencia`).
-  - Recalcular `saldo_posterior` del cliente consultando el saldo previo.
-- `LibroMayor`: **sin CRUD directo** — solo lectura (`BaseReadOnlyModelViewSet`) filtrado por cliente; los asientos los crea `PagoService` (y `PedidoService` en la Fase 4 si aplica).
-- **Dificultad**: muy alta. Lógica contable + consistencia ACID.
+### Modelo contable (decisión: consistencia completa)
+- El saldo del cliente (cuentas por cobrar) se deriva del **saldo corrido** del `LibroMayor` (`saldo_posterior` del último asiento por `-id`). `ClienteOptica` no guarda saldo.
+- Asientos: **DEBITO** incrementa el saldo (venta) y **CREDITO** lo decrementa (pago o reverso). **DEBITO** y **CREDITO** con `saldo_posterior = saldo_previo ± monto`.
+- `PedidoService.confirmar` crea asiento DEBITO por `pedido.total`; `PedidoService.cancelar` revierte ese asiento (CREDITO) vía `asiento_origen` (guarda anti-doble-reversión `asiento_ya_revertido`). El saldo queda neto consistente (pedido 100 con pago 40 cancelado → saldo −40 = crédito a favor).
+- Los asientos se crean **siempre dentro de la misma transacción** que el evento de negocio (confirmar/cancelar/aprobar) — nunca asientos sueltos.
+
+### Cambios de modelo (migración `0002`)
+- `MetodoPago(ActivoMixin)` → `activo` (soft delete; `ordering=('nombre',)` en el viewset porque no tiene timestamps).
+- `Pago`: + `motivo_rechazo`, `CheckConstraint` `pago_monto_positivo` (`monto > 0`) y `pago_tasa_cambio_positiva`, índice `pagos_idx_pedido_estado`.
+- `LibroMayor`: + `asiento_origen` (FK a `self`, SET_NULL) + índice `libro_mayor_idx_cliente_creado`.
+
+### App finance
+- `services.py`:
+  - `LibroMayorService` → `crear_asiento(...)` (lock del cliente con `select_for_update`, saldo previo, `saldo_posterior`, auditoría `asiento_libro_mayor`) y `revertir_asiento(...)` (tipo inverso + guarda `asiento_ya_revertido`).
+  - `PagoService` → `crear` (PENDIENTE, sin asiento), `aprobar` (lock Pago → Pedido → Cliente en ese orden; valida estado PENDIENTE, `referencia_requerida` si `MetodoPago.requiere_referencia`, sobre-pago `sum(aprobados del pedido) + monto <= pedido.total` → `pago_excede_pedido`; crea asiento CREDITO y `estado = APROBADO` en la misma transacción; auditoría `aprobar_pago`) y `rechazar` (persiste `motivo_rechazo`, sin asiento, auditoría `rechazar_pago`).
+  - Lock order consistente `Pedido/Pago → Cliente` para evitar deadlocks.
+- `serializers/`: `metodo_pago.py`, `pago.py` (`PagoSerializer`: create vía `PagoService.crear`, read-only `estado`/timestamps, valida `cliente == pedido.cliente` o lo deriva, monto/tasa_cambio positivos, `fecha_pago` opcional con `default=timezone.now`; `PagoResumenSerializer` para anidados), `libro_mayor.py` (read-only con `cliente_detalle`, `pedido_numero`, `pago_detalle`, `tipo_asiento_display`, `asiento_origen_id`).
+- `filters.py`: `MetodoPagoFilter` (`activo`, `moneda`), `PagoFilter` (`estado`, `cliente`, `pedido`, `metodo_pago`, `fecha_pago`), `LibroMayorFilter` (`cliente`, `tipo_asiento`, `fecha_creado`).
+- `permissions.py`: `EscrituraMetodoPagoOLectura = es_rol_o_lectura(ADMINISTRADOR, CONTABILIDAD)`, `GestionPago = es_rol(ADMINISTRADOR, CONTABILIDAD)`, `LecturaLibroMayor = es_rol(ADMINISTRADOR, CONTABILIDAD)`.
+- `views/`: `MetodoPagoViewSet` (soft delete, lista solo activos), `PagoViewSet` (create/list/retrieve; `update`/`partial_update`/`destroy` sobreescritos → 409 `pago_no_editable`/`pago_no_eliminable`), `AprobarPagoView` y `RechazarPagoView` (APIViews → `PagoService`), `LibroMayorViewSet` (`BaseReadOnlyModelViewSet`).
+- `urls.py`: router `metodos-pago/`, `pagos/`, `libro-mayor/` + `POST pagos/{id}/aprobar/` y `POST pagos/{id}/rechazar/`.
+
+### Rutas
+`/api/v1/metodos-pago/`, `/api/v1/pagos/`, `POST /api/v1/pagos/{id}/aprobar/`, `POST /api/v1/pagos/{id}/rechazar/`, `/api/v1/libro-mayor/`.
+- **Dificultad**: muy alta. Lógica contable + consistencia ACID (saldo corrido con lock, validaciones de referencia y sobre-pago, transiciones de pago, reversos de asiento).
+- **Done**: verificación E2E (crear pago pendiente sin asiento, aprobar → asiento CREDITO con `saldo_posterior` correcto, rechazar con `motivo_rechazo` y sin asiento, 409 `referencia_requerida`/`pago_excede_pedido`/`pago_estado_invalido`/`pago_no_editable`/`pago_no_eliminable`, confirmar pedido → asiento DEBITO, cancelar → reverso con `asiento_origen`, `libro-mayor` solo lectura con 403 a vendedor, soft delete de métodos, permisos y auditoría) + `check` y `makemigrations` sin pendientes.
 
 ## Fase 6 — document_engine (render + cross-app)
 

@@ -5,12 +5,12 @@ from backend.apps.finance.models import LibroMayor, MetodoPago, Pago
 
 @admin.register(MetodoPago)
 class MetodoPagoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'moneda', 'requiere_referencia')
+    list_display = ('nombre', 'moneda', 'requiere_referencia', 'activo')
 
 
 @admin.register(Pago)
 class PagoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'cliente', 'monto', 'estado', 'fecha_pago', 'creado_en')
+    list_display = ('id', 'cliente', 'monto', 'estado', 'fecha_pago', 'motivo_rechazo', 'creado_en')
     list_filter = ('estado', 'metodo_pago')
     search_fields = ('cliente__nombre_comercial', 'numero_referencia')
 

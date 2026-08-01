@@ -5,8 +5,10 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from backend.apps.core.choices import EstadoPedido, RolUsuario
+from backend.apps.core.choices import EstadoPedido, RolUsuario, TipoAsiento
 from backend.apps.core.services import AuditoriaService
+from backend.apps.finance.models import LibroMayor
+from backend.apps.finance.services import LibroMayorService
 from backend.apps.inventory.services import StockService
 from backend.apps.orders.models import ContadorPedido, DetallePedido, Pedido
 from backend.common.api.exceptions import ApiError
@@ -194,6 +196,15 @@ class PedidoService:
                 'confirmar_pedido',
                 {'estado_anterior': estado_anterior, 'estado_nuevo': EstadoPedido.CONFIRMADO},
             )
+            LibroMayorService.crear_asiento(
+                cliente=pedido.cliente,
+                tipo_asiento=TipoAsiento.DEBITO,
+                monto=pedido.total,
+                descripcion=f'Pedido {pedido.numero_pedido}',
+                pedido=pedido,
+                usuario=usuario,
+                direccion_ip=direccion_ip,
+            )
 
         return pedido
 
@@ -265,6 +276,18 @@ class PedidoService:
                         detalle.variante,
                         delta=detalle.cantidad,
                         motivo='cancelar_pedido',
+                        usuario=usuario,
+                        direccion_ip=direccion_ip,
+                    )
+
+                asiento_debito = (
+                    LibroMayor.objects.filter(pedido=pedido, tipo_asiento=TipoAsiento.DEBITO)
+                    .order_by('-id')
+                    .first()
+                )
+                if asiento_debito is not None:
+                    LibroMayorService.revertir_asiento(
+                        asiento_debito,
                         usuario=usuario,
                         direccion_ip=direccion_ip,
                     )
