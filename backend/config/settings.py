@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from decimal import Decimal
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -124,6 +125,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Impuesto aplicable a los pedidos (tasa fija, ej. IVA 16%)
+IMPUESTO_RATE = Decimal('0.16')
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True

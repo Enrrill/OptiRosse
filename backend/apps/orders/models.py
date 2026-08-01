@@ -1,13 +1,13 @@
 from django.db import models
 
 from backend.apps.clients.models import ClienteOptica
-from backend.apps.core.base_models import TimeStampedModel
+from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
 from backend.apps.core.choices import EstadoPedido
 from backend.apps.core.models import Usuario
 from backend.apps.inventory.models import VarianteProducto
 
 
-class RecetaOptica(models.Model):
+class RecetaOptica(ActivoMixin):
     nombre_paciente = models.CharField('nombre del paciente', max_length=100, blank=True, default='')
 
     od_esfera = models.DecimalField('OD esfera', max_digits=4, decimal_places=2, blank=True, null=True)
@@ -49,6 +49,9 @@ class Pedido(TimeStampedModel):
         verbose_name = 'pedido'
         verbose_name_plural = 'pedidos'
         db_table = 'pedidos'
+        indexes = [
+            models.Index(fields=['estado'], name='pedidos_idx_estado'),
+        ]
 
     def __str__(self):
         return f'Pedido #{self.numero_pedido} - {self.cliente.nombre_comercial}'
@@ -65,6 +68,21 @@ class DetallePedido(models.Model):
         verbose_name = 'detalle de pedido'
         verbose_name_plural = 'detalles de pedido'
         db_table = 'detalles_pedido'
+        constraints = [
+            models.CheckConstraint(condition=models.Q(cantidad__gte=1), name='detalles_cantidad_positiva'),
+        ]
 
     def __str__(self):
         return f'{self.variante} x{self.cantidad}'
+
+
+class ContadorPedido(models.Model):
+    ultimo_numero = models.IntegerField('último número', default=0)
+
+    class Meta:
+        verbose_name = 'contador de pedidos'
+        verbose_name_plural = 'contador de pedidos'
+        db_table = 'contador_pedidos'
+
+    def __str__(self):
+        return f'Último número de pedido: {self.ultimo_numero}'

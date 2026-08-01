@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from backend.apps.orders.models import DetallePedido, Pedido, RecetaOptica
+from backend.apps.orders.models import ContadorPedido, DetallePedido, Pedido, RecetaOptica
 
 
 class DetallePedidoInline(admin.TabularInline):
@@ -25,3 +25,8 @@ class PedidoAdmin(admin.ModelAdmin):
 @admin.register(DetallePedido)
 class DetallePedidoAdmin(admin.ModelAdmin):
     list_display = ('pedido', 'variante', 'cantidad', 'precio_unitario', 'precio_total')
+
+
+@admin.register(ContadorPedido)
+class ContadorPedidoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'ultimo_numero')
