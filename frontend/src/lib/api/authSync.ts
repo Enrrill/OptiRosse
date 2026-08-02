@@ -24,7 +24,7 @@ if (channel) {
     if (msg.type === 'tokens') {
       useAuthStore.getState().setTokens(msg.access, msg.refresh)
     } else if (msg.type === 'logout') {
-      useAuthStore.getState().logout()
+      useAuthStore.getState()._clearAuth()
     }
   }
 }

@@ -8,13 +8,14 @@ import { AUTH_ENDPOINTS } from '@/lib/api/endpoints'
 import { ApiError } from '@/lib/api/errors'
 import { useAuthStore } from '@/store/useAuth'
 import { useToast } from '@/store/useToast'
+import type { ApiResponse } from '@/types/api'
+import type { Usuario } from '@/types/models'
 import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FieldError } from '@/components/forms/FieldError'
 import { useTheme } from '@/app/ThemeProvider'
-import type { Usuario } from '@/types/models'
 
 const loginSchema = z.object({
   identificador: z.string().min(1, 'Ingresa tu nombre de usuario o correo'),
@@ -49,8 +50,8 @@ export default function LoginPage() {
       )
       setTokens(data.access, data.refresh)
 
-      const me = await apiClient.get<Usuario>(AUTH_ENDPOINTS.me)
-      setUser(me.data)
+      const me = await apiClient.get<ApiResponse<Usuario>>(AUTH_ENDPOINTS.me)
+      setUser(me.data.data)
 
       navigate(from, { replace: true })
     } catch (err) {
