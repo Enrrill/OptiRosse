@@ -23,6 +23,11 @@ Django 6 + React 19 + Vite 8 + Tailwind v4. Monorepo at project root.
 - CSS entry: `@import "tailwindcss"` (not legacy `@tailwind` directives)
 - JSX: use `className`, never `class`
 - Scripts: `pnpm dev`, `pnpm build`, `pnpm lint` (ESLint flat config)
+- **`apiClient` (axios) unwraps the envelope**: the interceptor converts `{success, data, errors, message, meta}` into `ApiResponse<T>` (`{data, meta, message}`); read the payload as `res.data.data`, NOT `res.data`. `useApiQuery`/`useApiMutation` in `hooks/useApi.ts` already handle this
+- **Auth store** (`store/useAuth.ts`, zustand + persist, key `optirosse-auth`): `logout()` broadcasts via `BroadcastChannel` (`lib/api/authSync.ts`) to sync tabs; the cross-tab handler must use `_clearAuth()` (no broadcast) to avoid a logout loop
+- **`ProtectedRoute`** (`components/layout/guards.tsx`) validates the token with `GET /auth/me/` on mount (shows `FullPageLoader`) before rendering — do not trust the persisted `isAuthenticated` flag
+- **Query defaults** (`lib/constants/query.ts`): no retry on 401 errors; `refetchOnWindowFocus: false`
+- ESLint flat config includes `react-hooks/set-state-in-effect` — do **not** call `setState` synchronously inside a `useEffect` (lint error)
 
 ## Commands
 
@@ -47,6 +52,7 @@ cd frontend && pnpm lint
 ## Project quirks
 
 - `backend/config/settings/` directory was removed — only `settings.py` (file) is used; do not recreate the package
+- JWT: `ROTATE_REFRESH_TOKENS=True` + `BLACKLIST_AFTER_ROTATION=True` — the refresh endpoint returns a **new** refresh token that must be persisted (`data.refresh ?? refresh` in `client.ts`); after invalidating tokens, re-login once
 - No test framework configured yet; no CI; no pre-commit hooks
 - No migrations were squashed; initial migrations exist for all apps
 - All model content in Spanish (field names, verbose, choices labels)
