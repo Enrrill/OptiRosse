@@ -59,13 +59,13 @@ export function useApiMutation<TData, TVariables = unknown>(
         method: options.method ?? 'post',
         data: variables as object,
       }),
-    onSuccess: (data, variables, context) => {
+    ...mutationOptions,
+    onSuccess: (data, variables, context, mutation) => {
       options.invalidates?.forEach((key) =>
         queryClient.invalidateQueries({ queryKey: key }),
       )
       if (options.successMessage) toast.success(options.successMessage)
-      mutationOptions?.onSuccess?.(data, variables, context)
+      mutationOptions?.onSuccess?.(data, variables, context, mutation)
     },
-    ...mutationOptions,
   })
 }

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 
 export type KpiVariant = 'primary' | 'secondary' | 'amber' | 'green' | 'error' | 'default'
 
-interface KpiCardProps {
+export interface KpiCardProps {
   label: string
   value: ReactNode
   sub?: ReactNode

@@ -33,6 +33,43 @@ export type EstadoPedido =
 
 export type EstadoPago = 'pendiente' | 'aprobado' | 'rechazado'
 
+export interface Cliente {
+  id: number
+  razon_social: string
+  nombre_comercial: string
+  identificacion_fiscal: string
+  correo: string
+  telefono: string
+  direccion: string
+  limite_credito: string
+  dias_credito: number
+  activo: boolean
+  creado_en: string
+  actualizado_en: string
+}
+
+export interface ClienteResumen {
+  id: number
+  razon_social: string
+  nombre_comercial: string
+  identificacion_fiscal: string
+}
+
+export interface LibroMayorAsiento {
+  id: number
+  cliente: number
+  cliente_detalle: ClienteResumen
+  pedido_numero: string | null
+  pago_detalle: unknown | null
+  tipo_asiento: 'debito' | 'credito' | string
+  tipo_asiento_display: string
+  monto: number | string
+  saldo_posterior: number | string
+  descripcion: string
+  asiento_origen_id: number | null
+  creado_en: string
+}
+
 export interface Periodo {
   desde: string
   hasta: string

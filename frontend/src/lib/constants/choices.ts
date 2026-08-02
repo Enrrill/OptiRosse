@@ -87,6 +87,22 @@ export const TIPO_DOCUMENTO: Record<string, ChoiceDisplay> = {
   recibo_pago: { label: 'Recibo de Pago', badge: 'bg-green-500/15 text-green-700 dark:text-green-300' },
 }
 
+export const ESTADO_ACTIVO: Record<string, ChoiceDisplay> = {
+  true: {
+    label: 'Activo',
+    badge: 'bg-green-500/15 text-green-700 dark:text-green-300',
+  },
+  false: {
+    label: 'Inactivo',
+    badge: 'bg-error-container/50 text-error',
+  },
+}
+
+export function estadoActivo(activo?: boolean | null): ChoiceDisplay | null {
+  if (activo === null || activo === undefined) return null
+  return ESTADO_ACTIVO[String(activo)]
+}
+
 export function choice(map: Record<string, ChoiceDisplay>, value?: string | null): ChoiceDisplay | null {
   if (!value) return null
   return map[value] ?? { label: value, badge: 'bg-surface-variant/40 text-on-surface-variant' }

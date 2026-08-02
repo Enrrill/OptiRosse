@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useDebounce } from './useDebounce'
 
 interface UsePaginationOptions {
@@ -13,6 +13,15 @@ export function usePagination({ pageSize = 20, debounceMs = 300 }: UsePagination
 
   const resetPage = () => setPage(1)
 
+  const params = useMemo(
+    () => ({
+      page,
+      page_size: pageSize,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    }),
+    [page, pageSize, debouncedSearch],
+  )
+
   return {
     page,
     setPage,
@@ -20,10 +29,6 @@ export function usePagination({ pageSize = 20, debounceMs = 300 }: UsePagination
     setSearch,
     resetPage,
     pageSize,
-    params: {
-      page,
-      page_size: pageSize,
-      ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    },
+    params,
   }
 }

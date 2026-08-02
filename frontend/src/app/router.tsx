@@ -10,6 +10,7 @@ const Login = lazy(() => import('@/features/auth/pages/LoginPage'))
 const Dashboard = lazy(() => import('@/features/dashboard/pages/DashboardPage'))
 const Perfil = lazy(() => import('@/features/profile/pages/PerfilPage'))
 const Clientes = lazy(() => import('@/features/clients/pages/ClientesPage'))
+const ClienteDetalle = lazy(() => import('@/features/clients/pages/ClienteDetallePage'))
 const Usuarios = lazy(() => import('@/features/users/pages/UsuariosPage'))
 const Inventario = lazy(() => import('@/features/inventory/pages/InventarioPage'))
 const Recetas = lazy(() => import('@/features/prescriptions/pages/RecetasPage'))
@@ -54,6 +55,7 @@ export const router = createBrowserRouter([
           { path: '/', element: dashboard },
           { path: '/perfil', element: withSuspense(<Perfil />) },
           { path: '/clientes', element: withSuspense(<Clientes />) },
+          { path: '/clientes/:id', element: withSuspense(<ClienteDetalle />) },
           { path: '/usuarios', element: <RoleRoute roles={adminOnly} />, children: [{ index: true, element: withSuspense(<Usuarios />) }] },
           { path: '/inventario', element: <RoleRoute roles={adminAlmacen} />, children: [{ index: true, element: withSuspense(<Inventario />) }] },
           { path: '/recetas', element: <RoleRoute roles={adminTecnicoVendedor} />, children: [{ index: true, element: withSuspense(<Recetas />) }] },
