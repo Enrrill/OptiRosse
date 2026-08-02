@@ -460,12 +460,12 @@ src/
 | Rol | KPIs | Recientes |
 |---|---|---|
 | administrador | pedidos_por_estado, total_vendido_mes, clientes, stock_bajo, pagos_pendientes, saldo_por_cobrar | pedidos + pagos |
-| vendedor_b2b | pedidos_por_estado, total_vendido_mes, clientes | pedidos + pagos |
+| vendedor_b2b | pedidos_por_estado, total_vendido_mes, clientes | pedidos |
 | almacen | stock_bajo, pedidos_por_estado (confirmado/listo_para_despacho/enviado) | pedidos |
 | tecnico_taller | pedidos_por_estado (confirmado/en_taller/listo_para_despacho) | pedidos |
 | contabilidad | pagos_pendientes, saldo_por_cobrar, total_vendido_mes | pedidos + pagos |
 
-Regla: **el grid es dirigido por presencia de claves** — si un KPI no viene, su tarjeta no se dibuja. Nota backend: implementar como "Fase 8 — dashboard (métricas)" en `PLAN_BACKEND.md` (vista read-only + servicio agregado; permiso `IsAuthenticated`).
+Regla: **el grid es dirigido por presencia de claves** — si un KPI no viene, su tarjeta no se dibuja. Igual con `recientes.pagos`: la clave llega **ausente** para roles sin acceso (vendedor/almacén/técnico) y el panel "Últimos pagos" se oculta. Nota backend: implementado como "Fase 8 — dashboard (métricas)" en `PLAN_BACKEND.md` (vista read-only + `DashboardService` en `finance`; permiso `IsAuthenticated`).
 
 ### Especificación visual (KPI por rol)
 
@@ -494,12 +494,12 @@ Regla: **el grid es dirigido por presencia de claves** — si un KPI no viene, s
 
 ### Checklist de implementación
 
-1. `endpoints.ts` + `types/models.ts` (contrato).
-2. `components/data/KpiCard.tsx` + `Panel.tsx`.
-3. `useDashboard.ts` + `kpiConfig.ts` + `KpiGrid` + `QuickActions` + `RecentOrders` + `RecentPayments` + `DashboardSkeleton`.
-4. Reescribir `DashboardPage.tsx` (loading/error/empty/success).
-5. Ajustar toast de bienvenida (login + dashboard).
-6. Backend: `GET /dashboard/resumen/` (Fase 8 de `PLAN_BACKEND.md`) — **bloqueante**.
+1. `endpoints.ts` + `types/models.ts` (contrato). ✅
+2. `components/data/KpiCard.tsx` + `Panel.tsx`. ✅
+3. `useDashboard.ts` + `kpiConfig.ts` + `KpiGrid` + `QuickActions` + `RecentOrders` + `RecentPayments` + `DashboardSkeleton`. ✅
+4. Reescribir `DashboardPage.tsx` (loading/error/empty/success). ✅
+5. Ajustar toast de bienvenida (login + dashboard). ✅
+6. Backend: `GET /dashboard/resumen/` (Fase 8 de `PLAN_BACKEND.md`) — ✅ implementado (`DashboardService` en `finance`).
 7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol.
 
 ### Prompt para Stitch
@@ -515,7 +515,7 @@ El frontend se implementa por fases. Cada fase entrega una **página navegable y
 |---|---|---|---|---|
 | **0. Fundación** | Migrar a TypeScript, instalar deps, proxy `/api`, alias `@/`, `@theme` Material 3, shadcn init, `lib/api/client.ts`, providers, limpiar boilerplate (App.css/assets) | — | `Icon`, `cn`, `lib/api/*`, `types/*`, `lib/constants/*` | ✅ Implementada |
 | **1. Auth + Shell + Perfil** | Login · AppShell (sidebar colapsable + topbar + menú usuario) · rutas protegidas/por rol · Perfil (cambiar contraseña, logout) | `auth/login`, `auth/refresh`, `auth/me`, `auth/cambiar-contrasena`, `auth/logout` | `AppShell`, `Sidebar`, `Topbar`, `UserMenu`, `ProtectedRoute`, `RoleRoute`, shadcn `ui/*` | ✅ Implementada |
-| **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `dashboard/resumen/` (nuevo, ver §13) | **`KpiCard`**, `Panel`, `KpiGrid`, `QuickActions`, `RecentOrders`, `RecentPayments`, `DashboardSkeleton` | ⏳ Pendiente (plan en §13) |
+| **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `dashboard/resumen/` (ver §13) | **`KpiCard`**, `Panel`, `KpiGrid`, `QuickActions`, `RecentOrders`, `RecentPayments`, `DashboardSkeleton` | ✅ Implementada (plan en §13) |
 | **3. Clientes** | Lista + detalle (crédito) + formulario drawer + desactivar | `clientes/` CRUD, `?search=` | `ConfirmDialog`, `Drawer`, `SectionCard`, `FieldError` | ⏳ Pendiente |
 | **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) | ⏳ Pendiente |
 | **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal | ⏳ Pendiente |

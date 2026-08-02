@@ -72,7 +72,7 @@ export interface PagoResumen {
 
 export interface DashboardRecientes {
   pedidos: PedidoResumen[]
-  pagos: PagoResumen[]
+  pagos?: PagoResumen[] | null
 }
 
 export interface DashboardResumen {

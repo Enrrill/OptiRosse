@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Usuario } from '@/types/models'
+import { notifyLogout } from '@/lib/api/authSync'
 
 interface AuthState {
   access: string | null
@@ -22,8 +23,10 @@ export const useAuthStore = create<AuthState>()(
       setTokens: (access, refresh) =>
         set({ access, refresh, isAuthenticated: true }),
       setUser: (user) => set({ user }),
-      logout: () =>
-        set({ access: null, refresh: null, user: null, isAuthenticated: false }),
+      logout: () => {
+        notifyLogout()
+        set({ access: null, refresh: null, user: null, isAuthenticated: false })
+      },
     }),
     {
       name: 'optirosse-auth',

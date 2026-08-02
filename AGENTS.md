@@ -12,7 +12,8 @@ Django 6 + React 19 + Vite 8 + Tailwind v4. Monorepo at project root.
 - All `TextChoices` in `core/choices.py` — import as `from backend.apps.core.choices import ...`
 - Cross-app model imports use full dotted path: `from backend.apps.clients.models import ClienteOptica`
 - `db_table` explicit on every model. `verbose_name` / `verbose_name_plural` in Spanish
-- No API views or URL routes exist beyond `/admin/`
+- API under `/api/v1/`: per-app `urls.py` included in `backend/config/urls.py`; responses use the envelope `{success, data, errors, message, meta}` (`backend/common/api/response.py`)
+- Business logic in `services.py` (thin views), read-only aggregates also as services (e.g. `DashboardService` in `finance`)
 - Always activate venv: `source venv/bin/activate && python manage.py <cmd>`
 
 ## Frontend (frontend/)

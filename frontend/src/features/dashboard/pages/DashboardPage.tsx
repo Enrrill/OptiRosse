@@ -37,7 +37,7 @@ export default function DashboardPage() {
   if (!resumen) return null
 
   const kpiCards = buildKpiCards(resumen.kpis)
-  const { pedidos = [], pagos = [] } = resumen.recientes
+  const { pedidos = [], pagos } = resumen.recientes
 
   return (
     <div>
@@ -61,16 +61,18 @@ export default function DashboardPage() {
         >
           <RecentOrders pedidos={pedidos} />
         </Panel>
-        <Panel
-          title="Últimos pagos"
-          action={
-            <Link className="font-label-sm text-primary underline-offset-4 hover:underline" to="/finanzas">
-              Ver todos
-            </Link>
-          }
-        >
-          <RecentPayments pagos={pagos} />
-        </Panel>
+        {pagos !== undefined && pagos !== null && (
+          <Panel
+            title="Últimos pagos"
+            action={
+              <Link className="font-label-sm text-primary underline-offset-4 hover:underline" to="/finanzas">
+                Ver todos
+              </Link>
+            }
+          >
+            <RecentPayments pagos={pagos} />
+          </Panel>
+        )}
       </div>
     </div>
   )

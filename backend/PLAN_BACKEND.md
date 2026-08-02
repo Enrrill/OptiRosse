@@ -245,7 +245,7 @@ Decisión de motor PDF: **WeasyPrint (backend)**. Las plantillas viven en BD com
 
 ---
 
-## Fase 8 — dashboard (métricas) ⏳ pendiente
+## Fase 8 — dashboard (métricas) ✅ implementada
 
 Endpoint agregado de KPIs que consume el **Dashboard** del frontend (Fase 2 de `PLAN_FRONTEND.md`). Decisión: el frontend no calcula totales/saldos con paginación; el backend expone el resumen en una sola respuesta role-aware.
 
@@ -289,22 +289,23 @@ Endpoint agregado de KPIs que consume el **Dashboard** del frontend (Fase 2 de `
 | Rol | KPIs | Recientes |
 |---|---|---|
 | administrador | todos | pedidos + pagos |
-| vendedor_b2b | pedidos_por_estado, total_vendido_mes, clientes | pedidos + pagos |
+| vendedor_b2b | pedidos_por_estado, total_vendido_mes, clientes | pedidos |
 | almacen | stock_bajo, pedidos_por_estado (confirmado/listo_para_despacho/enviado) | pedidos |
 | tecnico_taller | pedidos_por_estado (confirmado/en_taller/listo_para_despacho) | pedidos |
 | contabilidad | pagos_pendientes, saldo_por_cobrar, total_vendido_mes | pedidos + pagos |
 
-### Implementación propuesta
+Nota: la clave `recientes.pagos` se **omite** para roles sin acceso (vendedor/almacén/técnico) — el frontend oculta el panel cuando la clave está ausente. `recientes.pedidos` siempre presente (todos los roles leen pedidos).
 
-- `services.py` → `DashboardService.resumen(usuario)`: arma el dict según rol con conteos/agregados (queries agregadas: `count`, `Sum('total')` con filtros de fecha/estado, último `saldo_posterior` agrupado por cliente) y los recientes vía `select_related`.
-- `views/dashboard.py` → `DashboardResumenView` (APIView read-only, `IsAuthenticated`, delega en `DashboardService`).
-- `serializers/dashboard.py` → serializadores resumidos de pedido/pago (solo lectura).
-- `urls.py` → `path('dashboard/resumen/', ...)`.
-- Candidata a app: `finance` (agrega libro mayor + pagos + pedidos) o un paquete `dashboard` ligero. **Dificultad**: media.
+### Implementación
+
+- `finance/services.py` → `DashboardService.resumen(usuario)`: arma el dict según rol con queries agregadas (`values().annotate(Count)`, `Sum('total')` con filtros de fecha/estado, `distinct('cliente_id')` de Postgres para el último `saldo_posterior` por cliente) y los recientes vía `select_related`. Los dicts de respuesta usan solo primitivas (sin objetos ORM).
+- `finance/views/dashboard.py` → `DashboardResumenView` (APIView read-only, `IsAuthenticated`, delega en `DashboardService`).
+- `finance/urls.py` → `path('dashboard/resumen/', ...)` (sin serializers adicionales; los dicts se construyen en el servicio).
+- Sin cambios de modelo → sin migraciones.
 
 ### Rutas
 `/api/v1/dashboard/resumen/` (todos los roles, role-aware).
-- **Done**: verificación por curl del payload por cada rol (permisos 401 sin token, 403 no aplica), conteos/agregados correctos contra datos de prueba y `check` sin pendientes.
+- **Done**: `check` + `makemigrations --check` sin pendientes y verificación por curl del payload por rol (401 sin token; vendedor/almacén/técnico sin `recientes.pagos`).
 
 ---
 

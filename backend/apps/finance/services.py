@@ -1,12 +1,14 @@
 from decimal import Decimal
 
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Count, F, Sum
+from django.utils import timezone
 
 from backend.apps.clients.models import ClienteOptica
-from backend.apps.core.choices import EstadoPago, TipoAsiento
+from backend.apps.core.choices import EstadoPago, EstadoPedido, RolUsuario, TipoAsiento
 from backend.apps.core.services import AuditoriaService
 from backend.apps.finance.models import LibroMayor, Pago
+from backend.apps.inventory.models import VarianteProducto
 from backend.apps.orders.models import Pedido
 from backend.common.api.exceptions import ApiError
 
@@ -193,3 +195,131 @@ class PagoService:
             )
 
         return pago
+
+
+ESTADOS_VENTA = (
+    EstadoPedido.CONFIRMADO,
+    EstadoPedido.EN_TALLER,
+    EstadoPedido.LISTO_PARA_DESPACHO,
+    EstadoPedido.ENVIADO,
+)
+
+
+class DashboardService:
+    """Resumen de métricas role-aware para el panel de control del frontend."""
+
+    @staticmethod
+    def _pedidos_por_estado():
+        conteos = (
+            Pedido.objects.values('estado')
+            .annotate(total=Count('id'))
+            .values_list('estado', 'total')
+        )
+        conteo = dict(conteos)
+        return {estado: conteo.get(estado, 0) for estado, _ in EstadoPedido.choices}
+
+    @staticmethod
+    def _total_vendido_mes(desde, hasta):
+        total = Pedido.objects.filter(
+            estado__in=ESTADOS_VENTA,
+            creado_en__date__gte=desde,
+            creado_en__date__lte=hasta,
+        ).aggregate(total=Sum('total'))['total']
+        return float(total or 0)
+
+    @staticmethod
+    def _pagos_pendientes():
+        agregado = Pago.objects.filter(estado=EstadoPago.PENDIENTE).aggregate(
+            cantidad=Count('id'),
+            monto=Sum('monto'),
+        )
+        return {
+            'cantidad': agregado['cantidad'] or 0,
+            'monto': float(agregado['monto'] or 0),
+        }
+
+    @staticmethod
+    def _saldo_por_cobrar():
+        saldos = (
+            LibroMayor.objects.order_by('cliente_id', '-id')
+            .distinct('cliente_id')
+            .values_list('saldo_posterior', flat=True)
+        )
+        return float(sum(saldos))
+
+    @staticmethod
+    def _recientes_pedidos(limite=5):
+        pedidos = Pedido.objects.select_related('cliente').order_by('-creado_en')[:limite]
+        return [
+            {
+                'id': p.pk,
+                'numero_pedido': p.numero_pedido,
+                'cliente_nombre': p.cliente.nombre_comercial,
+                'estado': p.estado,
+                'total': float(p.total),
+                'creado_en': p.creado_en,
+            }
+            for p in pedidos
+        ]
+
+    @staticmethod
+    def _recientes_pagos(limite=5):
+        pagos = (
+            Pago.objects.select_related('cliente', 'metodo_pago')
+            .order_by('-creado_en')[:limite]
+        )
+        return [
+            {
+                'id': p.pk,
+                'cliente_nombre': p.cliente.nombre_comercial,
+                'metodo_pago_nombre': p.metodo_pago.nombre,
+                'monto': float(p.monto),
+                'estado': p.estado,
+                'creado_en': p.creado_en,
+            }
+            for p in pagos
+        ]
+
+    @classmethod
+    def resumen(cls, usuario):
+        fecha = timezone.now().date()
+        desde = fecha.replace(day=1)
+        rol = usuario.rol
+
+        kpis = {}
+        recientes = {}
+
+        if rol in (
+            RolUsuario.ADMINISTRADOR,
+            RolUsuario.VENDEDOR_B2B,
+            RolUsuario.ALMACEN,
+            RolUsuario.TECNICO_TALLER,
+        ):
+            kpis['pedidos_por_estado'] = cls._pedidos_por_estado()
+
+        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDOR_B2B, RolUsuario.CONTABILIDAD):
+            kpis['total_vendido_mes'] = cls._total_vendido_mes(desde, fecha)
+
+        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDOR_B2B):
+            kpis['clientes'] = ClienteOptica.objects.filter(activo=True).count()
+
+        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.ALMACEN):
+            kpis['stock_bajo'] = VarianteProducto.objects.filter(
+                activo=True,
+                stock__lte=F('alerta_stock_minimo'),
+            ).count()
+
+        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.CONTABILIDAD):
+            kpis['pagos_pendientes'] = cls._pagos_pendientes()
+            kpis['saldo_por_cobrar'] = cls._saldo_por_cobrar()
+
+        recientes['pedidos'] = cls._recientes_pedidos()
+        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.CONTABILIDAD):
+            recientes['pagos'] = cls._recientes_pagos()
+
+        return {
+            'fecha': fecha.isoformat(),
+            'periodo': {'desde': desde.isoformat(), 'hasta': fecha.isoformat()},
+            'kpis': kpis,
+            'recientes': recientes,
+        }

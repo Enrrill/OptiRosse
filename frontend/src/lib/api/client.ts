@@ -3,6 +3,8 @@ import type { ApiResponse, Envelope } from '@/types/api'
 import { useAuthStore } from '@/store/useAuth'
 import { API_BASE, AUTH_ENDPOINTS } from './endpoints'
 import { ApiError } from './errors'
+import { notifyTokens } from './authSync'
+import { sesionExpirada } from '@/store/useToast'
 
 const SKIP_REFRESH_PATHS = [
   AUTH_ENDPOINTS.login,
@@ -33,17 +35,20 @@ async function refreshAccessToken(): Promise<string> {
   if (!isRefreshing) {
     isRefreshing = true
     try {
-      const { data } = await axios.post<{ access: string }>(
+      const { data } = await axios.post<{ access: string; refresh?: string }>(
         `${API_BASE}${AUTH_ENDPOINTS.refresh}`,
         { refresh },
       )
-      useAuthStore.getState().setTokens(data.access, refresh)
+      const nextRefresh = data.refresh ?? refresh
+      useAuthStore.getState().setTokens(data.access, nextRefresh)
+      notifyTokens(data.access, nextRefresh)
       refreshQueue.forEach((item) => item.resolve(data.access))
       refreshQueue = []
       return data.access
     } catch (err) {
       refreshQueue.forEach((item) => item.reject(err))
       refreshQueue = []
+      sesionExpirada()
       useAuthStore.getState().logout()
       throw err
     } finally {
