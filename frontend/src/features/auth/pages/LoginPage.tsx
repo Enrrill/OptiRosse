@@ -52,7 +52,6 @@ export default function LoginPage() {
       const me = await apiClient.get<Usuario>(AUTH_ENDPOINTS.me)
       setUser(me.data)
 
-      toast.success('Bienvenido a OptiRosse')
       navigate(from, { replace: true })
     } catch (err) {
       const apiErr = err as ApiError
@@ -73,7 +72,7 @@ export default function LoginPage() {
         <Icon name={theme === 'dark' ? 'light_mode' : 'dark_mode'} />
       </button>
 
-      <div className="w-full max-w-md rounded-2xl border border-outline-variant bg-surface/95 p-8 shadow-lg backdrop-blur-md">
+      <div className="w-[95%] max-w-[420px] rounded-2xl border border-outline-variant bg-surface/95 p-8 shadow-lg backdrop-blur-md">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-on-primary shadow-md">
             <Icon name="lens_blur" size={32} filled />

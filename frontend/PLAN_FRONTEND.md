@@ -428,6 +428,85 @@ src/
 
 ---
 
+## 13. Fase 2 — Dashboard (plan de diseño e implementación)
+
+**Objetivo**: panel de control navegable (KPIs por rol, accesos rápidos, pedidos/pagos recientes) consumiendo **un único endpoint agregado** de métricas (decisión: cálculo server-side; el frontend NO suma con paginación). Mantiene el sistema de diseño Material 3 y reutiliza `DataTable`, `PageHeader`, `StatusBadge`, `ErrorState`, `EmptyState`.
+
+### Contrato backend (nuevo endpoint — dependencia de esta fase)
+
+`GET /api/v1/dashboard/resumen/` — **todos los roles autenticados**; el servidor devuelve solo el subconjunto de KPIs del rol. Envelope estándar; `data`:
+
+```json
+{
+  "fecha": "2026-08-02",
+  "periodo": { "desde": "2026-08-01", "hasta": "2026-08-02" },
+  "kpis": {
+    "pedidos_por_estado": { "borrador": 0, "confirmado": 12, "en_taller": 34, "listo_para_despacho": 8, "enviado": 41, "cancelado": 2 },
+    "total_vendido_mes": 18500.00,
+    "clientes": 42,
+    "stock_bajo": 18,
+    "pagos_pendientes": { "cantidad": 5, "monto": 2450.00 },
+    "saldo_por_cobrar": 12800.50
+  },
+  "recientes": {
+    "pedidos": [ { "id": 1, "numero_pedido": "PED-000123", "cliente_nombre": "Sofía Martínez", "estado": "confirmado", "total": 120.00, "creado_en": "2026-08-02T10:00:00Z" } ],
+    "pagos": [ { "id": 1, "cliente_nombre": "Javier Gómez", "metodo_pago_nombre": "Transferencia", "monto": 500.00, "estado": "pendiente", "creado_en": "2026-08-02T09:00:00Z" } ]
+  }
+}
+```
+
+**Alcance por rol** (`kpis` solo incluye lo visible; `recientes` ≤ 5 ítems, orden `-creado_en`):
+
+| Rol | KPIs | Recientes |
+|---|---|---|
+| administrador | pedidos_por_estado, total_vendido_mes, clientes, stock_bajo, pagos_pendientes, saldo_por_cobrar | pedidos + pagos |
+| vendedor_b2b | pedidos_por_estado, total_vendido_mes, clientes | pedidos + pagos |
+| almacen | stock_bajo, pedidos_por_estado (confirmado/listo_para_despacho/enviado) | pedidos |
+| tecnico_taller | pedidos_por_estado (confirmado/en_taller/listo_para_despacho) | pedidos |
+| contabilidad | pagos_pendientes, saldo_por_cobrar, total_vendido_mes | pedidos + pagos |
+
+Regla: **el grid es dirigido por presencia de claves** — si un KPI no viene, su tarjeta no se dibuja. Nota backend: implementar como "Fase 8 — dashboard (métricas)" en `PLAN_BACKEND.md` (vista read-only + servicio agregado; permiso `IsAuthenticated`).
+
+### Especificación visual (KPI por rol)
+
+- **PageHeader**: "Panel de control" + subtítulo con fecha larga localizada (dayjs `dddd D [de] MMMM`, ej. "Resumen de actividad para domingo, 2 de agosto").
+- **KpiGrid** (`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter`), `KpiCard` altura `h-40`, icono en recuadro `rounded-lg`, label `font-label-sm uppercase tracking-widest`, valor `font-heading text-headline-lg`, sub-label, hover `-translate-y-0.5`:
+  - `confirmado` → variante **primary** ("Confirmados") · `en_taller` → **secondary** ("En taller") · `listo_para_despacho` → **ámbar** ("Listos para despacho") · `enviado` → **verde** ("Enviados").
+  - `total_vendido_mes` → **primary** ("Vendido del mes", moneda) · `clientes` → **secondary** ("Clientes activos").
+  - `stock_bajo` → **ámbar** con icono `warning` y enlace "Ver inventario" → `/inventario`.
+  - `pagos_pendientes` → **verde** (valor = monto, sub = "N pagos").
+  - `saldo_por_cobrar` → valor moneda; **rojo** si negativo (crédito a favor).
+- **Accesos rápidos** (botones `rounded-full`, icono + texto): vendedor/admin "Nuevo pedido · Registrar pago · Nueva variante"; almacén "Ajustar stock · Pedidos por despachar"; técnico "Pedidos en taller"; contabilidad "Registrar pago · Aprobar pagos". En esta fase navegan a la lista del módulo; deep-links a creación cuando aterricen las fases 5/7/8.
+- **Recientes** (`grid grid-cols-1 lg:grid-cols-2 gap-gutter`): dos `Panel` (título + "Ver todos") con `DataTable`:
+  - Pedidos: N.º pedido (mono), Cliente, Estado (`StatusBadge`), Total (derecha), Fecha; row click → `/pedidos`.
+  - Pagos: Cliente, Método, Monto, Estado (`StatusBadge`), Fecha; row click → `/finanzas`.
+- **Estados**: loading → `DashboardSkeleton` (tarjetas + tablas skeleton); error → `ErrorState` full-page con "Reintentar"; kpis vacíos → `EmptyState`.
+
+### Arquitectura (archivos)
+
+- **Endpoints** (`src/lib/api/endpoints.ts`): añadir `DASHBOARD = '/dashboard/resumen/'`.
+- **Tipos** (`src/types/models.ts`): `EstadoPedido`, `EstadoPago`, `Periodo`, `DashboardKpis`, `PagosPendientesKpi`, `PedidoResumen`, `PagoResumen`, `DashboardResumen`.
+- **Hook** `src/features/dashboard/hooks/useDashboard.ts`: `useApiQuery(['dashboard','resumen'], DASHBOARD, { refetchOnWindowFocus: true })` → `{ resumen, isLoading, isError, error, refetch }`.
+- **Compartidos** (`src/components/data/`): `KpiCard.tsx` (genérico, reutilizable en reportes) y `Panel.tsx` (card con cabecera título + acción).
+- **Locales** (`src/features/dashboard/components/`): `kpiConfig.ts` (mapeo `kpis → KpiCardProps`), `KpiGrid.tsx`, `QuickActions.tsx`, `RecentOrders.tsx`, `RecentPayments.tsx`, `DashboardSkeleton.tsx`.
+- **Página** `src/features/dashboard/pages/DashboardPage.tsx`: reemplaza el placeholder por el flujo de estados.
+- **Toast de bienvenida**: en el montaje del dashboard, una vez por sesión (guard `sessionStorage`), con el nombre del usuario; se elimina el toast genérico del login para no duplicar.
+
+### Checklist de implementación
+
+1. `endpoints.ts` + `types/models.ts` (contrato).
+2. `components/data/KpiCard.tsx` + `Panel.tsx`.
+3. `useDashboard.ts` + `kpiConfig.ts` + `KpiGrid` + `QuickActions` + `RecentOrders` + `RecentPayments` + `DashboardSkeleton`.
+4. Reescribir `DashboardPage.tsx` (loading/error/empty/success).
+5. Ajustar toast de bienvenida (login + dashboard).
+6. Backend: `GET /dashboard/resumen/` (Fase 8 de `PLAN_BACKEND.md`) — **bloqueante**.
+7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol.
+
+### Prompt para Stitch
+> Diseña el panel principal (dashboard) de una aplicación web B2B para una óptica, en español, estilo moderno corporativo, colores morado #6D28D9 y azul claro #38BDF8, temas claro y oscuro, con el app shell de barra lateral y barra superior. Cabecera con título "Panel de control" y subtítulo con la fecha del día. Grilla de 4 tarjetas KPI con icono, etiqueta en mayúsculas pequeñas, número grande y una línea de detalle: una morada "Pedidos confirmados", una azul "En taller", una ámbar con icono de alerta "Stock bajo" y enlace "Ver inventario", y una verde "Pagos pendientes". Debajo, una fila de accesos rápidos como botones redondeados: "Nuevo pedido", "Registrar pago", "Nueva variante". Luego dos paneles lado a lado: "Últimos pedidos" (tabla con N.º pedido, cliente, estado como badge de color y total en moneda, con enlace "Ver todos") y "Últimos pagos" (tabla con cliente, método, monto, estado y fecha). Incluye el estado de carga con esqueletos de tarjetas y tablas, el estado vacío y el estado de error con botón "Reintentar".
+
+---
+
 ## Guía de implementación (roadmap página por página)
 
 El frontend se implementa por fases. Cada fase entrega una **página navegable y funcional** (diseño Stitch → implementación). Orden recomendado:
@@ -436,7 +515,7 @@ El frontend se implementa por fases. Cada fase entrega una **página navegable y
 |---|---|---|---|---|
 | **0. Fundación** | Migrar a TypeScript, instalar deps, proxy `/api`, alias `@/`, `@theme` Material 3, shadcn init, `lib/api/client.ts`, providers, limpiar boilerplate (App.css/assets) | — | `Icon`, `cn`, `lib/api/*`, `types/*`, `lib/constants/*` | ✅ Implementada |
 | **1. Auth + Shell + Perfil** | Login · AppShell (sidebar colapsable + topbar + menú usuario) · rutas protegidas/por rol · Perfil (cambiar contraseña, logout) | `auth/login`, `auth/refresh`, `auth/me`, `auth/cambiar-contrasena`, `auth/logout` | `AppShell`, `Sidebar`, `Topbar`, `UserMenu`, `ProtectedRoute`, `RoleRoute`, shadcn `ui/*` | ✅ Implementada |
-| **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `pedidos/?estado=&page_size=1`, `variantes/?stock_bajo=true&page_size=1`, `pagos/?estado=pendiente&page_size=1` | **`DataTable`**, `Pagination`, `StatusBadge`, `EmptyState`, `SkeletonRows`, `PageHeader` | ⏳ Pendiente |
+| **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `dashboard/resumen/` (nuevo, ver §13) | **`KpiCard`**, `Panel`, `KpiGrid`, `QuickActions`, `RecentOrders`, `RecentPayments`, `DashboardSkeleton` | ⏳ Pendiente (plan en §13) |
 | **3. Clientes** | Lista + detalle (crédito) + formulario drawer + desactivar | `clientes/` CRUD, `?search=` | `ConfirmDialog`, `Drawer`, `SectionCard`, `FieldError` | ⏳ Pendiente |
 | **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) | ⏳ Pendiente |
 | **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal | ⏳ Pendiente |

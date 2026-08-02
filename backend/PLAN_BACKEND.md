@@ -245,6 +245,69 @@ Decisión de motor PDF: **WeasyPrint (backend)**. Las plantillas viven en BD com
 
 ---
 
+## Fase 8 — dashboard (métricas) ⏳ pendiente
+
+Endpoint agregado de KPIs que consume el **Dashboard** del frontend (Fase 2 de `PLAN_FRONTEND.md`). Decisión: el frontend no calcula totales/saldos con paginación; el backend expone el resumen en una sola respuesta role-aware.
+
+### Endpoint
+
+`GET /api/v1/dashboard/resumen/` — **todos los roles autenticados** (`IsAuthenticated`); el servidor incluye solo el subconjunto de KPIs del rol. Envelope estándar (`success/data/message`), sin paginación.
+
+### Payload (`data`)
+
+```json
+{
+  "fecha": "2026-08-02",
+  "periodo": { "desde": "2026-08-01", "hasta": "2026-08-02" },
+  "kpis": {
+    "pedidos_por_estado": { "borrador": 0, "confirmado": 12, "en_taller": 34, "listo_para_despacho": 8, "enviado": 41, "cancelado": 2 },
+    "total_vendido_mes": 18500.00,
+    "clientes": 42,
+    "stock_bajo": 18,
+    "pagos_pendientes": { "cantidad": 5, "monto": 2450.00 },
+    "saldo_por_cobrar": 12800.50
+  },
+  "recientes": {
+    "pedidos": [ { "id": 1, "numero_pedido": "PED-000123", "cliente_nombre": "Sofía Martínez", "estado": "confirmado", "total": 120.00, "creado_en": "2026-08-02T10:00:00Z" } ],
+    "pagos": [ { "id": 1, "cliente_nombre": "Javier Gómez", "metodo_pago_nombre": "Transferencia", "monto": 500.00, "estado": "pendiente", "creado_en": "2026-08-02T09:00:00Z" } ]
+  }
+}
+```
+
+### Definiciones
+
+- `pedidos_por_estado`: conteo por estado (todos los estados, incluye 0).
+- `total_vendido_mes`: suma de `total` de pedidos en estados vendidos (`confirmado`/`en_taller`/`listo_para_despacho`/`enviado`) dentro del mes en curso (filtro `fecha_creado` del primer día del mes a hoy).
+- `clientes`: conteo de clientes activos.
+- `stock_bajo`: conteo de variantes activas con `stock <= alerta_stock_minimo`.
+- `pagos_pendientes`: `{cantidad, monto}` de pagos `pendiente`.
+- `saldo_por_cobrar`: suma del último `saldo_posterior` por cliente en `LibroMayor` (saldo corrido actual).
+- `recientes`: ≤ 5 ítems por lista, orden `-creado_en`, usando serializadores resumidos (nunca objetos ORM en la respuesta).
+
+### Alcance por rol
+
+| Rol | KPIs | Recientes |
+|---|---|---|
+| administrador | todos | pedidos + pagos |
+| vendedor_b2b | pedidos_por_estado, total_vendido_mes, clientes | pedidos + pagos |
+| almacen | stock_bajo, pedidos_por_estado (confirmado/listo_para_despacho/enviado) | pedidos |
+| tecnico_taller | pedidos_por_estado (confirmado/en_taller/listo_para_despacho) | pedidos |
+| contabilidad | pagos_pendientes, saldo_por_cobrar, total_vendido_mes | pedidos + pagos |
+
+### Implementación propuesta
+
+- `services.py` → `DashboardService.resumen(usuario)`: arma el dict según rol con conteos/agregados (queries agregadas: `count`, `Sum('total')` con filtros de fecha/estado, último `saldo_posterior` agrupado por cliente) y los recientes vía `select_related`.
+- `views/dashboard.py` → `DashboardResumenView` (APIView read-only, `IsAuthenticated`, delega en `DashboardService`).
+- `serializers/dashboard.py` → serializadores resumidos de pedido/pago (solo lectura).
+- `urls.py` → `path('dashboard/resumen/', ...)`.
+- Candidata a app: `finance` (agrega libro mayor + pagos + pedidos) o un paquete `dashboard` ligero. **Dificultad**: media.
+
+### Rutas
+`/api/v1/dashboard/resumen/` (todos los roles, role-aware).
+- **Done**: verificación por curl del payload por cada rol (permisos 401 sin token, 403 no aplica), conteos/agregados correctos contra datos de prueba y `check` sin pendientes.
+
+---
+
 ## Criterios de "done" por fase
 
 - App registrada en `settings.INSTALLED_APPS` y URL incluida.

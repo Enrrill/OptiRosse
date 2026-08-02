@@ -22,3 +22,62 @@ export interface TokenResponse {
   access: string
   refresh: string
 }
+
+export type EstadoPedido =
+  | 'borrador'
+  | 'confirmado'
+  | 'en_taller'
+  | 'listo_para_despacho'
+  | 'enviado'
+  | 'cancelado'
+
+export type EstadoPago = 'pendiente' | 'aprobado' | 'rechazado'
+
+export interface Periodo {
+  desde: string
+  hasta: string
+}
+
+export interface PagosPendientesKpi {
+  cantidad: number
+  monto: number
+}
+
+export interface DashboardKpis {
+  pedidos_por_estado?: Partial<Record<EstadoPedido, number>> | null
+  total_vendido_mes?: number | null
+  clientes?: number | null
+  stock_bajo?: number | null
+  pagos_pendientes?: PagosPendientesKpi | null
+  saldo_por_cobrar?: number | null
+}
+
+export interface PedidoResumen {
+  id: number
+  numero_pedido: string
+  cliente_nombre: string
+  estado: EstadoPedido | string
+  total: number
+  creado_en: string
+}
+
+export interface PagoResumen {
+  id: number
+  cliente_nombre: string
+  metodo_pago_nombre: string
+  monto: number
+  estado: EstadoPago | string
+  creado_en: string
+}
+
+export interface DashboardRecientes {
+  pedidos: PedidoResumen[]
+  pagos: PagoResumen[]
+}
+
+export interface DashboardResumen {
+  fecha: string
+  periodo: Periodo
+  kpis: DashboardKpis
+  recientes: DashboardRecientes
+}
