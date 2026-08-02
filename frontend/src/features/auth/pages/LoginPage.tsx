@@ -44,11 +44,11 @@ export default function LoginPage() {
   const onSubmit = handleSubmit(async (values) => {
     setLoading(true)
     try {
-      const { data } = await apiClient.post<{ access: string; refresh: string }>(
+      const { data } = await apiClient.post<ApiResponse<{ access: string; refresh: string }>>(
         AUTH_ENDPOINTS.login,
         values,
       )
-      setTokens(data.access, data.refresh)
+      setTokens(data.data.access, data.data.refresh)
 
       const me = await apiClient.get<ApiResponse<Usuario>>(AUTH_ENDPOINTS.me)
       setUser(me.data.data)

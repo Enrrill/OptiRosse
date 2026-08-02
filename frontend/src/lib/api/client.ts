@@ -1,4 +1,8 @@
-import axios, { AxiosError, type AxiosResponse } from 'axios'
+import axios, { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+
+interface CustomRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean
+}
 import type { ApiResponse, Envelope } from '@/types/api'
 import { useAuthStore } from '@/store/useAuth'
 import { API_BASE, AUTH_ENDPOINTS } from './endpoints'
@@ -30,21 +34,24 @@ let refreshQueue: Array<{ resolve: (access: string) => void; reject: (err: unkno
 
 async function refreshAccessToken(): Promise<string> {
   const { refresh } = useAuthStore.getState()
-  if (!refresh) throw new Error('Sin token de refresco')
+  if (!refresh) {
+    useAuthStore.getState().logout()
+    throw new Error('Sin token de refresco')
+  }
 
   if (!isRefreshing) {
     isRefreshing = true
     try {
-      const { data } = await axios.post<{ access: string; refresh?: string }>(
+      const { data } = await axios.post<Envelope<{ access: string; refresh?: string }>>(
         `${API_BASE}${AUTH_ENDPOINTS.refresh}`,
         { refresh },
       )
-      const nextRefresh = data.refresh ?? refresh
-      useAuthStore.getState().setTokens(data.access, nextRefresh)
-      notifyTokens(data.access, nextRefresh)
-      refreshQueue.forEach((item) => item.resolve(data.access))
+      const nextRefresh = data.data.refresh ?? refresh
+      useAuthStore.getState().setTokens(data.data.access, nextRefresh)
+      notifyTokens(data.data.access, nextRefresh)
+      refreshQueue.forEach((item) => item.resolve(data.data.access))
       refreshQueue = []
-      return data.access
+      return data.data.access
     } catch (err) {
       refreshQueue.forEach((item) => item.reject(err))
       refreshQueue = []
@@ -106,7 +113,7 @@ apiClient.interceptors.response.use(
   async (error: unknown) => {
     const axiosError = error as AxiosError
     const status = axiosError.response?.status ?? 0
-    const original = axiosError.config
+    const original = axiosError.config as CustomRequestConfig | undefined
 
     if (status === 401 && original && !shouldSkipRefresh(original.url) && !original._retry) {
       original._retry = true
