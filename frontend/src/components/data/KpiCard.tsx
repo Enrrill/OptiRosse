@@ -62,7 +62,7 @@ export function KpiCard({ label, value, sub, icon, variant = 'default', link }: 
   return (
     <div
       className={cn(
-        'flex h-40 flex-col justify-between rounded-xl p-md transition-transform duration-300 hover:-translate-y-0.5',
+        'flex h-40 flex-col justify-between rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-0.5',
         styles.card,
       )}
     >
@@ -81,7 +81,7 @@ export function KpiCard({ label, value, sub, icon, variant = 'default', link }: 
       </div>
       <div>
         <p className={cn('font-label-sm uppercase tracking-widest', styles.label)}>{label}</p>
-        <p className={cn('font-heading text-headline-lg leading-none mt-xs', styles.value)}>
+        <p className={cn('font-heading text-headline-lg leading-none mt-1', styles.value)}>
           {value}
         </p>
         {sub && <p className={cn('mt-1 text-sm', styles.label)}>{sub}</p>}

@@ -13,11 +13,11 @@ export function AppShell() {
       <Topbar />
       <main
         className={cn(
-          'min-h-screen p-4 pt-20 transition-all duration-300 md:p-6',
+          'min-h-screen p-4 pt-20 transition-all duration-300 md:px-8 md:pb-8 md:pt-20 lg:pt-20',
           collapsed ? 'lg:ml-[72px]' : 'lg:ml-64',
         )}
       >
-        <div className="mx-auto w-full max-w-7xl">
+        <div className="mx-auto w-full max-w-[1600px]">
           <Outlet />
         </div>
       </main>

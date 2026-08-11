@@ -146,14 +146,14 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
         </div>
       </SectionCard>
 
-      <div className="flex items-center justify-end gap-2">
+      <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-6 bg-surface-container-lowest px-6 py-4 border-t border-outline-variant/60 flex items-center justify-end gap-2">
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
             Cancelar
           </Button>
         )}
         <Button type="submit" loading={submitting}>
-          {!submitting && <Icon name="save" size={18} />}
+          {!submitting && <Icon name="save" size={18} className="mr-1.5" />}
           Guardar cliente
         </Button>
       </div>

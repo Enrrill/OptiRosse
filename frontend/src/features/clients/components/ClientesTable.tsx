@@ -71,7 +71,7 @@ export function ClientesTable({
     {
       key: 'correo',
       header: 'Correo',
-      cell: (row) => <span className="block max-w-[220px] truncate">{row.correo}</span>,
+      cell: (row) => <span className="block max-w-[320px] truncate text-on-surface-variant">{row.correo}</span>,
     },
     { key: 'telefono', header: 'Teléfono' },
     {
@@ -177,7 +177,7 @@ export function ClientesTable({
       onRowClick={(row) => navigate(`/clientes/${row.id}`)}
       toolbar={
         <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-xs">
+          <div className="relative w-full sm:max-w-md">
             <Icon
               name="search"
               size={18}
@@ -186,7 +186,7 @@ export function ClientesTable({
             <Input
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Buscar por nombre, RIF o correo..."
+              placeholder="Buscar por nombre comercial, RIF o correo..."
               className="pl-9"
             />
           </div>

@@ -65,6 +65,51 @@ export default function ClientesPage() {
         }
       />
 
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xs transition-shadow hover:shadow-md">
+          <div className="flex items-center justify-between">
+            <span className="font-label-sm text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              Total Cartera
+            </span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-container text-on-primary-container">
+              <Icon name="groups" size={20} />
+            </div>
+          </div>
+          <p className="mt-2 font-heading text-3xl font-bold text-on-surface">{count}</p>
+          <p className="mt-1 text-xs text-on-surface-variant">Clientes registrados en la plataforma</p>
+        </div>
+
+        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xs transition-shadow hover:shadow-md">
+          <div className="flex items-center justify-between">
+            <span className="font-label-sm text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              Filtro Actual
+            </span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container">
+              <Icon name={showInactivos ? 'person_off' : 'verified_user'} size={20} />
+            </div>
+          </div>
+          <p className="mt-2 font-heading text-2xl font-bold text-on-surface">
+            {showInactivos ? 'Inactivos' : 'Activos'}
+          </p>
+          <p className="mt-1 text-xs text-on-surface-variant">
+            {showInactivos ? 'Mostrando registros desactivados' : 'Mostrando clientes habilitados'}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xs transition-shadow hover:shadow-md">
+          <div className="flex items-center justify-between">
+            <span className="font-label-sm text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              En Pantalla
+            </span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-tertiary-container text-on-tertiary-container">
+              <Icon name="list_alt" size={20} />
+            </div>
+          </div>
+          <p className="mt-2 font-heading text-3xl font-bold text-on-surface">{clientes.length}</p>
+          <p className="mt-1 text-xs text-on-surface-variant">Resultados de la página actual</p>
+        </div>
+      </div>
+
       <ClientesTable
         clientes={clientes}
         count={count}

@@ -16,7 +16,7 @@ export function Topbar() {
   return (
     <header
       className={cn(
-        'fixed top-0 right-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-outline-variant bg-surface/80 px-4 backdrop-blur-md transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-outline-variant bg-surface/80 px-4 backdrop-blur-md transition-all duration-300',
         collapsed ? 'lg:left-[72px]' : 'lg:left-64',
       )}
     >

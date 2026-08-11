@@ -12,7 +12,7 @@ export function Panel({ title, action, children, className }: PanelProps) {
   return (
     <section
       className={cn(
-        'rounded-xl border border-outline-variant bg-surface-container-lowest p-md shadow-sm',
+        'rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-xs',
         className,
       )}
     >

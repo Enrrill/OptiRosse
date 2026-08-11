@@ -27,11 +27,11 @@ export function ClienteFormDrawer({ open, onOpenChange, cliente }: ClienteFormDr
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent side="right" className="max-w-xl">
-        <DrawerHeader>
+      <DrawerContent side="right" className="sm:w-[540px] md:w-[640px]">
+        <DrawerHeader className="p-6 pb-4">
           <div>
-            <DrawerTitle>{title}</DrawerTitle>
-            <DrawerDescription>{description}</DrawerDescription>
+            <DrawerTitle className="text-xl font-bold">{title}</DrawerTitle>
+            <DrawerDescription className="mt-1">{description}</DrawerDescription>
           </div>
           <DrawerClose asChild>
             <Button variant="ghost" size="icon" aria-label="Cerrar">
@@ -40,7 +40,7 @@ export function ClienteFormDrawer({ open, onOpenChange, cliente }: ClienteFormDr
           </DrawerClose>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-6 pt-2">
           <ClienteForm
             key={cliente?.id ?? 'nuevo'}
             cliente={cliente}

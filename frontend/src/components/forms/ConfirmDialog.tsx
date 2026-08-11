@@ -32,26 +32,41 @@ export function ConfirmDialog({
   loading = false,
   onConfirm,
 }: ConfirmDialogProps) {
+  const isDestructive = variant === 'destructive'
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-error-container">
-            <Icon name="warning" filled size={32} className="text-on-error-container" />
+      <DialogContent className="w-full sm:max-w-md p-6">
+        <div className="flex flex-col items-center gap-4 text-center py-2">
+          <div
+            className={`flex h-14 w-14 items-center justify-center rounded-full ${
+              isDestructive
+                ? 'bg-error-container text-on-error-container'
+                : 'bg-primary-container text-on-primary-container'
+            }`}
+          >
+            <Icon
+              name={isDestructive ? 'warning' : 'info'}
+              filled
+              size={30}
+              className="currentColor"
+            />
           </div>
           <DialogHeader className="items-center text-center">
-            <DialogTitle>{title}</DialogTitle>
+            <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
             {description && (
-              <DialogDescription className="mx-auto max-w-sm">{description}</DialogDescription>
+              <DialogDescription className="mt-2 text-sm text-on-surface-variant leading-relaxed">
+                {description}
+              </DialogDescription>
             )}
           </DialogHeader>
         </div>
-        <DialogFooter>
+        <DialogFooter className="mt-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
           <Button variant="outline" disabled={loading} onClick={() => onOpenChange(false)}>
             {cancelLabel}
           </Button>
           <Button variant={variant} disabled={loading} onClick={onConfirm}>
-            {loading && <Icon name="progress_activity" className="animate-spin" />}
+            {loading && <Icon name="progress_activity" className="animate-spin mr-2" />}
             {confirmLabel}
           </Button>
         </DialogFooter>

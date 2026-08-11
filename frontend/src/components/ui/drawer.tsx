@@ -33,7 +33,7 @@ function DrawerContent({
 }: React.ComponentProps<typeof DrawerPrimitive.Content> & { side?: 'right' | 'bottom' }) {
   const positionClasses =
     side === 'right'
-      ? 'inset-y-0 right-0 h-full w-full max-w-xl border-l border-outline-variant'
+      ? 'inset-y-0 right-0 h-full w-full sm:w-[540px] md:w-[640px] max-w-full border-l border-outline-variant'
       : 'inset-x-0 bottom-0 h-auto max-h-[90vh] border-t border-outline-variant'
 
   return (
