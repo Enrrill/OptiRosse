@@ -35,23 +35,6 @@ function DetalleSkeleton() {
   )
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: 'negative' }) {
-  return (
-    <div className="rounded-xl border border-outline-variant bg-surface-container-low p-4">
-      <p className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
-        {label}
-      </p>
-      <p
-        className={`mt-1 font-heading text-headline-md ${
-          tone === 'negative' ? 'text-error' : 'text-on-surface'
-        }`}
-      >
-        {value}
-      </p>
-    </div>
-  )
-}
-
 export default function ClienteDetallePage() {
   const { id: idParam } = useParams<{ id: string }>()
   const id = idParam && /^\d+$/.test(idParam) ? Number(idParam) : null
