@@ -507,6 +507,77 @@ Regla: **el grid es dirigido por presencia de claves** — si un KPI no viene, s
 
 ---
 
+## 14. Fase 5 — Inventario (plan de diseño e implementación)
+
+**Objetivo**: módulo completo de inventario en `/inventario` (sustituye el placeholder) con **tres sub-vistas por tabs** — Categorías · Productos (con variantes anidadas) · Variantes (con control de stock). Consume `categorias/`, `productos/`, `variantes/` y `variantes/{id}/ajustar-stock/`, que ya están implementadas y verificadas en el backend (Fase 3 de `PLAN_BACKEND.md`). Mantiene el sistema de diseño Material 3 y reutiliza `DataTable`, `PageHeader`, `StatusBadge`, `Pagination`, `ConfirmDialog`, `MoneyInput`, `SectionCard`, `FieldError`.
+
+### Navegación (decisión de arquitectura)
+
+Una sola ruta `/inventario` con **tabs Radix** (`Categorías` / `Productos` / `Variantes`), sincronizados con la query string vía `useSearchParams` para permitir deep-linking:
+- `?tab=categorias` (default), `?tab=productos`, `?tab=variantes`.
+- Los accesos rápidos del dashboard ("Ajustar stock", "Nueva variante") navegan a `?tab=variantes`; "Nueva variante" desde ahí puede abrir el filtro/tab correspondiente.
+- `getNavTitle` y el sidebar no cambian; el módulo queda cohesionado sin nuevas rutas de layout.
+
+### Contrato backend (verificado, sin cambios de API)
+
+- **Categorías** `GET/POST /api/v1/categorias/`, `GET/PUT/PATCH/DELETE /api/v1/categorias/{id}/` (escritura admin+almacén). Campos: `nombre`, `tipo_producto`, `tipo_producto_display`, `activo`. Filtros: `?activo=`, search `nombre`, ordering `nombre`.
+- **Productos** CRUD (escritura admin+almacén). Campos: `categoria`+`categoria_detalle`, `marca`, `codigo_modelo`, `descripcion`, `indice_refraccion`, `material`, `tratamiento`, `diseno`, `activo`, `variantes[]` (anidadas, **writable upsert**). Filtros: `?categoria=`, `?tipo=` (`categoria__tipo_producto`), `?marca=` icontains, `?activo=`; search en `marca|codigo_modelo|descripcion|categoria__nombre`.
+  - **Upsert de variantes**: en update, las filas con `id` se actualizan, las nuevas sin `id` se crean y las **omitidas se desactivan** (`activo=false`). No enviar `id` al crear.
+- **Variantes** CRUD (escritura admin+almacén). Campos: `producto`, `sku` (único), `codigo_barras` (único, nullable), `color`, `tamano`, `esfera`, `cilindro`, `eje`, `adicion`, `stock`, `alerta_stock_minimo`, `precio_al_mayor`, `precio_costo`, `activo`. Filtro clave **`?stock_bajo=true`** (`stock <= alerta_stock_minimo`); también `?producto=`, `?producto__categoria=`; search en `sku|codigo_barras|producto__marca|producto__codigo_modelo`.
+- **Ajustar stock** `POST /api/v1/variantes/{id}/ajustar-stock/` `{cantidad, motivo}` → devuelve la variante actualizada. `motivo` **obligatorio en UI si `cantidad < 0`**. Errores: `stock_insuficiente` (409) al dejar stock negativo.
+- **Validaciones reflejadas por el frontend**: esfera/cilindro −30..30, eje 0..180, adición ≥ 0, stock/alerta/precios no negativos; SKU y código de barras duplicados (mapeados a campo).
+- Errores de envelope: `errors` como objeto `{campo: [msgs]}` → `setError`; `stock_insuficiente` llega como error de negocio → toast con el `message`.
+
+### Especificación visual (por tab)
+
+- **PageHeader**: "Inventario" + subtítulo por tab ("Categorías", "Productos" o "Variantes"); los botones de acción viven en el toolbar del tab (evita doble acción en el header).
+- **Tab Categorías** (`SurfaceCard` simple):
+  - Tabla: Nombre, Tipo (`StatusBadge` con `TIPO_PRODUCTO`), Estado (`estadoActivo`), acciones editar/desactivar (solo roles con escritura). Toolbar: buscador + botón "Nueva categoría".
+  - CRUD en **modal** (`Dialog` centrado, `max-w-md`): campos nombre + tipo (`Select`). Sin paginación propia (lista pequeña, `page_size=100`).
+- **Tab Productos**:
+  - Tabla: Marca + código/modelo (celda compuesta), Categoría, Tipo (badge), N.º variantes, Estado, acciones editar/desactivar. Toolbar: buscador + `Select` tipo + `Select` categoría + campo marca + botón "Nuevo producto". Paginación estándar.
+  - **Formulario producto** en **drawer derecho** (`max-w-xl`): `SectionCard` "Datos del producto" (marca, código/modelo, categoría, descripción), `SectionCard` "Opciones técnicas" (índice de refracción, material, tratamiento, diseño), `SectionCard` "Variantes" con `VariantesEditor`.
+  - **`VariantesEditor`**: tabla editable con `useFieldArray` — columnas SKU, Código de barras, Color, Tamaño, Esfera, Cilindro, Eje, Adición, Stock, Alerta mín., Precio mayor, Precio costo + acción eliminar fila. Botón "+ Agregar variante". Precios con `MoneyInput`; campos numéricos con `valueAsNumber` y validación zod por fila. Al editar, las filas existentes conservan su `id`; **eliminar una fila con `id` la omite del payload** (el backend la desactiva) — se avisa con texto de ayuda. SKU/código de barras duplicados dentro del form → error por fila.
+  - Contenido del drawer reusa el row de la lista (trae `variantes[]`), sin fetch extra de detalle.
+- **Tab Variantes**:
+  - Tabla: **`StockBadge`** (celda de stock coloreada: verde normal, ámbar `stock<=alerta_stock_minimo`, rojo `stock=0`), SKU (mono), Producto (marca + código/modelo), Color/Tamaño, gradiente óptico (esfera/cilindro/eje), Precio mayor, Precio costo, acción "Ajustar stock". Toolbar: buscador + `Select` producto + **Switch "Solo stock bajo"** + botón "Nueva variante"→ según decisión puede abrir el drawer del producto o el form directo (Fase a decidir en edición; se reutiliza el form de producto con la pestaña de variantes abierta). Paginación estándar.
+  - **`AjustarStockDialog`**: muestra SKU/producto actual; campo **cantidad** (+/−, acepta negativos), **preview del stock resultante** (`stock_actual + cantidad`) que se pinta en rojo y bloquea el submit si sería negativo, campo **motivo** (obligatorio si `cantidad < 0`), feedback de `stock_insuficiente` (toast error con el `message`). Tras éxito → toast "Stock ajustado correctamente".
+- **Roles**: escritura visible para `administrador` y `almacen` (botones/acciones según `auth/me → rol`); el resto solo lectura (ocultar accion de editar/desactivar/ajustar, mostrar badges).
+- **Estados**: loading → `SkeletonRows` (vía `DataTable`); empty → `EmptyState` con acción de creación; error → `ErrorState` con "Reintentar".
+
+### Arquitectura (archivos)
+
+- **Tipos** (`src/types/models.ts`): `TipoProducto`, `Categoria`, `CategoriaResumen`, `Producto`, `VarianteProducto`. `TIPO_PRODUCTO` ya existe en `lib/constants/choices.ts`.
+- **Endpoints**: no se agregan (`CATEGORIAS/PRODUCTOS/VARIANTES` y el helper `accion()` ya existen); se usa `accion(VARIANTES, id, 'ajustar-stock/')`.
+- **Compartido nuevo** (`src/components/data/StockBadge.tsx`): badge/valor de stock reutilizable (verde/ámbar/rojo según `stock` vs `alerta_stock_minimo`); útil también en pedidos y dashboard.
+- **Hooks** (`src/features/inventory/hooks/`):
+  - `useCategorias.ts` (query sin paginación, `page_size:100`, `?search=`, `?activo=`), `useCategoriaMutations.ts` (crear/actualizar/desactivar/reactivar).
+  - `useProductos.ts` (paginación + filtros tipo/categoría/marca/search/activo), `useProductoMutations.ts` (crear/actualizar con `variantes[]` + desactivar).
+  - `useVariantes.ts` (paginación + `stock_bajo` + producto + search/activo), `useVarianteMutations.ts` (actualizar/desactivar y `useAjustarStock` con `POST accion(...)`).
+  - Invalidaciones: `['categorias'] ['productos'] ['variantes'] ['dashboard','resumen']`.
+- **Locales** (`src/features/inventory/components/`):
+  - Categorías: `CategoriasTable.tsx`, `CategoriaFormDialog.tsx`, `categoriaSchema.ts`.
+  - Productos: `ProductosTable.tsx`, `ProductoFormDrawer.tsx`, `ProductoForm.tsx`, `productoSchema.ts`, `VariantesEditor.tsx`.
+  - Variantes: `VariantesTable.tsx`, `AjustarStockDialog.tsx`, `ajustarStockSchema.ts`.
+  - `InventarioTabs.tsx`: maneja el estado de tab + deep-link `?tab=` y monta las tres sub-vistas.
+- **Página** `src/features/inventory/pages/InventarioPage.tsx`: sustituye el `PlaceholderPage` por `PageHeader` + `InventarioTabs`.
+
+### Checklist de implementación
+
+1. `types/models.ts` + `components/data/StockBadge.tsx`. 
+2. Hooks: categorías, productos, variantes + mutaciones + `useAjustarStock`. 
+3. Tab Categorías: schema + `CategoriaFormDialog` + `CategoriasTable`. 
+4. Tab Productos: schema (con variantes) + `VariantesEditor` + `ProductoForm` + `ProductoFormDrawer` + `ProductosTable`. 
+5. Tab Variantes: `VariantesTable` (toggle stock bajo) + `AjustarStockDialog`. 
+6. `InventarioTabs` + reescribir `InventarioPage.tsx`. 
+7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol (admin/almacén), upsert de variantes, ajuste de stock con negativo + `stock_insuficiente`.
+
+### Prompt para Stitch
+
+Reutilizar el prompt de la sección §6 (módulo de inventario). Ajuste para la fase: la vista de categorías usa un modal centrado para crear/editar (no panel lateral); los productos se editan en un drawer derecho con la tabla de variantes editables; las variantes incluyen la celda de stock con colores (verde/ámbar/rojo) y el toggle "Solo stock bajo"; el ajuste de stock muestra el stock resultante en vivo y un campo de motivo obligatorio al restar.
+
+---
+
 ## Guía de implementación (roadmap página por página)
 
 El frontend se implementa por fases. Cada fase entrega una **página navegable y funcional** (diseño Stitch → implementación). Orden recomendado:
@@ -517,7 +588,7 @@ El frontend se implementa por fases. Cada fase entrega una **página navegable y
 | **1. Auth + Shell + Perfil** | Login · AppShell (sidebar colapsable + topbar + menú usuario) · rutas protegidas/por rol · Perfil (cambiar contraseña, logout) | `auth/login`, `auth/refresh`, `auth/me`, `auth/cambiar-contrasena`, `auth/logout` | `AppShell`, `Sidebar`, `Topbar`, `UserMenu`, `ProtectedRoute`, `RoleRoute`, shadcn `ui/*` | ✅ Implementada |
 | **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `dashboard/resumen/` (ver §13) | **`KpiCard`**, `Panel`, `KpiGrid`, `QuickActions`, `RecentOrders`, `RecentPayments`, `DashboardSkeleton` | ✅ Implementada (plan en §13) |
 | **3. Clientes** | Lista + detalle (crédito) + formulario drawer + desactivar | `clientes/` CRUD, `?search=` | `DataTable`, `Drawer`, `ConfirmDialog`, `SectionCard`, `FieldError`, `Pagination`, `StatusBadge`, `Switch` | ✅ Implementada |
-| **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) | ⏳ Pendiente |
+| **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) | ✅ Implementada |
 | **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal | ⏳ Pendiente |
 | **6. Recetas** | Lista + formulario OD/OI | `recetas/` CRUD | — | ⏳ Pendiente |
 | **7. Pedidos** | Lista con filtros · detalle (stepper + transiciones por rol + documentos) · crear/editar (líneas + totales en vivo) | `pedidos/` CRUD, `{id}/confirmar/`, `{id}/cambiar-estado/` | `OrderStepper`, selector de variante, `OrderActions` | ⏳ Pendiente |

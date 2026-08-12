@@ -1,0 +1,249 @@
+import { DataTable, type Column } from '@/components/data/DataTable'
+import { Pagination } from '@/components/data/Pagination'
+import { StatusBadge } from '@/components/data/StatusBadge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Icon } from '@/components/Icon'
+import { choice, estadoActivo, TIPO_PRODUCTO } from '@/lib/constants/choices'
+import { formatNumber } from '@/lib/format'
+import type { Categoria, Producto } from '@/types/models'
+
+interface ProductosTableProps {
+  productos: Producto[]
+  count: number
+  page: number
+  pageSize: number
+  onPageChange: (page: number) => void
+  isLoading: boolean
+  isError: boolean
+  errorMessage?: string
+  onRetry: () => void
+  search: string
+  onSearchChange: (value: string) => void
+  tipoFiltro: string
+  onTipoChange: (value: string) => void
+  categoriaFiltro: number | null
+  onCategoriaChange: (value: number | null) => void
+  marcaFiltro: string
+  onMarcaChange: (value: string) => void
+  categorias: Categoria[]
+  showInactivos: boolean
+  onToggleInactivos: (value: boolean) => void
+  canManage: boolean
+  onEdit: (producto: Producto) => void
+  onToggleEstado: (producto: Producto) => void
+  onNuevo: () => void
+}
+
+export function ProductosTable({
+  productos,
+  count,
+  page,
+  pageSize,
+  onPageChange,
+  isLoading,
+  isError,
+  errorMessage,
+  onRetry,
+  search,
+  onSearchChange,
+  tipoFiltro,
+  onTipoChange,
+  categoriaFiltro,
+  onCategoriaChange,
+  marcaFiltro,
+  onMarcaChange,
+  categorias,
+  showInactivos,
+  onToggleInactivos,
+  canManage,
+  onEdit,
+  onToggleEstado,
+  onNuevo,
+}: ProductosTableProps) {
+  const columns: Column<Producto>[] = [
+    {
+      key: 'marca',
+      header: 'Producto',
+      cell: (row) => (
+        <div>
+          <p className="font-medium text-on-surface">
+            {row.marca} <span className="font-mono text-on-surface-variant">{row.codigo_modelo}</span>
+          </p>
+          <p className="max-w-[260px] truncate text-xs text-on-surface-variant">{row.descripcion}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'categoria_detalle',
+      header: 'Categoría',
+      cell: (row) => <span>{row.categoria_detalle.nombre}</span>,
+    },
+    {
+      key: 'tipo',
+      header: 'Tipo',
+      cell: (row) => (
+        <StatusBadge display={choice(TIPO_PRODUCTO, row.categoria_detalle.tipo_producto)} />
+      ),
+    },
+    {
+      key: 'variantes_count',
+      header: 'Variantes',
+      align: 'right',
+      cell: (row) => (
+        <div className="text-right">
+          <span className="font-mono text-sm font-semibold">
+            {formatNumber(row.variantes.length)}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'estado',
+      header: 'Estado',
+      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+    },
+    {
+      key: 'acciones',
+      header: 'Acciones',
+      align: 'right',
+      cell: (row) =>
+        canManage ? (
+          <div className="flex items-center justify-end gap-0.5">
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Editar producto"
+                    onClick={() => onEdit(row)}
+                  >
+                    <Icon name="edit" size={18} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Editar</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={row.activo ? 'Desactivar producto' : 'Reactivar producto'}
+                    onClick={() => onToggleEstado(row)}
+                  >
+                    <Icon name={row.activo ? 'visibility_off' : 'restart_alt'} size={18} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        ) : null,
+    },
+  ]
+
+  return (
+    <DataTable<Producto>
+      columns={columns}
+      data={productos}
+      rowKey={(row) => row.id}
+      loading={isLoading}
+      error={isError ? (errorMessage ?? 'Ocurrió un error al cargar los productos') : null}
+      onRetry={onRetry}
+      emptyTitle={showInactivos ? 'No hay productos inactivos' : 'No hay productos'}
+      emptyDescription="Registra tu primer producto con sus variantes (SKU, stock y precios)."
+      emptyAction={
+        canManage ? (
+          <Button onClick={onNuevo}>
+            <Icon name="add" size={18} /> Nuevo producto
+          </Button>
+        ) : undefined
+      }
+      toolbar={
+        <div className="flex flex-col gap-3 border-b border-outline-variant p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative w-full sm:max-w-sm">
+              <Icon
+                name="search"
+                size={18}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+              />
+              <Input
+                value={search}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Buscar por marca, modelo o categoría..."
+                className="pl-9"
+              />
+            </div>
+            {canManage && (
+              <Button onClick={onNuevo}>
+                <Icon name="add" size={18} /> Nuevo producto
+              </Button>
+            )}
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
+            <Select
+              value={tipoFiltro || 'todos'}
+              onValueChange={(value) => onTipoChange(value === 'todos' ? '' : value)}
+            >
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Tipo de producto" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos los tipos</SelectItem>
+                {Object.entries(TIPO_PRODUCTO).map(([tipo, display]) => (
+                  <SelectItem key={tipo} value={tipo}>
+                    {display.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={categoriaFiltro != null ? String(categoriaFiltro) : 'todas'}
+              onValueChange={(value) =>
+                onCategoriaChange(value === 'todas' ? null : Number(value))
+              }
+            >
+              <SelectTrigger className="w-full sm:w-52">
+                <SelectValue placeholder="Categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todas las categorías</SelectItem>
+                {categorias.map((categoria) => (
+                  <SelectItem key={categoria.id} value={String(categoria.id)}>
+                    {categoria.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <div className="relative w-full sm:w-48">
+              <Input
+                value={marcaFiltro}
+                onChange={(e) => onMarcaChange(e.target.value)}
+                placeholder="Filtrar por marca"
+              />
+            </div>
+
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
+              <Switch checked={showInactivos} onCheckedChange={onToggleInactivos} />
+              Mostrar inactivos
+            </label>
+          </div>
+        </div>
+      }
+      footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
+    />
+  )
+}

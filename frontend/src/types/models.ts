@@ -55,6 +55,62 @@ export interface ClienteResumen {
   identificacion_fiscal: string
 }
 
+export type TipoProducto =
+  | 'montura'
+  | 'cristal_terminado'
+  | 'bloque_tallado'
+  | 'accesorio'
+
+export interface Categoria {
+  id: number
+  nombre: string
+  tipo_producto: TipoProducto
+  tipo_producto_display: string
+  activo: boolean
+}
+
+export interface CategoriaResumen {
+  id: number
+  nombre: string
+  tipo_producto: TipoProducto
+  tipo_producto_display: string
+}
+
+export interface VarianteProducto {
+  id: number
+  producto: number
+  sku: string
+  codigo_barras: string | null
+  color: string
+  tamano: string
+  esfera: string | null
+  cilindro: string | null
+  eje: number | null
+  adicion: string | null
+  stock: number
+  alerta_stock_minimo: number
+  precio_al_mayor: string
+  precio_costo: string
+  activo: boolean
+}
+
+export interface Producto {
+  id: number
+  categoria: number
+  categoria_detalle: CategoriaResumen
+  marca: string
+  codigo_modelo: string
+  descripcion: string
+  indice_refraccion: string
+  material: string
+  tratamiento: string
+  diseno: string
+  activo: boolean
+  creado_en: string
+  actualizado_en: string
+  variantes: VarianteProducto[]
+}
+
 export interface LibroMayorAsiento {
   id: number
   cliente: number

@@ -1,6 +1,14 @@
-import { PlaceholderPage } from '@/features/dashboard/components/PlaceholderPage'
-import { NAV_ITEMS } from '@/lib/constants/nav'
+import { PageHeader } from '@/components/data/PageHeader'
+import { InventarioTabs } from '../components/InventarioTabs'
 
 export default function InventarioPage() {
-  return <PlaceholderPage item={NAV_ITEMS[2]} />
+  return (
+    <div>
+      <PageHeader
+        title="Inventario"
+        description="Categorías, productos y control de stock."
+      />
+      <InventarioTabs />
+    </div>
+  )
 }

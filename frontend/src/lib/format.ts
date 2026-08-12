@@ -42,3 +42,11 @@ export function formatGradiente(esfera?: string | null): string {
   if (!esfera) return '—'
   return `${esfera}D`
 }
+
+export type NivelStock = 'empty' | 'low' | 'ok'
+
+export function nivelStock(stock: number, alertaMinima: number): NivelStock {
+  if (stock <= 0) return 'empty'
+  if (stock <= alertaMinima) return 'low'
+  return 'ok'
+}
