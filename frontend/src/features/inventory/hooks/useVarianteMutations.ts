@@ -8,7 +8,7 @@ const INVALIDATES: unknown[][] = [['variantes'], ['productos'], ['dashboard', 'r
 
 export function useAjustarStock(id: number | null) {
   return useApiMutation<VarianteProducto, AjustarStockPayload>({
-    url: id ? accion(VARIANTES, id, 'ajustar-stock/') : '',
+    url: id ? accion(VARIANTES, id, 'ajustar-stock') : '',
     method: 'post',
     invalidates: INVALIDATES,
     successMessage: 'Stock ajustado correctamente',

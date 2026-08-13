@@ -22,4 +22,7 @@ export const PLANTILLAS = '/plantillas/'
 export const DASHBOARD = '/dashboard/resumen/'
 
 export const detalle = (base: string, id: number | string) => `${base}${id}/`
-export const accion = (base: string, id: number | string, nombre: string) => `${base}${id}/${nombre}/`
+
+/** Endpoint de acción sobre un recurso: base/{id}/{nombre}/ (barra única). */
+export const accion = (base: string, id: number | string, nombre: string) =>
+  `${base}${id}/${nombre.replace(/\/+$/, '')}/`

@@ -42,7 +42,7 @@ export function useConfirmarPedido(id: number | null) {
   const queryClient = useQueryClient()
   return useApiMutation<Pedido, { notas?: string }>(
     {
-      url: id ? accion(PEDIDOS, id, 'confirmar/') : '',
+      url: id ? accion(PEDIDOS, id, 'confirmar') : '',
       method: 'post',
       invalidates: [['pedidos'], ['pedido', id], ['dashboard', 'resumen']],
       successMessage: 'Pedido confirmado correctamente',
@@ -62,7 +62,7 @@ export function useCambiarEstadoPedido(id: number | null) {
   const queryClient = useQueryClient()
   return useApiMutation<Pedido, CambiarEstadoVariables>(
     {
-      url: id ? accion(PEDIDOS, id, 'cambiar-estado/') : '',
+      url: id ? accion(PEDIDOS, id, 'cambiar-estado') : '',
       method: 'post',
       invalidates: [['pedidos'], ['pedido', id], ['dashboard', 'resumen']],
       successMessage: 'Estado del pedido actualizado',
