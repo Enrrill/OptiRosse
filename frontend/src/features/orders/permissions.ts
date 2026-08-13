@@ -14,7 +14,8 @@ type Transicion = Partial<Record<EstadoPedido, RolUsuario[]>>
 
 const TRANSICIONES: Record<EstadoPedido, Transicion> = {
   borrador: {
-    confirmado: ['administrador', 'vendedor_b2b'],
+    // La confirmación no es una transición de cambiar-estado: el botón
+    // "Confirmar pedido" (puedeConfirmarPedido) va por el endpoint dedicado.
     cancelado: ['administrador', 'vendedor_b2b'],
   },
   confirmado: {
@@ -50,14 +51,25 @@ export function puedeTransicionar(
   return (TRANSICIONES[estado][destino] ?? []).includes(rol)
 }
 
-/** Siguiente transición del flujo principal permitida para el rol (excluye cancelar). */
+/**
+ * Siguiente transición del flujo principal permitida para el rol.
+ * Excluye `cancelado` (botón aparte) y `confirmado` (transición que solo
+ * se realiza por el endpoint dedicado de confirmar, que descuenta stock
+ * y registra el asiento contable).
+ */
 export function siguienteTransicion(
   estado: EstadoPedido,
   rol?: RolUsuario | null,
 ): EstadoPedido | null {
   if (!rol) return null
   for (const destino of FLUJO) {
-    if (destino !== 'cancelado' && puedeTransicionar(estado, destino, rol)) return destino
+    if (
+      destino !== 'cancelado' &&
+      destino !== 'confirmado' &&
+      puedeTransicionar(estado, destino, rol)
+    ) {
+      return destino
+    }
   }
   return null
 }

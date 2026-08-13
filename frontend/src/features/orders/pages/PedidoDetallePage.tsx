@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
+import { useToast } from '@/store/useToast'
+import { ApiError } from '@/lib/api/errors'
 import { choice, ESTADO_PEDIDO } from '@/lib/constants/choices'
 import { formatDateTime, formatGradienteCompleto, formatMoney } from '@/lib/format'
 import type { EstadoPedido } from '@/types/models'
@@ -65,6 +67,11 @@ export default function PedidoDetallePage() {
   const confirmar = useConfirmarPedido(id)
   const cambiarEstado = useCambiarEstadoPedido(id)
   const eliminar = useEliminarPedido(id)
+  const toast = useToast()
+
+  const mostrarError = (err: unknown, fallback: string) => {
+    toast.error(err instanceof ApiError ? err.defaultMessage : fallback)
+  }
 
   if (id === null) {
     return <ErrorState message="El pedido solicitado no existe." />
@@ -90,18 +97,30 @@ export default function PedidoDetallePage() {
 
   const confirmarSiguiente = async () => {
     if (!siguiente) return
-    await cambiarEstado.mutateAsync({ nuevo_estado: siguiente })
-    setSiguienteOpen(false)
+    try {
+      await cambiarEstado.mutateAsync({ nuevo_estado: siguiente })
+      setSiguienteOpen(false)
+    } catch (err) {
+      mostrarError(err, 'No se pudo actualizar el estado del pedido')
+    }
   }
 
   const cancelarPedido = async (motivo: string) => {
-    await cambiarEstado.mutateAsync({ nuevo_estado: 'cancelado', motivo })
-    setCancelarOpen(false)
+    try {
+      await cambiarEstado.mutateAsync({ nuevo_estado: 'cancelado', motivo })
+      setCancelarOpen(false)
+    } catch (err) {
+      mostrarError(err, 'No se pudo cancelar el pedido')
+    }
   }
 
   const eliminarPedido = async () => {
-    await eliminar.mutateAsync()
-    navigate('/pedidos')
+    try {
+      await eliminar.mutateAsync()
+      navigate('/pedidos')
+    } catch (err) {
+      mostrarError(err, 'No se pudo eliminar el pedido')
+    }
   }
 
   return (
@@ -268,8 +287,12 @@ export default function PedidoDetallePage() {
         confirmLabel="Confirmar pedido"
         loading={confirmar.isPending}
         onConfirm={async () => {
-          await confirmar.mutateAsync()
-          setConfirmarOpen(false)
+          try {
+            await confirmar.mutateAsync()
+            setConfirmarOpen(false)
+          } catch (err) {
+            mostrarError(err, 'No se pudo confirmar el pedido')
+          }
         }}
       />
 

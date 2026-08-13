@@ -17,7 +17,8 @@ from backend.common.api.exceptions import ApiError
 class TransicionesPedido:
     TRANSICIONES = {
         EstadoPedido.BORRADOR: {
-            EstadoPedido.CONFIRMADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDOR_B2B),
+            # La confirmación no está en el mapa: solo se alcanza mediante
+            # PedidoService.confirmar (descuenta stock y registra el asiento).
             EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDOR_B2B),
         },
         EstadoPedido.CONFIRMADO: {
@@ -163,7 +164,7 @@ class PedidoService:
         with transaction.atomic():
             pedido = Pedido.objects.select_for_update().get(pk=pedido.pk)
 
-            if not TransicionesPedido.es_transicion_valida(pedido.estado, EstadoPedido.CONFIRMADO):
+            if pedido.estado != EstadoPedido.BORRADOR:
                 raise ApiError(
                     'No se puede confirmar un pedido que no está en borrador',
                     status_code=409,

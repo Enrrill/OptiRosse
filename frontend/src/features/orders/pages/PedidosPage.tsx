@@ -5,6 +5,8 @@ import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
+import { useToast } from '@/store/useToast'
+import { ApiError } from '@/lib/api/errors'
 import { usePagination } from '@/hooks/usePagination'
 import { usePedidos, type PedidoParams } from '../hooks/usePedidos'
 import { useEliminarPedido } from '../hooks/usePedidoMutations'
@@ -48,6 +50,7 @@ export default function PedidosPage() {
 
   const { pedidos, count, isLoading, isError, error, refetch } = usePedidos(params)
   const eliminar = useEliminarPedido(eliminarTarget?.id ?? null)
+  const toast = useToast()
 
   const actualizarEstadoFiltro = (value: string) => {
     setEstadoFiltro(value)
@@ -57,8 +60,12 @@ export default function PedidosPage() {
 
   const confirmarEliminacion = async () => {
     if (!eliminarTarget) return
-    await eliminar.mutateAsync()
-    setEliminarTarget(null)
+    try {
+      await eliminar.mutateAsync()
+      setEliminarTarget(null)
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.defaultMessage : 'No se pudo eliminar el pedido')
+    }
   }
 
   return (

@@ -259,6 +259,15 @@ DEBITO_MONTO=$(jq -r --argjson p "$PED2" '.data[] | select(.pedido == $p and .ti
 req POST "$TOKEN" "/pedidos/$PED2/confirmar/"
 [ "$HTTP" = "409" ] && pass "doble confirmación -> 409" || fail "doble confirmar: HTTP $HTTP (esperado 409)"
 
+# Regresión (bug Fase 7): borrador->confirmado SOLO por /confirmar/. El endpoint
+# /cambiar-estado/ debe rechazarlo (409) para no saltarse stock + asiento débito.
+req POST "$TOKEN" "/pedidos/" "{\"cliente\":$CLIENTE_ID,\"receta\":null,\"notas\":\"regresion confirmar\",\"detalles\":[{\"variante\":${VIDS[0]},\"cantidad\":2,\"precio_unitario\":${VPRECIO[0]}}]}"
+PED5=$(jqr '.data.id')
+req POST "$TOKEN" "/pedidos/$PED5/cambiar-estado/" '{"nuevo_estado":"confirmado"}'
+[ "$HTTP" = "409" ] && pass "confirmar vía /cambiar-estado/ (borrador) -> 409" || fail "cambiar-estado a confirmado: HTTP $HTTP (esperado 409)"
+req DELETE "$TOKEN" "/pedidos/$PED5/"
+[ "$HTTP" = "200" ] && pass "borrador de regresión eliminado" || fail "limpieza del borrador de regresión: HTTP $HTTP"
+
 # --- 7. Transiciones por rol (403 / 200 / 409) ---------------------------------------
 say "== 7. Transiciones de estado por rol =="
 req POST "$T_VENDEDOR" "/pedidos/$PED2/cambiar-estado/" '{"nuevo_estado":"en_taller"}'
