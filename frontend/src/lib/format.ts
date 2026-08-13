@@ -50,3 +50,27 @@ export function nivelStock(stock: number, alertaMinima: number): NivelStock {
   if (stock <= alertaMinima) return 'low'
   return 'ok'
 }
+
+function valorGraduacion(valor?: string | number | null): number | null {
+  if (valor === null || valor === undefined || valor === '') return null
+  const num = typeof valor === 'string' ? Number(valor) : valor
+  if (Number.isNaN(num)) return null
+  return num
+}
+
+/** Resumen de graduación óptica, ej. "−2.5 / −0.75 / 180°" (o "—" si no hay valores). */
+export function formatGradienteCompleto(
+  esfera?: string | number | null,
+  cilindro?: string | number | null,
+  eje?: string | number | null,
+): string {
+  const partes: string[] = []
+  const esferaN = valorGraduacion(esfera)
+  const cilindroN = valorGraduacion(cilindro)
+  const ejeN = valorGraduacion(eje)
+  if (esferaN !== null) partes.push(String(esferaN))
+  if (cilindroN !== null) partes.push(String(cilindroN))
+  if (ejeN !== null) partes.push(`${ejeN}°`)
+  if (partes.length === 0) return '—'
+  return partes.join(' / ')
+}

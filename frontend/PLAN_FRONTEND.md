@@ -564,17 +564,92 @@ Una sola ruta `/inventario` con **tabs Radix** (`Categorías` / `Productos` / `V
 
 ### Checklist de implementación
 
-1. `types/models.ts` + `components/data/StockBadge.tsx`. 
-2. Hooks: categorías, productos, variantes + mutaciones + `useAjustarStock`. 
-3. Tab Categorías: schema + `CategoriaFormDialog` + `CategoriasTable`. 
-4. Tab Productos: schema (con variantes) + `VariantesEditor` + `ProductoForm` + `ProductoFormDrawer` + `ProductosTable`. 
-5. Tab Variantes: `VariantesTable` (toggle stock bajo) + `AjustarStockDialog`. 
-6. `InventarioTabs` + reescribir `InventarioPage.tsx`. 
-7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol (admin/almacén), upsert de variantes, ajuste de stock con negativo + `stock_insuficiente`.
+1. `types/models.ts` + `components/data/StockBadge.tsx`. ✅
+2. Hooks: categorías, productos, variantes + mutaciones + `useAjustarStock`. ✅
+3. Tab Categorías: schema + `CategoriaFormDialog` + `CategoriasTable`. ✅
+4. Tab Productos: schema (con variantes) + `VariantesEditor` + `ProductoForm` + `ProductoFormDrawer` + `ProductosTable`. ✅
+5. Tab Variantes: `VariantesTable` (toggle stock bajo) + `AjustarStockDialog`. ✅
+6. `InventarioTabs` + reescribir `InventarioPage.tsx`. ✅
+7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol (admin/almacén), upsert de variantes, ajuste de stock con negativo + `stock_insuficiente`. ✅
 
 ### Prompt para Stitch
 
 Reutilizar el prompt de la sección §6 (módulo de inventario). Ajuste para la fase: la vista de categorías usa un modal centrado para crear/editar (no panel lateral); los productos se editan en un drawer derecho con la tabla de variantes editables; las variantes incluyen la celda de stock con colores (verde/ámbar/rojo) y el toggle "Solo stock bajo"; el ajuste de stock muestra el stock resultante en vivo y un campo de motivo obligatorio al restar.
+
+---
+
+## 15. Fase 6 — Recetas ópticas (plan de diseño e implementación)
+
+**Objetivo**: módulo completo en `/recetas` (sustituye el placeholder) con lista + formulario en drawer (crear/editar/desactivar/reactivar). Consume `recetas/` CRUD, ya implementado y verificado en el backend (`RecetaOpticaViewSet` + `EscrituraRecetaOLectura` en `orders`, Fase "Pedidos y Recetas" de `PLAN_BACKEND.md`). Mantiene el sistema de diseño Material 3 y reutiliza `DataTable`, `PageHeader`, `StatusBadge`, `Pagination`, `ConfirmDialog`, `Drawer`, `SectionCard`, `FieldError`, `Switch`.
+
+### Acceso por rol (decisiones de arquitectura)
+
+- La ruta `/recetas` se **amplía a todos los roles autenticados** (se elimina el `RoleRoute roles={adminTecnicoVendedor}` en `src/app/router.tsx`). Coherente con `EscrituraRecetaOLectura` (lectura para todos) y con el sidebar, que ya muestra "Recetas" para todos los roles.
+- **Escritura** (Nueva receta, editar, desactivar/reactivar) visible solo para `administrador`, `tecnico_taller` y `vendedor_b2b`; el resto ve la lista en solo lectura (se ocultan el botón del `PageHeader` y las acciones por fila).
+- Helper `puedeEditarRecetas(rol)` local en la feature (evita duplicar el array de roles en el form y en la tabla).
+
+### Contrato backend (verificado, sin cambios de API)
+
+- `GET/POST /api/v1/recetas/`, `GET/PUT/PATCH/DELETE /api/v1/recetas/{id}/` — permiso `EscrituraRecetaOLectura`. `RECETAS` ya existe en `endpoints.ts`.
+- Search `?search=` → `nombre_paciente` (único campo). Filtro `?activo=` (la lista por defecto solo trae `activo=true`; `?activo=false` incluye inactivos). Orden por defecto `-id`.
+- Campos:
+  | Campo | Tipo | Notas |
+  |---|---|---|
+  | `id` | number | read-only |
+  | `nombre_paciente` | string | opcional (máx 100) |
+  | `od_esfera` / `od_cilindro` / `od_adicion` | number \| null | decimal 2; esf/cil −30..30, adic ≥ 0 |
+  | `od_eje` | number \| null | entero 0..180 |
+  | `oi_esfera` / `oi_cilindro` / `oi_eje` / `oi_adicion` | number \| null | mismo esquema (ojo izquierdo) |
+  | `distancia_pupilar` | number \| null | decimal 1 (mm) |
+  | `notas` | string | opcional |
+  | `activo` | boolean | soft delete |
+- Validaciones del backend que el form debe reflejar: esfera/cilindro −30..30, eje 0..180, adición ≥ 0. Errores del envelope como objeto `{campo:[msgs]}` → `setError` por campo.
+- **Sin `creado_en`/`actualizado_en`** (no extiende `TimeStampedModel`) → la tabla no muestra columna de fecha.
+- Soft delete: `DELETE` marca `activo=false` → confirmación "Desactivar"; reactivar con `PATCH {activo:true}` → confirmación "Reactivar".
+
+### Especificación visual
+
+- **PageHeader**: "Recetas ópticas" + subtítulo "Graduaciones y prescripciones de los pacientes." Botón "Nueva receta" (icono `add`, solo roles con escritura).
+- **Tabla** (`RecetasTable` sobre `DataTable`):
+  - Columnas: **# Receta** (mono `#<id>`), **Paciente** (o "Sin paciente"), **OD resumen** y **OI resumen** en fuente mono (`−2.50 / −0.75 / 180°` o "—"), **DP** (mm), **Estado** (`estadoActivo`), **Acciones** (editar + desactivar/reactivar, solo escritura).
+  - Toolbar: buscador "Buscar por paciente..." (icono de lupa) + Switch "Mostrar inactivos". Footer: `Pagination`.
+  - Estados: loading → `SkeletonRows` (vía `DataTable`); empty → `EmptyState` con acción de creación (si hay permiso); error → `ErrorState` con "Reintentar".
+- **Formulario en drawer derecho** (`max-w-xl`, consistente con Clientes/Usuarios/Productos):
+  - `SectionCard` "Paciente" (icon `person`): `nombre_paciente`.
+  - `SectionCard` "OD — Ojo derecho" (icon `visibility`): grid 2 cols con esfera, cilindro, eje, adición.
+  - `SectionCard` "OI — Ojo izquierdo" (icon `visibility_off`): ídem.
+  - `SectionCard` "Medidas y notas" (icon `straighten`): `distancia_pupilar` (mm, `step=0.1`) + `notas` (`Textarea`).
+  - Inputs numéricos con `valueAsNumber` + zod (`coerce`): esfera/cilindro/adición `step=0.25`, eje `step=1`, `min`/`max` según rango; **campos vacíos → `null`** (no se envían strings vacíos al backend).
+  - Errores en campo (rojo + `FieldError`) con los mismos mensajes en español del backend; mapeo de errores del envelope con `setError`.
+- **ConfirmDialog** para desactivar ("¿Desactivar esta receta?") / reactivar ("¿Reactivar esta receta?"), con nombre del paciente en la descripción.
+
+### Arquitectura (archivos)
+
+- **Tipos** (`src/types/models.ts`): `RecetaOptica` (`id`, `nombre_paciente`, `od_esfera`, `od_cilindro`, `od_eje`, `od_adicion`, `oi_esfera`, `oi_cilindro`, `oi_eje`, `oi_adicion`, `distancia_pupilar`, `notas`, `activo`).
+- **Compartido** (`src/lib/format.ts`): añadir `formatGradienteCompleto(esfera?, cilindro?, eje?)` → `−2.50 / −0.75 / 180°` (reutilizable en el detalle de pedido §8 y en inventario).
+- **Endpoints**: sin cambios (`RECETAS` ya existe).
+- **Hooks** (`src/features/prescriptions/hooks/`):
+  - `useRecetas.ts`: paginación + `?search=` + `?activo=false` (patrón `useUsuarios`).
+  - `useRecetaMutations.ts`: `useCrearReceta`, `useActualizarReceta(id)`, `useDesactivarReceta(id)` (DELETE), `useReactivarReceta(id)` (PATCH `{activo:true}`); todas invalidan `['recetas']`.
+- **Locales** (`src/features/prescriptions/components/`):
+  - `recetaSchema.ts`: zod con `coerce` y rangos; `RecetaFormValues`, `RecetaPayload`, `RECETA_DEFAULT_VALUES`, `toRecetaFormValues`, `toRecetaPayload` (convierte `''`→`null`).
+  - `RecetaForm.tsx` (RHF + secciones OD/OI), `RecetaFormDrawer.tsx` (drawer `max-w-xl`, patrón `UsuarioFormDrawer`), `RecetasTable.tsx`.
+- **Página** `src/features/prescriptions/pages/RecetasPage.tsx`: reemplaza `PlaceholderPage` por `PageHeader` + `RecetasTable` + drawer + `ConfirmDialog` (mismo patrón de `UsuariosPage`).
+- **Router** (`src/app/router.tsx`): `/recetas` sin `RoleRoute` (lectura para todos los autenticados).
+
+### Checklist de implementación
+
+1. `types/models.ts` (`RecetaOptica`) + `formatGradienteCompleto` en `lib/format.ts`. 
+2. `recetaSchema.ts` (zod rangos + valores nullables). 
+3. Hooks: `useRecetas` + `useRecetaMutations`. 
+4. `RecetaForm` + `RecetaFormDrawer` (secciones OD/OI). 
+5. `RecetasTable` (resumen OD/OI mono, toggle inactivos, acciones por rol). 
+6. Reescribir `RecetasPage.tsx` + ampliar ruta `/recetas` en `router.tsx`. 
+7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol (admin/técnico/vendedor escritura; almacén/contabilidad solo lectura), validación de rangos y soft delete.
+
+### Prompt para Stitch
+
+Reutilizar el prompt de la sección §7 (recetas ópticas). Ajustes para la fase: la lista muestra el número de receta en fuente monoespaciada, el paciente, los resúmenes OD y OI en fuente mono (esfera / cilindro / eje), la distancia pupilar, un badge de estado y un interruptor "Mostrar inactivos"; el formulario se presenta en un panel lateral derecho (drawer) con cuatro secciones — Paciente, OD — Ojo derecho, OI — Ojo izquierdo (esfera, cilindro, eje y adición cada una) y Medidas y notas (distancia pupilar y notas) — con validación en rojo por rango; e incluye un modal de confirmación para desactivar/reactivar la receta.
 
 ---
 
@@ -589,8 +664,8 @@ El frontend se implementa por fases. Cada fase entrega una **página navegable y
 | **2. Dashboard** | KPIs por rol, accesos rápidos, pedidos/pagos recientes, toast de bienvenida | `dashboard/resumen/` (ver §13) | **`KpiCard`**, `Panel`, `KpiGrid`, `QuickActions`, `RecentOrders`, `RecentPayments`, `DashboardSkeleton` | ✅ Implementada (plan en §13) |
 | **3. Clientes** | Lista + detalle (crédito) + formulario drawer + desactivar | `clientes/` CRUD, `?search=` | `DataTable`, `Drawer`, `ConfirmDialog`, `SectionCard`, `FieldError`, `Pagination`, `StatusBadge`, `Switch` | ✅ Implementada |
 | **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) | ✅ Implementada |
-| **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal | ⏳ Pendiente |
-| **6. Recetas** | Lista + formulario OD/OI | `recetas/` CRUD | — | ⏳ Pendiente |
+| **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal | ✅ Implementada (plan en §14) |
+| **6. Recetas** | Lista + formulario OD/OI | `recetas/` CRUD | (reutiliza los anteriores) | ⏳ Pendiente (plan en §15) |
 | **7. Pedidos** | Lista con filtros · detalle (stepper + transiciones por rol + documentos) · crear/editar (líneas + totales en vivo) | `pedidos/` CRUD, `{id}/confirmar/`, `{id}/cambiar-estado/` | `OrderStepper`, selector de variante, `OrderActions` | ⏳ Pendiente |
 | **8. Finanzas** | Métodos de pago · Pagos (aprobar/rechazar con motivo) · Libro mayor (solo lectura) | `metodos-pago/`, `pagos/`, `{id}/aprobar|rechazar/`, `libro-mayor/` | — | ⏳ Pendiente |
 | **9. Documentos** | Plantillas (editor HTML/CSS admin + preview) · diálogo generar + descarga blob | `plantillas/` CRUD, `{id}/generar/` | editor de código ligero | ⏳ Pendiente |

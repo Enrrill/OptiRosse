@@ -26,11 +26,6 @@ const withSuspense = (element: React.ReactNode) => (
 
 const adminOnly: RolUsuario[] = ['administrador']
 const adminAlmacen: RolUsuario[] = ['administrador', 'almacen']
-const adminTecnicoVendedor: RolUsuario[] = [
-  'administrador',
-  'tecnico_taller',
-  'vendedor_b2b',
-]
 const adminContabilidad: RolUsuario[] = ['administrador', 'contabilidad']
 const adminContabilidadVendedor: RolUsuario[] = [
   'administrador',
@@ -58,7 +53,7 @@ export const router = createBrowserRouter([
           { path: '/clientes/:id', element: withSuspense(<ClienteDetalle />) },
           { path: '/usuarios', element: <RoleRoute roles={adminOnly} />, children: [{ index: true, element: withSuspense(<Usuarios />) }] },
           { path: '/inventario', element: <RoleRoute roles={adminAlmacen} />, children: [{ index: true, element: withSuspense(<Inventario />) }] },
-          { path: '/recetas', element: <RoleRoute roles={adminTecnicoVendedor} />, children: [{ index: true, element: withSuspense(<Recetas />) }] },
+          { path: '/recetas', element: withSuspense(<Recetas />) },
           { path: '/pedidos', element: <RoleRoute roles={adminContabilidadVendedor} />, children: [{ index: true, element: withSuspense(<Pedidos />) }] },
           { path: '/finanzas', element: <RoleRoute roles={adminContabilidad} />, children: [{ index: true, element: withSuspense(<Finanzas />) }] },
           { path: '/documentos', element: <RoleRoute roles={adminContabilidadVendedor} />, children: [{ index: true, element: withSuspense(<Documentos />) }] },

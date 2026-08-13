@@ -111,6 +111,22 @@ export interface Producto {
   variantes: VarianteProducto[]
 }
 
+export interface RecetaOptica {
+  id: number
+  nombre_paciente: string
+  od_esfera: string | null
+  od_cilindro: string | null
+  od_eje: number | null
+  od_adicion: string | null
+  oi_esfera: string | null
+  oi_cilindro: string | null
+  oi_eje: number | null
+  oi_adicion: string | null
+  distancia_pupilar: string | null
+  notas: string
+  activo: boolean
+}
+
 export interface LibroMayorAsiento {
   id: number
   cliente: number
