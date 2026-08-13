@@ -15,6 +15,9 @@ const Usuarios = lazy(() => import('@/features/users/pages/UsuariosPage'))
 const Inventario = lazy(() => import('@/features/inventory/pages/InventarioPage'))
 const Recetas = lazy(() => import('@/features/prescriptions/pages/RecetasPage'))
 const Pedidos = lazy(() => import('@/features/orders/pages/PedidosPage'))
+const PedidoNuevo = lazy(() => import('@/features/orders/pages/PedidoFormPage'))
+const PedidoEditar = lazy(() => import('@/features/orders/pages/PedidoFormPage'))
+const PedidoDetalle = lazy(() => import('@/features/orders/pages/PedidoDetallePage'))
 const Finanzas = lazy(() => import('@/features/finance/pages/FinanzasPage'))
 const Documentos = lazy(() => import('@/features/documents/pages/DocumentosPage'))
 const NotFound = lazy(() => import('@/features/errors/NotFoundPage'))
@@ -54,7 +57,10 @@ export const router = createBrowserRouter([
           { path: '/usuarios', element: <RoleRoute roles={adminOnly} />, children: [{ index: true, element: withSuspense(<Usuarios />) }] },
           { path: '/inventario', element: <RoleRoute roles={adminAlmacen} />, children: [{ index: true, element: withSuspense(<Inventario />) }] },
           { path: '/recetas', element: withSuspense(<Recetas />) },
-          { path: '/pedidos', element: <RoleRoute roles={adminContabilidadVendedor} />, children: [{ index: true, element: withSuspense(<Pedidos />) }] },
+          { path: '/pedidos', element: withSuspense(<Pedidos />) },
+          { path: '/pedidos/nuevo', element: withSuspense(<PedidoNuevo />) },
+          { path: '/pedidos/:id', element: withSuspense(<PedidoDetalle />) },
+          { path: '/pedidos/:id/editar', element: withSuspense(<PedidoEditar />) },
           { path: '/finanzas', element: <RoleRoute roles={adminContabilidad} />, children: [{ index: true, element: withSuspense(<Finanzas />) }] },
           { path: '/documentos', element: <RoleRoute roles={adminContabilidadVendedor} />, children: [{ index: true, element: withSuspense(<Documentos />) }] },
           { path: '/403', element: withSuspense(<Forbidden />) },

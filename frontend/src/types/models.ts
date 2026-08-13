@@ -127,6 +127,61 @@ export interface RecetaOptica {
   activo: boolean
 }
 
+export interface VarianteResumen {
+  id: number
+  sku: string
+  producto_marca: string
+  producto_codigo_modelo: string
+  color: string
+  tamano: string
+  esfera: string | null
+  cilindro: string | null
+  eje: number | null
+  adicion: string | null
+}
+
+export interface DetallePedido {
+  id: number
+  variante: number
+  variante_detalle: VarianteResumen
+  cantidad: number
+  precio_unitario: string
+  precio_total: string
+}
+
+export interface Pedido {
+  id: number
+  numero_pedido: string
+  cliente: number
+  cliente_detalle: ClienteResumen
+  usuario: number
+  usuario_nombre: string
+  receta: number | null
+  receta_detalle: RecetaOptica | null
+  estado: EstadoPedido
+  subtotal: string
+  impuesto: string
+  total: string
+  notas: string
+  detalles: DetallePedido[]
+  creado_en: string
+  actualizado_en: string
+}
+
+export interface DetallePedidoPayload {
+  id?: number
+  variante: number
+  cantidad: number
+  precio_unitario: number | null
+}
+
+export interface PedidoPayload {
+  cliente: number
+  receta?: number | null
+  notas?: string
+  detalles: DetallePedidoPayload[]
+}
+
 export interface LibroMayorAsiento {
   id: number
   cliente: number

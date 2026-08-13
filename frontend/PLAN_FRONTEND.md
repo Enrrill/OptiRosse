@@ -639,17 +639,148 @@ Reutilizar el prompt de la sección §6 (módulo de inventario). Ajuste para la 
 
 ### Checklist de implementación
 
-1. `types/models.ts` (`RecetaOptica`) + `formatGradienteCompleto` en `lib/format.ts`. 
-2. `recetaSchema.ts` (zod rangos + valores nullables). 
-3. Hooks: `useRecetas` + `useRecetaMutations`. 
-4. `RecetaForm` + `RecetaFormDrawer` (secciones OD/OI). 
-5. `RecetasTable` (resumen OD/OI mono, toggle inactivos, acciones por rol). 
-6. Reescribir `RecetasPage.tsx` + ampliar ruta `/recetas` en `router.tsx`. 
-7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol (admin/técnico/vendedor escritura; almacén/contabilidad solo lectura), validación de rangos y soft delete.
+1. `types/models.ts` (`RecetaOptica`) + `formatGradienteCompleto` en `lib/format.ts`. ✅
+2. `recetaSchema.ts` (zod rangos + valores nullables). ✅
+3. Hooks: `useRecetas` + `useRecetaMutations`. ✅
+4. `RecetaForm` + `RecetaFormDrawer` (secciones OD/OI). ✅
+5. `RecetasTable` (resumen OD/OI mono, toggle inactivos, acciones por rol). ✅
+6. Reescribir `RecetasPage.tsx` + ampliar ruta `/recetas` en `router.tsx`. ✅
+7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol (admin/técnico/vendedor escritura; almacén/contabilidad solo lectura), validación de rangos y soft delete. ✅
 
 ### Prompt para Stitch
 
 Reutilizar el prompt de la sección §7 (recetas ópticas). Ajustes para la fase: la lista muestra el número de receta en fuente monoespaciada, el paciente, los resúmenes OD y OI en fuente mono (esfera / cilindro / eje), la distancia pupilar, un badge de estado y un interruptor "Mostrar inactivos"; el formulario se presenta en un panel lateral derecho (drawer) con cuatro secciones — Paciente, OD — Ojo derecho, OI — Ojo izquierdo (esfera, cilindro, eje y adición cada una) y Medidas y notas (distancia pupilar y notas) — con validación en rojo por rango; e incluye un modal de confirmación para desactivar/reactivar la receta.
+
+---
+
+## 16. Fase 7 — Pedidos (plan de diseño e implementación)
+
+**Objetivo**: módulo completo en `/pedidos` (sustituye el placeholder) con lista con filtros, detalle (timeline de estados + transiciones por rol y estado) y formulario de crear/editar en **página dedicada** con líneas de detalle editables y totales en vivo. Consume `pedidos/` CRUD + `POST pedidos/{id}/confirmar/` + `POST pedidos/{id}/cambiar-estado/`, ya implementados y verificados en el backend (Fase 4 de `PLAN_BACKEND.md`: `PedidoService` + `TransicionesPedido` + asientos de `LibroMayorService`). Mantiene el sistema de diseño Material 3 y reutiliza `DataTable`, `PageHeader`, `StatusBadge`, `Pagination`, `Panel`, `ConfirmDialog`, `SectionCard`, `FieldError`, `MoneyInput`, `formatGradienteCompleto`.
+
+### Acceso por rol y navegación (decisiones de arquitectura)
+
+- La ruta `/pedidos` se **amplía a todos los roles autenticados** (se elimina el `RoleRoute roles={adminContabilidadVendedor}` en `src/app/router.tsx`). Coherente con `EscrituraPedidoOLectura` (lectura para todos) y con el sidebar, que ya muestra "Pedidos" para todos los roles. Almacén y técnico necesitan el detalle para transicionar estados.
+- **Escritura** gated por **rol Y estado** (ver transiciones más abajo): crear/editar/eliminar solo `administrador` y `vendedor_b2b` (y solo sobre `borrador`); el resto ve lista y detalle en solo lectura.
+- **Rutas nuevas** (el formulario es complejo: tabla editable de líneas + tres selectores con búsqueda → **página dedicada**, no drawer):
+  - `/pedidos` — lista con filtros.
+  - `/pedidos/nuevo` — creación.
+  - `/pedidos/:id` — detalle.
+  - `/pedidos/:id/editar` — edición (acceso solo si `borrador`).
+- **Deep-links** (se actualizan al aterrizar la fase):
+  - `QuickActions`: "Nuevo pedido" → `/pedidos/nuevo`; almacén "Pedidos por despachar" → `/pedidos?estado=listo_para_despacho`; técnico "Pedidos en taller" → `/pedidos?estado=en_taller`.
+  - `ClienteDetallePage`: botón "Nuevo pedido" → `/pedidos/nuevo?cliente=<id>` (preselecciona el cliente en el form).
+
+### Contrato backend (verificado, sin cambios de API)
+
+- `GET/POST /api/v1/pedidos/`, `GET/PUT/PATCH/DELETE /api/v1/pedidos/{id}/` — create vía `PedidoService.crear` (numeración `PED-000123` + IVA 16% server-side); `update` solo `borrador` (409 `pedido_no_editable`); `destroy` delega en `eliminar_borrador` (**borrado real**, no soft delete; solo `borrador`, 409 `pedido_no_eliminable`). `PEDIDOS` y el helper `accion()` ya existen en `endpoints.ts`.
+- `POST /api/v1/pedidos/{id}/confirmar/` `{notas?}` — admin/vendedor (`PuedeConfirmarPedido`); **descuenta stock y crea asiento DÉBITO**.
+- `POST /api/v1/pedidos/{id}/cambiar-estado/` `{nuevo_estado, motivo?}` — admin, vendedor, almacén, técnico (`PuedeTransicionarPedido`); valida transición (409 `transicion_invalida`) y rol (403 `transicion_no_permitida`).
+
+**Campos**:
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| `id` / `numero_pedido` | number / string | read-only (`PED-000123`) |
+| `cliente` + `cliente_detalle` | number / `{id, razon_social, nombre_comercial, identificacion_fiscal}` | requerido |
+| `usuario` + `usuario_nombre` | number / string | read-only |
+| `receta` + `receta_detalle` | number \| null / `RecetaOptica` | opcional; `OneToOne` (una receta no se reusa en dos pedidos) |
+| `estado` | string | `borrador\|confirmado\|en_taller\|listo_para_despacho\|enviado\|cancelado` |
+| `subtotal` / `impuesto` / `total` | string (decimal) | **read-only**, calculados por el backend (IVA `IMPUESTO_RATE = 0.16`) |
+| `notas` | string | opcional |
+| `detalles[]` | array | líneas anidadas (writable) |
+| `creado_en` / `actualizado_en` | string | timestamps |
+
+**Detalle de línea** (`detalles[]`): `id` (escribible, opcional), `variante` (número, requerido), `variante_detalle` (read-only `{id, sku, producto_marca, producto_codigo_modelo, color, tamano, esfera, cilindro, eje, adicion}`), `cantidad` (entero ≥ 1), `precio_unitario` (decimal ≥ 0; si se omite se autocompleta con `variante.precio_al_mayor`), `precio_total` (read-only). Upsert: en update las filas con `id` se actualizan, las nuevas sin `id` se crean y las **omitidas se eliminan**.
+
+**Transiciones y roles** (espejo exacto de `TransicionesPedido`, se replica en `features/orders/permissions.ts`):
+
+| De | A | Roles |
+|---|---|---|
+| borrador | confirmado | admin, vendedor — ⚠️ ejecutar con **`POST confirmar/`**, no `cambiar-estado/` (valida stock + asiento) |
+| borrador | cancelado | admin, vendedor |
+| confirmado | en_taller | admin, técnico |
+| confirmado | cancelado | admin, vendedor |
+| en_taller | listo_para_despacho | admin, técnico |
+| en_taller | cancelado | admin, vendedor, técnico |
+| listo_para_despacho | enviado | admin, almacén |
+| listo_para_despacho | cancelado | admin, vendedor, técnico |
+
+Terminales: `enviado`, `cancelado` (sin acciones).
+
+**Filtros**: `?estado=` (`ChoiceFilter`), `?cliente=`, `?usuario=` (`ModelChoiceFilter`), `?numero_pedido=` (`icontains`), `?fecha_creado_after=` / `?fecha_creado_before=` (`DateFromToRangeFilter`); search en `numero_pedido\|cliente__nombre_comercial\|cliente__razon_social`. Lista devuelve **todos** los estados por defecto (no hay soft delete).
+
+**Errores**: negocio `transicion_invalida` (409), `transicion_no_permitida` (403), `pedido_no_editable` (409), `pedido_no_eliminable` (409), `stock_insuficiente` (409); validaciones de campo: "Hay variantes repetidas en el mismo pedido" (`detalles`), "Esta receta ya está asociada a otro pedido" (`receta`), "La cantidad debe ser mayor o igual a 1" (`cantidad`), "No puede ser un valor negativo" (`precio_unitario`).
+
+### Especificación visual
+
+- **PageHeader**: "Pedidos" + subtítulo "Órdenes de compra y su ciclo de vida." Botón "Nuevo pedido" (icono `add`, roles con escritura) → `/pedidos/nuevo`.
+- **Lista** (`PedidosTable` sobre `DataTable`):
+  - Columnas: **N.º pedido** (mono `PED-000123`), **Cliente** (`nombre_comercial`), **Usuario** (`usuario_nombre`), **Estado** (`StatusBadge` con `ESTADO_PEDIDO`), **Total** (derecha, `formatMoney`), **Fecha** (`formatDate` de `creado_en`), **Acciones** (ver; editar/eliminar solo `borrador` + escritura). Row click → `/pedidos/:id`.
+  - Toolbar: buscador "Buscar por N.º o cliente..." (lupa) + `Select` estado (`ESTADO_PEDIDO` + "Todos") + `Select` cliente (activos, `page_size=100`, patrón filtro de productos) + rango de fechas (dos `Input type="date"`) + botón "Nuevo pedido" (creador).
+  - Params iniciales desde `?estado=` (deep-link del dashboard). `usePagination` + el patrón de `RecetasPage`. Footer: `Pagination`.
+- **Detalle** (`PedidoDetallePage`):
+  - Header: link "Volver a Pedidos", título `numero_pedido` (mono, `font-heading`), descripción `cliente.nombre_comercial` · fecha, `StatusBadge` estado, botones de acción por rol+estado, botón "Editar" (solo `borrador` y escritura).
+  - **`OrderTimeline`**: stepper horizontal `borrador → confirmado → en_taller → listo_para_despacho → enviado` — completados en verde (check), actual en primario, pendientes en gris; si `cancelado` se pinta un banner rojo y la timeline se muestra desmarcada (o con paso cancelado resaltado en `error`). Muestra `actualizado_en` como fecha de última transición.
+  - Grid de paneles (estilos de `ClienteDetallePage`): `Panel` **Cliente** (razón social, RIF, correo, teléfono, límite y días de crédito) · `Panel` **Receta** (si hay `receta_detalle`: paciente, OD/OI con `formatGradienteCompleto`, DP; enlace a `/recetas`).
+  - `Panel` **Detalle del pedido**: tabla de líneas (SKU mono gris + variedad, producto con marca/código, cantidad, precio unitario, `precio_total` derecha) + **`PedidoTotalesPanel`** (subtotal, IVA 16% como "Impuesto (16%)", total destacado `font-heading`); a la derecha del panel o como bloque inferior.
+  - `Panel` **Notas** (o "—" si vacío).
+  - **Acciones por estado/rol** (derivadas de `permissions.ts`):
+    - `borrador`: **Confirmar pedido** (ConfirmDialog simple; `POST confirmar/`) · **Editar** (link) · **Eliminar** (ConfirmDialog destructivo; DELETE → vuelve a la lista) · **Cancelar pedido** (`MotivoDialog`, motivo requerido).
+    - `confirmado`: **Pasar a En taller** (admin/técnico, ConfirmDialog) · **Cancelar** (admin/vendedor, `MotivoDialog`).
+    - `en_taller`: **Pasar a Listo para despacho** (admin/técnico) · **Cancelar** (admin/vendedor/técnico).
+    - `listo_para_despacho`: **Marcar enviado** (admin/almacén) · **Cancelar** (admin/vendedor/técnico).
+    - `enviado`/`cancelado`: sin acciones (cue de estado terminal).
+  - Tras cada transición → toast con `message` del envelope + invalidaciones (ver hooks).
+  - **Documentos** (Factura / Orden de trabajo / Nota de entrega): **diferidos a la Fase 9** (dependen del módulo de plantillas); el bloque queda documentado como pendiente en la fase 9.
+- **Formulario en página dedicada** (`/pedidos/nuevo`, `/pedidos/:id/editar`):
+  - `PageHeader` "Nuevo pedido"/"Editar pedido" + link volver; si se intenta editar un pedido no `borrador` → panel informativo read-only (el backend devuelve 409 `pedido_no_editable`, pero la UI no debe ofrecerlo).
+  - `SectionCard` "Cliente y receta" (icon `person`): **`SearchableSelect`** cliente (requerido; búsqueda por razón social, nombre comercial o RIF; preseleccionado por `?cliente=`) y **`SearchableSelect`** receta (opcional; solo activas; al elegir una se muestra el resumen OD/OI).
+  - `SectionCard` "Líneas del pedido" (icon `list_alt`) con **`PedidoLineasEditor`** (`useFieldArray`):
+    - Fila: columna **Variante** (`SearchableSelect` con búsqueda por SKU/marca/código/modelo; al elegir autocompleta `precio_unitario = variante.precio_al_mayor` y rellena la descripción), **Cantidad** (input numérico ≥ 1), **Precio unitario** (`MoneyInput` editable, ≥ 0), **Total línea** (lectura en vivo `precio_unitario × cantidad`), botón quitar fila (icono `close`/`delete`).
+    - Botón "+ Agregar línea". Validación zod por línea: variante requerida, cantidad ≥ 1, **sin variantes duplicadas** (espejo del backend), precio no negativo.
+    - Al editar, las filas existentes conservan su `id`; **eliminar una fila con `id` la omite del payload** (el backend la elimina) — texto de ayuda.
+  - `SectionCard` "Notas" (icon `notes`): `Textarea`.
+  - **`PedidoTotalesPanel`** (sticky bottom del formulario): subtotal, IVA 16%, total — calculados **en vivo** client-side con `IVA_RATE` (`calcularTotalesLineas`); nota "Los totales se recalculan al guardar".
+  - Footer sticky: botones **Guardar** (primario, `progress_activity` en pending) y **Cancelar** (navega atrás).
+  - Manejo de errores: validación zod en campo (rojo + `FieldError`); errores del envelope mapeados con `setError` (`cliente`, `receta`); errores anidados de `detalles` y errores de negocio (`stock_insuficiente`, `pedido_no_editable`) → toast con el `message`. Tras crear → redirige al detalle; tras editar → refresca el detalle.
+- **Estados**: loading → `SkeletonRows` (lista) / `DetalleSkeleton` (patrón ClienteDetalle); empty → `EmptyState` con "Nuevo pedido"; error → `ErrorState` con "Reintentar".
+
+### Arquitectura (archivos)
+
+- **Dependencia nueva**: `cmdk` (Command) para el combobox con búsqueda. Se crean las primitivas `components/ui/command.tsx` (patrón shadcn) y el componente genérico **`components/forms/SearchableSelect.tsx`** (Popover + Command + búsqueda debounced vía API) — reusable en fases 8/9 (pagos, generación de documentos).
+- **Compartido nuevo** (`components/forms/MotivoDialog.tsx`): modal con `Textarea` requerido (reusable para rechazar pagos en la Fase 8).
+- **Tipos** (`src/types/models.ts`): `VarianteResumen` (`variante_detalle`), `DetallePedido`, `Pedido`, `DetallePedidoPayload {id?, variante, cantidad, precio_unitario}` y `PedidoPayload` (payload de crear/editar).
+- **Endpoints**: sin cambios (`PEDIDOS` + `accion(PEDIDOS, id, 'confirmar/')` / `accion(PEDIDOS, id, 'cambiar-estado/')`).
+- **Constantes de negocio** (`features/orders/lib/pedidoTotales.ts`): `IVA_RATE = 0.16` y `calcularTotalesLineas(lineas)` (subtotal/impuesto/total) — lógica local a la feature.
+- **Permisos/transiciones** (`features/orders/permissions.ts`): `puedeGestionarPedidos(rol)` (crear/editar/eliminar), `puedeConfirmar(rol)`, `proximaTransicion(estado, rol)`, `transiciones(estado)` y `puedeTransicionar(estado, destino, rol)` — replica `TransicionesPedido`.
+- **Hooks** (`features/orders/hooks/`):
+  - `usePedidos.ts`: paginación + `?search=` + `?estado=` + `?cliente=` + `fecha_creado_after/before` (patrón `useRecetas` ampliado).
+  - `usePedido.ts`: detalle por id (`GET`), `enabled: id != null`.
+  - `usePedidoMutations.ts`:
+    - `useCrearPedido` / `useActualizarPedido(id)` (POST/PUT con `detalles[]`).
+    - `useEliminarPedido(id)` (DELETE, solo borrador).
+    - `useConfirmarPedido(id)` (POST `accion(PEDIDOS, id, 'confirmar/')`).
+    - `useCambiarEstadoPedido(id)` (POST `accion(PEDIDOS, id, 'cambiar-estado/')`).
+    - Invalidaciones: `['pedidos']`, `['pedido', id]`, `['dashboard','resumen']` (KPIs y recientes), y `['libro-mayor','cliente', clienteId]` en confirmar/cancelar (asientos DÉBITO/CRÉDITO).
+  - `useOpciones.ts`: loaders `buscarClientes`, `buscarRecetas`, `buscarVariantes` (vía `apiClient.get(..., {params})` → `res.data.data`, `page_size=20`, `activo=true` donde aplique) para el `SearchableSelect`.
+- **Locales** (`features/orders/components/`): `PedidosTable.tsx`, `OrderTimeline.tsx`, `PedidoLineasEditor.tsx`, `PedidoForm.tsx`, `pedidoSchema.ts` (zod + `PedidoFormValues` + `toPedidoFormValues`/`toPedidoPayload` con `detalles[]`), `PedidoTotalesPanel.tsx`, `PedidoDetalleContent.tsx`.
+- **Páginas** (`features/orders/pages/`): reescribir `PedidosPage.tsx` (lista); crear `PedidoFormPage.tsx` (lee `useParams` id → nuevo o editar; lee `?cliente=` para preseleccionar) y `PedidoDetallePage.tsx`.
+- **Router** (`src/app/router.tsx`): `/pedidos` sin `RoleRoute`; añadir `/pedidos/nuevo`, `/pedidos/:id` y `/pedidos/:id/editar` (lazy).
+- **Dashboard/Clientes**: actualizar `QuickActions` (deep-links) y el botón "Nuevo pedido" de `ClienteDetallePage` (`?cliente=`).
+
+### Checklist de implementación
+
+1. `types/models.ts` (`Pedido`, `DetallePedido`, `VarianteResumen`, payloads) + `cmdk` + `components/ui/command.tsx` + `SearchableSelect` + `MotivoDialog` + `pedidoTotales.ts`. ✅
+2. Hooks: `usePedidos` + `usePedido` + `usePedidoMutations` + `useOpciones`. ✅
+3. `PedidosTable` (filtros estado/cliente/fechas + `?estado=` inicial) + reescribir `PedidosPage`. ✅
+4. `OrderTimeline` + `PedidoDetallePage` (paneles, totales, acciones por rol/estado, cancelar con motivo). ✅
+5. `pedidoSchema` + `PedidoLineasEditor` + `PedidoForm` + `PedidoFormPage` (nuevo/editar, `?cliente=`). ✅
+6. Router (abrir `/pedidos`, rutas nuevas) + deep-links (`QuickActions`, `ClienteDetallePage`). ✅
+7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol (crear/editar/eliminar borrador, confirmar → stock y asiento débito, transiciones + 403/409, cancelar con motivo y reversión de stock/asiento, filtros y deep-links). ⏳ Pendiente (lint y build verdes; falta prueba manual por rol)
+
+### Prompt para Stitch
+
+Reutilizar el prompt de la sección §8 (pedidos). Ajustes para la fase: la lista incluye filtros de estado, cliente y rango de fechas y filas clicables hacia el detalle; el detalle muestra un stepper horizontal de estados con el actual resaltado y un banner de cancelado en rojo, paneles de cliente y receta óptica, la tabla de líneas y un panel de totales (subtotal, IVA 16%, total); el formulario se presenta como **página dedicada** con tres selectores con búsqueda (cliente, receta óptica, variante), una **tabla editable de líneas** (variante búsqueda por SKU, cantidad, precio unitario que se autocompleta, total por línea, botón agregar/quitar) y un panel de totales en vivo en la parte inferior estilado como barra fija; e incluye modales de confirmación para confirmar/transicionar y un modal de cancelación con campo de motivo obligatorio.
 
 ---
 
@@ -665,8 +796,8 @@ El frontend se implementa por fases. Cada fase entrega una **página navegable y
 | **3. Clientes** | Lista + detalle (crédito) + formulario drawer + desactivar | `clientes/` CRUD, `?search=` | `DataTable`, `Drawer`, `ConfirmDialog`, `SectionCard`, `FieldError`, `Pagination`, `StatusBadge`, `Switch` | ✅ Implementada |
 | **4. Usuarios (admin)** | Lista + form drawer + activar/desactivar | `usuarios/` CRUD | (reutiliza los anteriores) | ✅ Implementada |
 | **5. Inventario** | Categorías · Productos (variantes anidadas) · Variantes (`stock_bajo`) · modal ajustar stock | `categorias/`, `productos/`, `variantes/`, `variantes/{id}/ajustar-stock/` | `MoneyInput`, tablas editables, modal | ✅ Implementada (plan en §14) |
-| **6. Recetas** | Lista + formulario OD/OI | `recetas/` CRUD | (reutiliza los anteriores) | ⏳ Pendiente (plan en §15) |
-| **7. Pedidos** | Lista con filtros · detalle (stepper + transiciones por rol + documentos) · crear/editar (líneas + totales en vivo) | `pedidos/` CRUD, `{id}/confirmar/`, `{id}/cambiar-estado/` | `OrderStepper`, selector de variante, `OrderActions` | ⏳ Pendiente |
+| **6. Recetas** | Lista + formulario OD/OI | `recetas/` CRUD | (reutiliza los anteriores) | ✅ Implementada (plan en §15) |
+| **7. Pedidos** | Lista con filtros · detalle (timeline de estados + transiciones por rol) · crear/editar en página dedicada (líneas editables + totales en vivo) | `pedidos/` CRUD, `{id}/confirmar/`, `{id}/cambiar-estado/` | `SearchableSelect`, `OrderTimeline`, `MotivoDialog`, `PedidoLineasEditor` | ✅ Implementada (plan en §16) |
 | **8. Finanzas** | Métodos de pago · Pagos (aprobar/rechazar con motivo) · Libro mayor (solo lectura) | `metodos-pago/`, `pagos/`, `{id}/aprobar|rechazar/`, `libro-mayor/` | — | ⏳ Pendiente |
 | **9. Documentos** | Plantillas (editor HTML/CSS admin + preview) · diálogo generar + descarga blob | `plantillas/` CRUD, `{id}/generar/` | editor de código ligero | ⏳ Pendiente |
 | **10. Pulido** | Empty states en todas las listas, páginas 403/404/500, auditoría dark mode y accesibilidad | — | `ErrorPages` | ⏳ Pendiente |

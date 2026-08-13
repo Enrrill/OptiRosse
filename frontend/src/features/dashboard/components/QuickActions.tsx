@@ -13,12 +13,12 @@ interface QuickAction {
 
 const ACTIONS: Record<RolUsuario, QuickAction[]> = {
   administrador: [
-    { label: 'Nuevo pedido', icon: 'add_circle', to: '/pedidos' },
+    { label: 'Nuevo pedido', icon: 'add_circle', to: '/pedidos/nuevo' },
     { label: 'Registrar pago', icon: 'payments', to: '/finanzas' },
     { label: 'Nueva variante', icon: 'library_add', to: '/inventario?tab=variantes' },
   ],
   vendedor_b2b: [
-    { label: 'Nuevo pedido', icon: 'add_circle', to: '/pedidos' },
+    { label: 'Nuevo pedido', icon: 'add_circle', to: '/pedidos/nuevo' },
     { label: 'Registrar pago', icon: 'payments', to: '/finanzas' },
     { label: 'Nueva variante', icon: 'library_add', to: '/inventario?tab=variantes' },
   ],

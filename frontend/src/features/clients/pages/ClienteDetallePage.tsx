@@ -94,7 +94,7 @@ export default function ClienteDetallePage() {
               <StatusBadge display={estadoActivo(cliente.activo)} />
               {puedePedidos && (
                 <Button asChild>
-                  <Link to="/pedidos">
+                  <Link to={`/pedidos/nuevo?cliente=${cliente.id}`}>
                     <Icon name="add_circle" size={18} /> Nuevo pedido
                   </Link>
                 </Button>

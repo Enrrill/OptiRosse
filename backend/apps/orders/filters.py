@@ -19,7 +19,7 @@ class PedidoFilter(django_filters.FilterSet):
     cliente = django_filters.ModelChoiceFilter(queryset=ClienteOptica.objects.all())
     usuario = django_filters.ModelChoiceFilter(queryset=Usuario.objects.all())
     numero_pedido = django_filters.CharFilter(lookup_expr='icontains')
-    fecha_creado = django_filters.DateFromToRangeFilter()
+    fecha_creado = django_filters.DateFromToRangeFilter(field_name='creado_en')
 
     class Meta:
         model = Pedido
