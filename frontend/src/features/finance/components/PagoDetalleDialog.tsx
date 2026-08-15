@@ -1,13 +1,19 @@
+import { useState } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Icon } from '@/components/Icon'
+import { GenerarDocumentoDialog } from '@/components/forms/GenerarDocumentoDialog'
+import { useAuthStore } from '@/store/useAuth'
 import { choice, ESTADO_PAGO } from '@/lib/constants/choices'
+import { puedeGenerarDocumentos } from '@/lib/constants/permissions'
 import { formatDateTime, formatMoney } from '@/lib/format'
 import type { Pago } from '@/types/models'
 
@@ -27,6 +33,8 @@ function Fila({ label, children }: { label: string; children: React.ReactNode })
 }
 
 export function PagoDetalleDialog({ open, onOpenChange, pago }: PagoDetalleDialogProps) {
+  const [documentoOpen, setDocumentoOpen] = useState(false)
+  const rol = useAuthStore((s) => s.user?.rol)
   if (!pago) return null
 
   return (
@@ -76,7 +84,22 @@ export function PagoDetalleDialog({ open, onOpenChange, pago }: PagoDetalleDialo
             </Fila>
           )}
         </div>
+
+        {puedeGenerarDocumentos(rol) && (
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setDocumentoOpen(true)}>
+              <Icon name="description" size={18} /> Recibo de pago
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
+
+      <GenerarDocumentoDialog
+        open={documentoOpen}
+        onOpenChange={setDocumentoOpen}
+        objetoId={pago.id}
+        tiposPermitidos={['recibo_pago']}
+      />
     </Dialog>
   )
 }

@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/data/StatusBadge'
 import { ErrorState } from '@/components/data/ErrorState'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
 import { MotivoDialog } from '@/components/forms/MotivoDialog'
+import { GenerarDocumentoDialog } from '@/components/forms/GenerarDocumentoDialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Icon } from '@/components/Icon'
@@ -13,6 +14,7 @@ import { useAuthStore } from '@/store/useAuth'
 import { useToast } from '@/store/useToast'
 import { ApiError } from '@/lib/api/errors'
 import { choice, ESTADO_PEDIDO } from '@/lib/constants/choices'
+import { puedeGenerarDocumentos } from '@/lib/constants/permissions'
 import { formatDateTime, formatGradienteCompleto, formatMoney } from '@/lib/format'
 import type { EstadoPedido } from '@/types/models'
 import { usePedido } from '../hooks/usePedido'
@@ -63,6 +65,7 @@ export default function PedidoDetallePage() {
   const [siguienteOpen, setSiguienteOpen] = useState(false)
   const [cancelarOpen, setCancelarOpen] = useState(false)
   const [eliminarOpen, setEliminarOpen] = useState(false)
+  const [documentoOpen, setDocumentoOpen] = useState(false)
 
   const confirmar = useConfirmarPedido(id)
   const cambiarEstado = useCambiarEstadoPedido(id)
@@ -168,6 +171,11 @@ export default function PedidoDetallePage() {
               {puedeCancelarPedido && (
                 <Button variant="destructive" onClick={() => setCancelarOpen(true)}>
                   <Icon name="block" size={18} /> Cancelar pedido
+                </Button>
+              )}
+              {puedeGenerarDocumentos(rol) && (
+                <Button variant="outline" onClick={() => setDocumentoOpen(true)}>
+                  <Icon name="description" size={18} /> Generar documento
                 </Button>
               )}
             </div>
@@ -329,6 +337,13 @@ export default function PedidoDetallePage() {
         variant="destructive"
         loading={eliminar.isPending}
         onConfirm={eliminarPedido}
+      />
+
+      <GenerarDocumentoDialog
+        open={documentoOpen}
+        onOpenChange={setDocumentoOpen}
+        objetoId={pedido.id}
+        tiposPermitidos={['factura', 'orden_trabajo', 'nota_entrega']}
       />
     </div>
   )

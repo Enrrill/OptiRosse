@@ -300,3 +300,23 @@ export interface DashboardResumen {
   kpis: DashboardKpis
   recientes: DashboardRecientes
 }
+
+export type TipoDocumento = 'factura' | 'orden_trabajo' | 'nota_entrega' | 'recibo_pago'
+
+export interface PlantillaDocumento {
+  id: number
+  nombre: string
+  tipo_documento: TipoDocumento
+  tipo_documento_display: string
+  contenido_html: string
+  estilos_css: string
+  activo: boolean
+  actualizado_en: string
+}
+
+export interface PlantillaDocumentoPayload {
+  nombre: string
+  tipo_documento: TipoDocumento
+  contenido_html: string
+  estilos_css: string
+}
