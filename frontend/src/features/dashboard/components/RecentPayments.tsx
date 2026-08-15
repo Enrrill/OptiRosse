@@ -43,7 +43,7 @@ export function RecentPayments({ pagos }: { pagos: PagoResumen[] }) {
       columns={columns}
       data={pagos}
       rowKey={(r) => r.id}
-      onRowClick={() => navigate('/finanzas')}
+      onRowClick={() => navigate('/finanzas?tab=pagos')}
       emptyTitle="Sin pagos recientes"
       className="border-0 shadow-none"
     />

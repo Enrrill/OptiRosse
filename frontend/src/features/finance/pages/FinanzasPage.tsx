@@ -1,6 +1,14 @@
-import { PlaceholderPage } from '@/features/dashboard/components/PlaceholderPage'
-import { NAV_ITEMS } from '@/lib/constants/nav'
+import { PageHeader } from '@/components/data/PageHeader'
+import { FinanzasTabs } from '../components/FinanzasTabs'
 
 export default function FinanzasPage() {
-  return <PlaceholderPage item={NAV_ITEMS[5]} />
+  return (
+    <div>
+      <PageHeader
+        title="Finanzas"
+        description="Métodos de pago, gestión de pagos y libro mayor."
+      />
+      <FinanzasTabs />
+    </div>
+  )
 }

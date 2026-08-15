@@ -12,7 +12,7 @@ import { useAuthStore } from '@/store/useAuth'
 import { estadoActivo } from '@/lib/constants/choices'
 import { formatDateTime, formatMoney } from '@/lib/format'
 import { useCliente } from '../hooks/useCliente'
-import { useSaldoCliente } from '../hooks/useSaldoCliente'
+import { useSaldoCliente } from '@/hooks/useSaldoCliente'
 import { useDesactivarCliente, useReactivarCliente } from '../hooks/useClienteMutations'
 import { ClienteFormDrawer } from '../components/ClienteFormDrawer'
 import type { RolUsuario } from '@/types/models'
@@ -101,7 +101,7 @@ export default function ClienteDetallePage() {
               )}
               {puedePagos && (
                 <Button asChild variant="secondary">
-                  <Link to="/finanzas">
+                  <Link to={`/finanzas?tab=pagos&nuevo=1&cliente=${cliente.id}`}>
                     <Icon name="payments" size={18} /> Registrar pago
                   </Link>
                 </Button>

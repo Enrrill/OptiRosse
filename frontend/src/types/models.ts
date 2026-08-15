@@ -182,12 +182,66 @@ export interface PedidoPayload {
   detalles: DetallePedidoPayload[]
 }
 
+export interface PagoDetalle {
+  id: number
+  monto: number | string
+  estado: EstadoPago | string
+  numero_referencia: string
+}
+
+export interface MetodoPago {
+  id: number
+  nombre: string
+  moneda: string
+  requiere_referencia: boolean
+  activo: boolean
+}
+
+export interface MetodoPagoPayload {
+  nombre: string
+  moneda: string
+  requiere_referencia: boolean
+}
+
+export interface Pago {
+  id: number
+  cliente: number
+  cliente_detalle: ClienteResumen
+  pedido: number | null
+  pedido_numero: string | null
+  metodo_pago: number
+  metodo_pago_detalle: string
+  monto: number | string
+  tasa_cambio: number | string
+  numero_referencia: string
+  comprobante_imagen_url: string
+  estado: EstadoPago | string
+  estado_display: string
+  fecha_pago: string
+  motivo_rechazo: string
+  creado_en: string
+  actualizado_en: string
+}
+
+export interface PagoPayload {
+  cliente: number
+  pedido?: number | null
+  metodo_pago: number
+  monto: number | string
+  tasa_cambio?: number | string
+  numero_referencia?: string
+  comprobante_imagen_url?: string
+  fecha_pago?: string
+}
+
 export interface LibroMayorAsiento {
   id: number
   cliente: number
   cliente_detalle: ClienteResumen
+  pedido: number | null
   pedido_numero: string | null
-  pago_detalle: unknown | null
+  pago: number | null
+  pago_detalle: PagoDetalle | null
   tipo_asiento: 'debito' | 'credito' | string
   tipo_asiento_display: string
   monto: number | string
@@ -195,6 +249,7 @@ export interface LibroMayorAsiento {
   descripcion: string
   asiento_origen_id: number | null
   creado_en: string
+  actualizado_en: string
 }
 
 export interface Periodo {
