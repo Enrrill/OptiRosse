@@ -9,6 +9,7 @@ export const AUTH_ENDPOINTS = {
 }
 
 export const USUARIOS = '/usuarios/'
+export const AUDITORIA = '/auditoria/'
 export const CLIENTES = '/clientes/'
 export const CATEGORIAS = '/categorias/'
 export const PRODUCTOS = '/productos/'

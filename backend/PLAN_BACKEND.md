@@ -309,6 +309,26 @@ Nota: la clave `recientes.pagos` se **omite** para roles sin acceso (vendedor/al
 
 ---
 
+## Fase 9 — auditoría (endpoint de lectura) ✅ implementada
+
+`RegistroAuditoria` se escribía desde Fase 1 (vía `AuditoriaService`/`AuditoriaMixin`) pero solo se leía desde el admin de Django. Esta fase expone la consulta read-only para el módulo de Auditoría del frontend (Fase 10 de `PLAN_FRONTEND.md`).
+
+### Mejoras al modelo (migración `core.0002`)
+- `accion`/`tabla_afectada` → `TextChoices` (`AccionAuditoria`, `TablaAfectada`) en `core/choices.py`; **sin cambios de esquema** (Django no migra choices), pero habilita filtros por choix y `*_display`.
+- Índices para escalabilidad: `Index(-creado_en, -id)` (orden por defecto), `Index(tabla_afectada, objeto_id)` (historial por registro) y `db_index=True` en `usuario`.
+
+### App core
+- `serializers/auditoria.py` → `RegistroAuditoriaSerializer` (read-only; `accion_display`/`tabla_display` vía `get_*_display`, `usuario_detalle` por `SerializerMethodField`).
+- `filters.py` → `RegistroAuditoriaFilter`: `usuario` (`ModelChoiceFilter`), `accion` (`ChoiceFilter`), `tabla` (`ChoiceFilter` sobre `tabla_afectada`), `objeto_id`, `fecha_creado` (`DateFromToRangeFilter`).
+- `views/auditoria.py` → `RegistroAuditoriaViewSet(BaseReadOnlyModelViewSet)`, permiso `EsAdministrador` (solo admin; 403 al resto), `select_related('usuario')`, `search` en acción/módulo/usuario, `ordering=(-creado_en, -id)`.
+- `urls.py` → `auditoria/` (lista + detalle).
+
+### Rutas
+`GET /api/v1/auditoria/`, `GET /api/v1/auditoria/{id}/`.
+- **Done**: `check` + `makemigrations --check` limpio; verificación por curl (200 admin con `accion_display`/`tabla_display`/`usuario_detalle`, filtros `tabla`/`accion`/`objeto_id`/fechas, 403 vendedor, 401 sin token).
+
+---
+
 ## Criterios de "done" por fase
 
 - App registrada en `settings.INSTALLED_APPS` y URL incluida.

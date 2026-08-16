@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
-from backend.apps.core.choices import RolUsuario
+from backend.apps.core.choices import AccionAuditoria, RolUsuario, TablaAfectada
 
 
 class UsuarioManager(BaseUserManager):
@@ -59,9 +59,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin, TimeStampedModel, ActivoMixin)
 
 
 class RegistroAuditoria(TimeStampedModel):
-    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, verbose_name='usuario')
-    accion = models.CharField('acción', max_length=100)
-    tabla_afectada = models.CharField('tabla afectada', max_length=100)
+    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, verbose_name='usuario', db_index=True)
+    accion = models.CharField('acción', max_length=100, choices=AccionAuditoria.choices)
+    tabla_afectada = models.CharField('tabla afectada', max_length=100, choices=TablaAfectada.choices)
     objeto_id = models.IntegerField('ID del objeto', null=True, blank=True)
     detalles = models.JSONField('detalles', null=True, blank=True)
     direccion_ip = models.CharField('dirección IP', max_length=45, blank=True, default='')
@@ -70,6 +70,10 @@ class RegistroAuditoria(TimeStampedModel):
         verbose_name = 'registro de auditoría'
         verbose_name_plural = 'registros de auditoría'
         db_table = 'registros_auditoria'
+        indexes = [
+            models.Index(fields=['-creado_en', '-id'], name='auditoria_creado_idx'),
+            models.Index(fields=['tabla_afectada', 'objeto_id'], name='auditoria_tabla_objeto_idx'),
+        ]
 
     def __str__(self):
         return f'{self.accion} - {self.creado_en}'

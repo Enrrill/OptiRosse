@@ -9,12 +9,14 @@ from backend.apps.core.views.auth import (
     MeView,
     RefreshView,
 )
+from backend.apps.core.views.auditoria import RegistroAuditoriaViewSet
 from backend.apps.core.views.usuarios import UsuarioViewSet
 
 app_name = 'core'
 
 router = SimpleRouter()
 router.register('usuarios', UsuarioViewSet, basename='usuario')
+router.register('auditoria', RegistroAuditoriaViewSet, basename='auditoria')
 
 urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='auth-login'),

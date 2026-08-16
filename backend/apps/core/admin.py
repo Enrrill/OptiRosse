@@ -12,6 +12,7 @@ class UsuarioAdmin(admin.ModelAdmin):
 
 @admin.register(RegistroAuditoria)
 class RegistroAuditoriaAdmin(admin.ModelAdmin):
-    list_display = ('accion', 'tabla_afectada', 'usuario', 'creado_en')
-    list_filter = ('accion', 'tabla_afectada')
-    search_fields = ('accion', 'tabla_afectada')
+    list_display = ('creado_en', 'accion', 'tabla_afectada', 'usuario', 'objeto_id')
+    list_filter = ('accion', 'tabla_afectada', 'usuario')
+    search_fields = ('accion', 'tabla_afectada', 'usuario__nombre_usuario', 'usuario__correo')
+    ordering = ('-creado_en',)

@@ -784,6 +784,62 @@ Reutilizar el prompt de la sección §8 (pedidos). Ajustes para la fase: la list
 
 ---
 
+## 17. Fase 10 — Auditoría (registro de acciones del personal)
+
+**Objetivo**: módulo `/auditoria` (solo `administrador`) para consultar el registro de acciones de los usuarios. El modelo `RegistroAuditoria` ya existía y el backend registraba cada acción vía `AuditoriaService` + `AuditoriaMixin` (crear/actualizar/desactivar, ajuste de stock, transiciones de pedido, pagos, asientos de libro mayor, generación de documentos). Esta fase añade el **endpoint de lectura** (`/api/v1/auditoria/`) y la UI del módulo, y se antepone al Pulido (renumerado a Fase 11).
+
+### Contrato backend (nuevo endpoint — dependencia de esta fase)
+
+- `GET /api/v1/auditoria/`, `GET /api/v1/auditoria/{id}/` — **solo `administrador`** (403 a otros roles). `BaseReadOnlyModelViewSet` + envelope estándar.
+- Campos: `id`, `usuario` + `usuario_detalle` (`{id, nombre_usuario, nombre, apellido, rol}` o `null` para acciones del sistema), `accion` + `accion_display`, `tabla_afectada` + `tabla_display` (db_table), `objeto_id`, `detalles` (JSON), `direccion_ip`, `creado_en`, `actualizado_en`.
+- Filtros: `?usuario=` · `?accion=` (`TextChoices`) · `?tabla=` (db_table) · `?objeto_id=` · `?fecha_creado_after=/fecha_creado_before=` · `?search=` (acción/módulo/usuario) · `?ordering=-creado_en` (default). Paginación estándar.
+- Mejoras al modelo (migración `core.0002`): `TextChoices` en `accion`/`tabla_afectada` (sin cambios de esquema) + índices `(creado_en, id)` y `(tabla_afectada, objeto_id)` + `db_index` en `usuario` → consultas rápidas al crecer y trazabilidad por registro.
+
+### Especificación visual
+
+- **PageHeader**: "Auditoría" + subtítulo "Registro de las acciones realizadas por el personal: quién hizo qué, en qué módulo y cuándo." Sin botón de acción (solo lectura).
+- **Tarjeta resumen**: "Registros totales" (`count`).
+- **Tabla** (`AuditoriaTable` sobre `DataTable`): columnas **Fecha y hora** (`formatDateTime`), **Usuario** (nombre completo + `@usuario` o "Sistema"), **Acción** (`StatusBadge` vía `ACCION_AUDITORIA`), **Módulo** (`StatusBadge` vía `TABLA_AUDITORIA`), **ID** (mono `#id`), **IP** (mono), **Detalle** (icono `data_object`).
+- **Toolbar**: buscador "Buscar por usuario, acción o módulo..." + `Select` usuario (+"Todos los usuarios") + `Select` acción + `Select` módulo + rango de fechas (dos `Input type="date"`). Footer: `Pagination`.
+- **Banner "Historial del registro"**: al llegar `?tabla=&objeto_id=` (deep-link), se muestra un banner con "Historial del registro {Módulo} #{id}" y botón "Quitar filtro".
+- **Detalle** (`RegistroDetalleDialog`, `max-w-lg`): campos Acción/Módulo (badges), Usuario (con `@usuario`), ID del objeto (mono), Dirección IP (mono) y **`detalles` JSON** en `<pre>` mono con scroll (`max-h-64 overflow-auto`).
+- **Estados**: loading → `SkeletonRows` (vía `DataTable`); empty → "No hay registros de actividad"; error → `ErrorState` con "Reintentar".
+
+### Arquitectura (archivos)
+
+**Backend** (`backend/apps/core/`):
+- `choices.py` → `AccionAuditoria` (13 acciones) y `TablaAfectada` (14 db_table) con labels en español.
+- `models.py` → `choices=` + índices en `RegistroAuditoria`; migración `0002`.
+- `serializers/auditoria.py` → `RegistroAuditoriaSerializer` (`*_display` vía `get_*_display` + `usuario_detalle` por `SerializerMethodField`).
+- `filters.py` → `RegistroAuditoriaFilter`; `views/auditoria.py` → `RegistroAuditoriaViewSet` (read-only, `EsAdministrador`, `select_related('usuario')`); `urls.py` → `auditoria/`.
+- `admin.py` → `list_display` con `creado_en` primero + `list_filter` de usuario.
+
+**Frontend**:
+- `endpoints.ts` → `AUDITORIA = '/auditoria/'`.
+- `types/models.ts` → `RegistroAuditoria`, `AuditoriaUsuarioResumen`.
+- `lib/constants/choices.ts` → `ACCION_AUDITORIA`, `TABLA_AUDITORIA` (`ChoiceDisplay`).
+- `features/audit/hooks/` → `useRegistrosAuditoria.ts` (patrón `useLibroMayor`) y `useUsuariosOpciones.ts` (usuarios activos para el filtro).
+- `features/audit/components/` → `AuditoriaTable.tsx`, `RegistroDetalleDialog.tsx`.
+- `features/audit/pages/AuditoriaPage.tsx`: lee `?tabla=`/`?objeto_id=` (deep-link desde Pedido) como filtros iniciales y gestiona el banner.
+- `lib/constants/nav.ts` → item "Auditoría" (icon `history`, roles `administrador`); `router.tsx` → `/auditoria` con `RoleRoute roles={adminOnly}`.
+- `features/orders/pages/PedidoDetallePage.tsx` → botón "Ver historial" (solo admin) → `/auditoria?tabla=pedidos&objeto_id=<id>`.
+
+### Checklist de implementación
+
+1. `TextChoices` + modelo (choices/índices) + migración `0002` + `check`/`migrate`. ✅
+2. `RegistroAuditoriaSerializer` + `RegistroAuditoriaFilter` + `RegistroAuditoriaViewSet` + urls + admin. ✅
+3. Smoke test: `makemigrations --check` limpio; 200 admin, 403 vendedor, 401 anónimo; filtros `tabla/accion/objeto_id`. ✅
+4. Tipos + `AUDITORIA` + `ACCION_AUDITORIA`/`TABLA_AUDITORIA`. ✅
+5. Hooks + `AuditoriaTable` + `RegistroDetalleDialog` + `AuditoriaPage`. ✅
+6. Router + nav + botón "Ver historial" en `PedidoDetallePage`. ✅
+7. Verificación: `pnpm lint`, `pnpm build`, prueba manual por rol (admin accede; resto recibe 403 en ruta y endpoint). ✅
+
+### Prompt para Stitch
+
+> Diseña el módulo de auditoría de una aplicación web B2B de óptica, en español, estilo moderno corporativo, colores morado #6D28D9 y azul claro #38BDF8, temas claro y oscuro, con el app shell. Vista de lista: tabla con columnas "Fecha y hora", "Usuario" (nombre y @usuario), "Acción" (badge de color: Crear/Aprobar/Confirmar verde, Actualizar/Cambiar estado azul, Eliminar/Cancelar/Rechazar/Desactivar rojo, Ajuste de stock ámbar, Asiento de libro mayor morado, Generar documento rosa), "Módulo" (badge), "ID" en fuente mono, y "IP" en fuente mono, con un botón de detalle por fila; barra superior con buscador, selector de usuario, selector de acción, selector de módulo y rango de fechas. Arriba una tarjeta resumen con el total de registros. Un banner contextual "Historial del registro Pedidos #123" con botón de quitar filtro cuando se accede desde un pedido. Modal de detalle con los campos de la acción y el JSON de detalles en un bloque monoespaciado con scroll. Incluye estados de carga, vacío y error.
+
+---
+
 ## Guía de implementación (roadmap página por página)
 
 El frontend se implementa por fases. Cada fase entrega una **página navegable y funcional** (diseño Stitch → implementación). Orden recomendado:
@@ -800,6 +856,7 @@ El frontend se implementa por fases. Cada fase entrega una **página navegable y
 | **7. Pedidos** | Lista con filtros · detalle (timeline de estados + transiciones por rol) · crear/editar en página dedicada (líneas editables + totales en vivo) | `pedidos/` CRUD, `{id}/confirmar/`, `{id}/cambiar-estado/` | `SearchableSelect`, `OrderTimeline`, `MotivoDialog`, `PedidoLineasEditor` | ✅ Implementada (plan en §16) |
 | **8. Finanzas** | Métodos de pago · Pagos (aprobar/rechazar con motivo) · Libro mayor (solo lectura) | `metodos-pago/`, `pagos/`, `{id}/aprobar|rechazar/`, `libro-mayor/` | — | ✅ Implementada |
 | **9. Documentos** | Plantillas (editor HTML/CSS admin + preview) · diálogo generar + descarga blob | `plantillas/` CRUD, `{id}/generar/` | editor de código ligero | ✅ Implementada |
-| **10. Pulido** | Empty states en todas las listas, páginas 403/404/500, auditoría dark mode y accesibilidad | — | `ErrorPages` | ⏳ Pendiente |
+| **10. Auditoría** | Registro de acciones del personal (solo admin) · filtros usuario/acción/módulo/fechas · historial por registro (deep-link desde Pedido) | `auditoria/` | `AuditoriaTable`, `RegistroDetalleDialog` | ✅ Implementada (plan en §17) |
+| **11. Pulido** | Empty states en todas las listas, páginas 403/404/500, auditoría dark mode y accesibilidad | — | `ErrorPages` | ⏳ Pendiente |
 
 **Principios por fase**: cada página consume el envelope (no `response.data` de DRF en crudo) vía `useApi`; los errores se mapean a campos/toast; las acciones se muestran/ocultan según el rol de `auth/me`; los estados de carga/vacío/error se heredan de `DataTable`/`EmptyState`.

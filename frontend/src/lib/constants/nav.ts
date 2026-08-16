@@ -17,6 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/pedidos', label: 'Pedidos', icon: 'shopping_cart' },
   { to: '/finanzas', label: 'Finanzas', icon: 'payments', roles: ['administrador', 'contabilidad'] },
   { to: '/documentos', label: 'Documentos', icon: 'folder_shared', roles: ['administrador', 'contabilidad', 'vendedor_b2b'] },
+  { to: '/auditoria', label: 'Auditoría', icon: 'history', roles: ['administrador'] },
   { to: '/usuarios', label: 'Usuarios', icon: 'manage_accounts', roles: ['administrador'] },
 ]
 

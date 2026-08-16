@@ -320,3 +320,26 @@ export interface PlantillaDocumentoPayload {
   contenido_html: string
   estilos_css: string
 }
+
+export interface AuditoriaUsuarioResumen {
+  id: number
+  nombre_usuario: string
+  nombre: string
+  apellido: string
+  rol: RolUsuario
+}
+
+export interface RegistroAuditoria {
+  id: number
+  usuario: number | null
+  usuario_detalle: AuditoriaUsuarioResumen | null
+  accion: string
+  accion_display: string
+  tabla_afectada: string
+  tabla_display: string
+  objeto_id: number | null
+  detalles: Record<string, unknown> | null
+  direccion_ip: string
+  creado_en: string
+  actualizado_en: string
+}

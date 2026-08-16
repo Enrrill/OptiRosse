@@ -178,6 +178,13 @@ export default function PedidoDetallePage() {
                   <Icon name="description" size={18} /> Generar documento
                 </Button>
               )}
+              {rol === 'administrador' && (
+                <Button asChild variant="outline">
+                  <Link to={`/auditoria?tabla=pedidos&objeto_id=${pedido.id}`}>
+                    <Icon name="history" size={18} /> Ver historial
+                  </Link>
+                </Button>
+              )}
             </div>
           }
         />
