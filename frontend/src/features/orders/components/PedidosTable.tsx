@@ -207,6 +207,8 @@ export function PedidosTable({
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
               />
               <Input
+                id="search-pedidos"
+                name="search"
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Buscar por N.º o cliente..."
@@ -249,18 +251,22 @@ export function PedidosTable({
             </div>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+            <label htmlFor="pedidos-fecha-desde" className="flex items-center gap-2 text-sm text-on-surface-variant">
               Desde
               <Input
+                id="pedidos-fecha-desde"
+                name="fecha_desde"
                 type="date"
                 value={fechaDesde}
                 onChange={(e) => onFechaDesdeChange(e.target.value)}
                 className="w-40"
               />
             </label>
-            <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+            <label htmlFor="pedidos-fecha-hasta" className="flex items-center gap-2 text-sm text-on-surface-variant">
               Hasta
               <Input
+                id="pedidos-fecha-hasta"
+                name="fecha_hasta"
                 type="date"
                 value={fechaHasta}
                 onChange={(e) => onFechaHastaChange(e.target.value)}

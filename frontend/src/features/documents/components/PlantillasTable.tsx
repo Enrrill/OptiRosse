@@ -151,6 +151,8 @@ export function PlantillasTable({
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
             />
             <Input
+              id="search-plantillas"
+              name="search"
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Buscar por nombre..."
@@ -171,8 +173,8 @@ export function PlantillasTable({
                 ))}
               </SelectContent>
             </Select>
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-              <Switch checked={showInactivos} onCheckedChange={onToggleInactivos} />
+            <label htmlFor="toggle-inactivos-plantillas" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
+              <Switch id="toggle-inactivos-plantillas" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
               Mostrar inactivos
             </label>
             {canEdit && (

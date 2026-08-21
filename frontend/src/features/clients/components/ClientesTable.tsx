@@ -184,6 +184,8 @@ export function ClientesTable({
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
             />
             <Input
+              id="search-clientes"
+              name="search"
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Buscar por nombre comercial, RIF o correo..."
@@ -191,8 +193,8 @@ export function ClientesTable({
             />
           </div>
           {canManage && (
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-              <Switch checked={showInactivos} onCheckedChange={onToggleInactivos} />
+            <label htmlFor="toggle-inactivos-clientes" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
+              <Switch id="toggle-inactivos-clientes" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
               Mostrar inactivos
             </label>
           )}

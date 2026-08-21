@@ -65,16 +65,12 @@ function getPageRange(currentPage: number, totalPages: number): number[] {
     return Array.from({ length: totalPages }, (_, i) => i + 1)
   }
 
-  const leftIndex = Math.max(1, currentPage - 2)
-  const rightIndex = Math.min(totalPages, currentPage + 2)
-
-  let range: number[]
-  if (currentPage <= 3) {
-    range = [1, 2, 3, rightIndex, totalPages]
-  } else if (currentPage >= totalPages - 2) {
-    range = [1, leftIndex, totalPages - 2, totalPages - 1, totalPages]
-  } else {
-    range = [1, leftIndex, currentPage, rightIndex, totalPages]
+  const pages = new Set<number>()
+  pages.add(1)
+  for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+    pages.add(i)
   }
-  return range
+  pages.add(totalPages)
+
+  return Array.from(pages).sort((a, b) => a - b)
 }

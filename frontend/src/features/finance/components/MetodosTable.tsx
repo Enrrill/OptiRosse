@@ -119,6 +119,8 @@ export function MetodosTable({
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
             />
             <Input
+              id="search-metodos"
+              name="search"
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Buscar por nombre o moneda..."
@@ -126,8 +128,8 @@ export function MetodosTable({
             />
           </div>
           <div className="flex items-center gap-3">
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-              <Switch checked={showInactivos} onCheckedChange={onToggleInactivos} />
+            <label htmlFor="toggle-inactivos-metodos" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
+              <Switch id="toggle-inactivos-metodos" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
               Mostrar inactivos
             </label>
             <Button onClick={onNuevo}>

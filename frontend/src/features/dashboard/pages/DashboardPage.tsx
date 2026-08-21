@@ -37,7 +37,7 @@ export default function DashboardPage() {
   if (!resumen) return null
 
   const kpiCards = buildKpiCards(resumen.kpis)
-  const { pedidos = [], pagos } = resumen.recientes
+  const { pedidos = [], pagos = [] } = resumen.recientes
 
   return (
     <div>

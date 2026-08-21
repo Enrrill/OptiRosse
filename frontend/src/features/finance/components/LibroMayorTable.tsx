@@ -174,9 +174,11 @@ export function LibroMayorTable({
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
             />
             <Input
+              id="search-libro-mayor"
+              name="search"
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Buscar por cliente o descripción..."
+              placeholder="Buscar por concepto o referencia..."
               className="pl-9"
             />
           </div>
@@ -213,18 +215,22 @@ export function LibroMayorTable({
                 ))}
               </SelectContent>
             </Select>
-            <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+            <label htmlFor="lm-fecha-desde" className="flex items-center gap-2 text-sm text-on-surface-variant">
               Desde
               <Input
+                id="lm-fecha-desde"
+                name="fecha_desde"
                 type="date"
                 value={fechaDesde}
                 onChange={(e) => onFechaDesdeChange(e.target.value)}
                 className="w-40"
               />
             </label>
-            <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+            <label htmlFor="lm-fecha-hasta" className="flex items-center gap-2 text-sm text-on-surface-variant">
               Hasta
               <Input
+                id="lm-fecha-hasta"
+                name="fecha_hasta"
                 type="date"
                 value={fechaHasta}
                 onChange={(e) => onFechaHastaChange(e.target.value)}

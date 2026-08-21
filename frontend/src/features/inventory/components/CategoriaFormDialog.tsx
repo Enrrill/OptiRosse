@@ -114,7 +114,7 @@ export function CategoriaFormDialog({ open, onOpenChange, categoria }: Categoria
           </div>
 
           <div className="space-y-1.5">
-            <Label>Tipo de producto</Label>
+            <Label htmlFor="categoria-tipo">Tipo de producto</Label>
             <Controller
               control={control}
               name="tipo_producto"

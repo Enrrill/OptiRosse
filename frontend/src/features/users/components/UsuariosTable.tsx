@@ -174,6 +174,8 @@ export function UsuariosTable({
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
               />
               <Input
+                id="search-usuarios"
+                name="search"
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Buscar por usuario, nombre o correo..."
@@ -197,8 +199,8 @@ export function UsuariosTable({
               </SelectContent>
             </Select>
           </div>
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-            <Switch checked={showInactivos} onCheckedChange={onToggleInactivos} />
+          <label htmlFor="toggle-inactivos-usuarios" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
+            <Switch id="toggle-inactivos-usuarios" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
             Mostrar inactivos
           </label>
         </div>

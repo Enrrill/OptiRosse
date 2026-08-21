@@ -158,14 +158,16 @@ export function VariantesTable({
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
               />
               <Input
+                id="search-variantes"
+                name="search"
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Buscar por SKU, código de barras o marca..."
                 className="pl-9"
               />
             </div>
-            <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-on-surface-variant">
-              <Switch checked={soloStockBajo} onCheckedChange={onToggleSoloStockBajo} />
+            <label htmlFor="toggle-stock-bajo" className="flex cursor-pointer items-center gap-2 text-sm font-medium text-on-surface-variant">
+              <Switch id="toggle-stock-bajo" name="solo_stock_bajo" checked={soloStockBajo} onCheckedChange={onToggleSoloStockBajo} />
               Solo stock bajo
             </label>
           </div>

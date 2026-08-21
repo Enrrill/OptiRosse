@@ -217,18 +217,22 @@ export function AuditoriaTable({
             </Select>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+            <label htmlFor="fecha-desde" className="flex items-center gap-2 text-sm text-on-surface-variant">
               Desde
               <Input
+                id="fecha-desde"
+                name="fecha_desde"
                 type="date"
                 value={fechaDesde}
                 onChange={(e) => onFechaDesdeChange(e.target.value)}
                 className="w-40"
               />
             </label>
-            <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+            <label htmlFor="fecha-hasta" className="flex items-center gap-2 text-sm text-on-surface-variant">
               Hasta
               <Input
+                id="fecha-hasta"
+                name="fecha_hasta"
                 type="date"
                 value={fechaHasta}
                 onChange={(e) => onFechaHastaChange(e.target.value)}

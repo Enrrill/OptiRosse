@@ -179,6 +179,8 @@ export function ProductosTable({
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
               />
               <Input
+                id="search-productos"
+                name="search"
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Buscar por marca, modelo o categoría..."
@@ -230,14 +232,16 @@ export function ProductosTable({
 
             <div className="relative w-full sm:w-48">
               <Input
+                id="search-marca"
+                name="marca"
                 value={marcaFiltro}
                 onChange={(e) => onMarcaChange(e.target.value)}
                 placeholder="Filtrar por marca"
               />
             </div>
 
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-              <Switch checked={showInactivos} onCheckedChange={onToggleInactivos} />
+            <label htmlFor="toggle-inactivos-productos" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
+              <Switch id="toggle-inactivos-productos" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
               Mostrar inactivos
             </label>
           </div>

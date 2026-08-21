@@ -117,6 +117,8 @@ export function CategoriasTable({
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
             />
             <Input
+              id="search-categorias"
+              name="search"
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Buscar por nombre..."
@@ -125,8 +127,8 @@ export function CategoriasTable({
           </div>
           <div className="flex items-center gap-3">
             {canManage && (
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-                <Switch checked={showInactivas} onCheckedChange={onToggleInactivas} />
+              <label htmlFor="toggle-inactivas-categorias" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
+                <Switch id="toggle-inactivas-categorias" name="show_inactivas" checked={showInactivas} onCheckedChange={onToggleInactivas} />
                 Mostrar inactivas
               </label>
             )}
