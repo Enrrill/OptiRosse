@@ -6,7 +6,19 @@ interface UsePaginationOptions {
   debounceMs?: number
 }
 
-export function usePagination({ pageSize = 20, debounceMs = 300 }: UsePaginationOptions = {}) {
+export interface PaginationMeta {
+  count: number
+  next: string | null
+  previous: string | null
+  total_pages: number
+  page: number
+  page_range: number[]
+}
+
+export function usePagination({
+  pageSize = 15,
+  debounceMs = 300,
+}: UsePaginationOptions = {}) {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, debounceMs)
@@ -22,6 +34,15 @@ export function usePagination({ pageSize = 20, debounceMs = 300 }: UsePagination
     [page, pageSize, debouncedSearch],
   )
 
+  const paginationMeta = useMemo<PaginationMeta>(() => ({
+    count: 0,
+    next: null,
+    previous: null,
+    total_pages: 1,
+    page: 1,
+    page_range: [1],
+  }), [])
+
   return {
     page,
     setPage,
@@ -30,5 +51,6 @@ export function usePagination({ pageSize = 20, debounceMs = 300 }: UsePagination
     resetPage,
     pageSize,
     params,
+    paginationMeta,
   }
 }

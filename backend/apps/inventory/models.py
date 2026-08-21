@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models import Q
+from django.contrib.postgres.search import SearchVector, SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
 from backend.apps.core.choices import TipoProducto
@@ -35,13 +37,23 @@ class Producto(TimeStampedModel, ActivoMixin):
     tratamiento = models.CharField('tratamiento', max_length=50, blank=True, default='')
     diseno = models.CharField('diseño', max_length=50, blank=True, default='')
 
+    search_vector = SearchVectorField(null=True, editable=False)
+
     class Meta:
         verbose_name = 'producto'
         verbose_name_plural = 'productos'
         db_table = 'productos'
+        indexes = [
+            models.Index(fields=['search_vector'], name='idx_prod_search_vec'),
+            GinIndex(fields=['search_vector'], name='idx_prod_search_gin'),
+        ]
 
     def __str__(self):
         return f'{self.marca} {self.codigo_modelo}'
+
+    def save(self, *args, **kwargs):
+        self.search_vector = SearchVector('nombre', 'descripcion', 'marca')
+        super().save(*args, **kwargs)
 
 
 class VarianteProducto(ActivoMixin):

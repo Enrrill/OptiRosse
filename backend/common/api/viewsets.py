@@ -4,12 +4,12 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
 from backend.common.api.mixins import AuditoriaMixin
-from backend.common.api.pagination import StandardResultsSetPagination
+from backend.common.api.pagination import HybridPagination
 from backend.common.api.response import api_response
 
 
 class BaseModelViewSet(AuditoriaMixin, ModelViewSet):
-    pagination_class = StandardResultsSetPagination
+    pagination_class = HybridPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     ordering = ('-creado_en',)
 
@@ -37,6 +37,6 @@ class BaseModelViewSet(AuditoriaMixin, ModelViewSet):
 
 
 class BaseReadOnlyModelViewSet(ReadOnlyModelViewSet):
-    pagination_class = StandardResultsSetPagination
+    pagination_class = HybridPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     ordering = ('-creado_en',)
