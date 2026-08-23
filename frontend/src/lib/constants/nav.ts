@@ -26,18 +26,42 @@ export function navItemsForRole(rol?: RolUsuario | null): NavItem[] {
   return NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(rol))
 }
 
-const EXTRA_TITLES: Record<string, string> = {
-  '/perfil': 'Perfil de Usuario',
-  '/pedidos/nuevo': 'Nuevo Pedido',
+export interface BreadcrumbSegment {
+  label: string
+  /** Si se omite, es el segmento activo (último). */
+  to?: string
 }
 
-export function getNavTitle(pathname: string): string {
-  if (EXTRA_TITLES[pathname]) return EXTRA_TITLES[pathname]
-  if (pathname.startsWith('/perfil')) return 'Perfil de Usuario'
-  if (pathname.startsWith('/pedidos/')) return 'Pedidos'
-  if (pathname.startsWith('/clientes/')) return 'Clientes'
+/**
+ * Devuelve los segmentos del breadcrumb para el Topbar.
+ * El último segmento es siempre la sección activa (sin link).
+ * Siempre incluye "OptiRosse" como raíz.
+ */
+export function getNavBreadcrumb(pathname: string): BreadcrumbSegment[] {
+  const root: BreadcrumbSegment = { label: 'OptiRosse', to: '/' }
+
+  // Rutas especiales con subnivel
+  if (pathname.startsWith('/perfil')) {
+    return [root, { label: 'Perfil' }]
+  }
+  if (pathname.startsWith('/pedidos/nuevo')) {
+    return [root, { label: 'Pedidos', to: '/pedidos' }, { label: 'Nuevo pedido' }]
+  }
+  if (/^\/pedidos\/\d+/.test(pathname)) {
+    return [root, { label: 'Pedidos', to: '/pedidos' }, { label: 'Detalle' }]
+  }
+  if (/^\/clientes\/\d+/.test(pathname)) {
+    return [root, { label: 'Clientes', to: '/clientes' }, { label: 'Detalle' }]
+  }
+
+  // Rutas principales registradas en la nav
   const match = NAV_ITEMS.find(
     (item) => item.to !== '/' && pathname.startsWith(item.to),
   )
-  return match?.label ?? 'Dashboard'
+  if (match) {
+    return [root, { label: match.label }]
+  }
+
+  // Ruta raíz (Dashboard)
+  return [root]
 }

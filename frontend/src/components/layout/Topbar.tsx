@@ -1,11 +1,62 @@
-import { useLocation } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/button'
 import { useTheme } from '@/app/ThemeProvider'
 import { useUIStore } from '@/store/useUI'
-import { getNavTitle } from '@/lib/constants/nav'
+import { getNavBreadcrumb } from '@/lib/constants/nav'
 import { cn } from '@/lib/utils'
 import { UserMenu } from './UserMenu'
+
+function TopbarBreadcrumb({ pathname }: { pathname: string }) {
+  const segments = getNavBreadcrumb(pathname)
+
+  return (
+    <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1">
+      {segments.map((segment, index) => {
+        const isLast = index === segments.length - 1
+        const isOnly = segments.length === 1
+
+        return (
+          <span key={index} className="flex items-center gap-1 min-w-0">
+            {index > 0 && (
+              <Icon
+                name="chevron_right"
+                size={14}
+                className="shrink-0 text-outline/50"
+              />
+            )}
+            {segment.to && !isLast ? (
+              <Link
+                to={segment.to}
+                className={cn(
+                  'truncate text-sm font-medium transition-colors hover:text-primary',
+                  isOnly
+                    ? 'font-heading text-lg font-bold text-primary'
+                    : 'text-on-surface-variant',
+                )}
+              >
+                {segment.label}
+              </Link>
+            ) : (
+              <span
+                className={cn(
+                  'truncate text-sm font-medium',
+                  isLast && !isOnly
+                    ? 'font-semibold text-primary'
+                    : isOnly
+                      ? 'font-heading text-lg font-bold text-primary'
+                      : 'text-on-surface-variant',
+                )}
+              >
+                {segment.label}
+              </span>
+            )}
+          </span>
+        )
+      })}
+    </nav>
+  )
+}
 
 export function Topbar() {
   const { theme, toggleTheme } = useTheme()
@@ -30,9 +81,7 @@ export function Topbar() {
         >
           <Icon name="menu" />
         </Button>
-        <h2 className="truncate font-heading text-headline-md font-bold text-primary">
-          {getNavTitle(location.pathname)}
-        </h2>
+        <TopbarBreadcrumb pathname={location.pathname} />
       </div>
 
       <div className="flex items-center gap-1.5">
