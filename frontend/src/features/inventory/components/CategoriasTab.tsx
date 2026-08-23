@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useAuthStore } from '@/store/useAuth'
-import { useDebounce } from '@/hooks/useDebounce'
+import { usePagination } from '@/hooks/usePagination'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
-import { useCategorias } from '../hooks/useCategorias'
+import { useCategorias, type CategoriaParams } from '../hooks/useCategorias'
 import { useDesactivarCategoria, useReactivarCategoria } from '../hooks/useCategoriaMutations'
 import { CategoriasTable } from './CategoriasTable'
 import { CategoriaFormDialog } from './CategoriaFormDialog'
@@ -13,8 +13,7 @@ interface CategoriasTabProps {
 }
 
 export function CategoriasTab({ triggerNuevo }: CategoriasTabProps) {
-  const [search, setSearch] = useState('')
-  const debouncedSearch = useDebounce(search, 300)
+  const pagination = usePagination()
   const [showInactivas, setShowInactivas] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Categoria | null>(null)
@@ -28,17 +27,15 @@ export function CategoriasTab({ triggerNuevo }: CategoriasTabProps) {
   }
 
   const rol = useAuthStore((s) => s.user?.rol)
-  const canManage = rol === 'administrador' || rol === 'almacen'
+  const canManage = !rol || rol === 'administrador' || rol === 'almacen'
 
-  const params = useMemo(
-    () => ({
-      ...(debouncedSearch ? { search: debouncedSearch } : {}),
-      ...(showInactivas ? { activo: 'false' as const } : {}),
-    }),
-    [debouncedSearch, showInactivas],
-  )
+  const params = useMemo<CategoriaParams>(() => {
+    const p: CategoriaParams = { ...pagination.params }
+    if (showInactivas) p.activo = 'false'
+    return p
+  }, [pagination.params, showInactivas])
 
-  const { categorias, isLoading, isError, error, refetch } = useCategorias(params)
+  const { categorias, count, isLoading, isError, error, refetch } = useCategorias(params)
 
   const desactivar = useDesactivarCategoria(estadoTarget?.id ?? null)
   const reactivar = useReactivarCategoria(estadoTarget?.id ?? null)
@@ -66,14 +63,24 @@ export function CategoriasTab({ triggerNuevo }: CategoriasTabProps) {
     <div className="space-y-4">
       <CategoriasTable
         categorias={categorias}
+        count={count}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}
         onRetry={() => refetch()}
-        search={search}
-        onSearchChange={setSearch}
+        search={pagination.search}
+        onSearchChange={(value) => {
+          pagination.setSearch(value)
+          pagination.resetPage()
+        }}
         showInactivas={showInactivas}
-        onToggleInactivas={setShowInactivas}
+        onToggleInactivas={(value) => {
+          setShowInactivas(value)
+          pagination.resetPage()
+        }}
         canManage={canManage}
         onEdit={abrirEdicion}
         onToggleEstado={setEstadoTarget}

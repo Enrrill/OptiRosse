@@ -1,4 +1,4 @@
-import { toast } from 'sonner'
+import { toast, type ExternalToast } from 'sonner'
 
 export function sesionExpirada(): void {
   toast.error('Sesión expirada. Inicia sesión nuevamente.', { id: 'sesion-expirada' })
@@ -6,8 +6,11 @@ export function sesionExpirada(): void {
 
 export function useToast() {
   return {
-    success: (message: string) => toast.success(message),
-    error: (message: string) => toast.error(message),
-    info: (message: string) => toast(message),
+    success: (message: string, options?: ExternalToast) => toast.success(message, options),
+    error: (message: string, options?: ExternalToast) => toast.error(message, options),
+    warning: (message: string, options?: ExternalToast) => toast.warning(message, options),
+    info: (message: string, options?: ExternalToast) => toast.info(message, options),
+    promise: toast.promise,
+    dismiss: toast.dismiss,
   }
 }

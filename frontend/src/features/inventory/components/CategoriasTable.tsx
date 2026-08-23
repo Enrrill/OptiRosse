@@ -1,6 +1,7 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
+import { Pagination } from '@/components/data/Pagination'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -10,6 +11,10 @@ import type { Categoria } from '@/types/models'
 
 interface CategoriasTableProps {
   categorias: Categoria[]
+  count: number
+  page: number
+  pageSize: number
+  onPageChange: (page: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -26,6 +31,10 @@ interface CategoriasTableProps {
 
 export function CategoriasTable({
   categorias,
+  count,
+  page,
+  pageSize,
+  onPageChange,
   isLoading,
   isError,
   errorMessage,
@@ -125,7 +134,17 @@ export function CategoriasTable({
               />
             ) : undefined
           }
+          actions={
+            canManage ? (
+              <Button onClick={onNuevo}>
+                <Icon name="add" size={18} /> Nueva categoría
+              </Button>
+            ) : undefined
+          }
         />
+      }
+      footer={
+        <Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />
       }
     />
   )

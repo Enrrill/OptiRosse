@@ -227,6 +227,13 @@ export function ProductosTable({
           activeFilterCount={activeCount}
           activeFilters={activeFiltersList}
           onClearFilters={handleClearFilters}
+          actions={
+            canManage ? (
+              <Button onClick={onNuevo}>
+                <Icon name="add" size={18} /> Nuevo producto
+              </Button>
+            ) : undefined
+          }
           filterContent={
             <div className="space-y-3">
               <div className="space-y-1">

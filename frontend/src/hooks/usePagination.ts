@@ -16,10 +16,11 @@ export interface PaginationMeta {
 }
 
 export function usePagination({
-  pageSize = 15,
+  pageSize: initialPageSize = 15,
   debounceMs = 300,
 }: UsePaginationOptions = {}) {
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(initialPageSize)
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, debounceMs)
 
@@ -46,10 +47,11 @@ export function usePagination({
   return {
     page,
     setPage,
+    pageSize,
+    setPageSize,
     search,
     setSearch,
     resetPage,
-    pageSize,
     params,
     paginationMeta,
   }
