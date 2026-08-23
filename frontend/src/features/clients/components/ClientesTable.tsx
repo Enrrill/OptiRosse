@@ -4,12 +4,12 @@ import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { estadoActivo } from '@/lib/constants/choices'
 import { formatDate, formatMoney, formatNumber } from '@/lib/format'
+import { FilterChip } from '@/components/ui/FilterChip'
 import type { Cliente } from '@/types/models'
 
 interface ClientesTableProps {
@@ -193,10 +193,11 @@ export function ClientesTable({
             />
           </div>
           {canManage && (
-            <label htmlFor="toggle-inactivos-clientes" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-              <Switch id="toggle-inactivos-clientes" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
-              Mostrar inactivos
-            </label>
+            <FilterChip
+              id="toggle-inactivos-clientes"
+              checked={showInactivos}
+              onCheckedChange={onToggleInactivos}
+            />
           )}
         </div>
       }

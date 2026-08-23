@@ -3,7 +3,7 @@ import { Pagination } from '@/components/data/Pagination'
 import { StockBadge } from '@/components/data/StockBadge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
+import { FilterChip } from '@/components/ui/FilterChip'
 import {
   Select,
   SelectContent,
@@ -166,10 +166,14 @@ export function VariantesTable({
                 className="pl-9"
               />
             </div>
-            <label htmlFor="toggle-stock-bajo" className="flex cursor-pointer items-center gap-2 text-sm font-medium text-on-surface-variant">
-              <Switch id="toggle-stock-bajo" name="solo_stock_bajo" checked={soloStockBajo} onCheckedChange={onToggleSoloStockBajo} />
-              Solo stock bajo
-            </label>
+            <FilterChip
+              id="toggle-stock-bajo"
+              checked={soloStockBajo}
+              onCheckedChange={onToggleSoloStockBajo}
+              chipText="Stock bajo"
+              label="Filtrar por stock bajo"
+              activeLabel="Mostrando solo stock bajo"
+            />
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Select

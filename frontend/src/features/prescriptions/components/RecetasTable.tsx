@@ -3,7 +3,7 @@ import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
+import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
 import { estadoActivo } from '@/lib/constants/choices'
@@ -175,10 +175,11 @@ export function RecetasTable({
               className="pl-9"
             />
           </div>
-          <label htmlFor="toggle-inactivos-recetas" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-            <Switch id="toggle-inactivos-recetas" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
-            Mostrar inactivos
-          </label>
+          <FilterChip
+            id="toggle-inactivos-recetas"
+            checked={showInactivos}
+            onCheckedChange={onToggleInactivos}
+          />
         </div>
       }
       footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}

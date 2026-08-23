@@ -11,7 +11,11 @@ import { ProductosTable } from './ProductosTable'
 import { ProductoFormDrawer } from './ProductoFormDrawer'
 import type { Producto } from '@/types/models'
 
-export function ProductosTab() {
+interface ProductosTabProps {
+  triggerNuevo?: number
+}
+
+export function ProductosTab({ triggerNuevo }: ProductosTabProps) {
   const pagination = usePagination()
   const [tipoFiltro, setTipoFiltro] = useState('')
   const [categoriaFiltro, setCategoriaFiltro] = useState<number | null>(null)
@@ -21,6 +25,13 @@ export function ProductosTab() {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Producto | null>(null)
   const [estadoTarget, setEstadoTarget] = useState<Producto | null>(null)
+
+  const [lastTrigger, setLastTrigger] = useState(triggerNuevo)
+  if (triggerNuevo !== undefined && triggerNuevo !== lastTrigger) {
+    setLastTrigger(triggerNuevo)
+    setEditing(null)
+    setFormOpen(true)
+  }
 
   const rol = useAuthStore((s) => s.user?.rol)
   const canManage = rol === 'administrador' || rol === 'almacen'

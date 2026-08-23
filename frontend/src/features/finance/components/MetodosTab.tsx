@@ -7,13 +7,24 @@ import { MetodosTable } from './MetodosTable'
 import { MetodoPagoFormDialog } from './MetodoPagoFormDialog'
 import type { MetodoPago } from '@/types/models'
 
-export function MetodosTab() {
+interface MetodosTabProps {
+  triggerNuevo?: number
+}
+
+export function MetodosTab({ triggerNuevo }: MetodosTabProps) {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 300)
   const [showInactivos, setShowInactivos] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<MetodoPago | null>(null)
   const [estadoTarget, setEstadoTarget] = useState<MetodoPago | null>(null)
+
+  const [lastTrigger, setLastTrigger] = useState(triggerNuevo)
+  if (triggerNuevo !== undefined && triggerNuevo !== lastTrigger) {
+    setLastTrigger(triggerNuevo)
+    setEditing(null)
+    setFormOpen(true)
+  }
 
   const params = useMemo(
     () => ({

@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/Icon'
+import { useAuthStore } from '@/store/useAuth'
 import { CategoriasTab } from './CategoriasTab'
 import { ProductosTab } from './ProductosTab'
 import { VariantesTab } from './VariantesTab'
@@ -17,6 +20,10 @@ const DEFAULT_TAB: InventarioTabKey = 'categorias'
 
 export function InventarioTabs() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const [triggerNuevo, setTriggerNuevo] = useState(0)
+
+  const rol = useAuthStore((s) => s.user?.rol)
+  const canManage = rol === 'administrador' || rol === 'almacen'
 
   const raw = searchParams.get('tab')
   const active: InventarioTabKey =
@@ -27,22 +34,35 @@ export function InventarioTabs() {
     setSearchParams(next === DEFAULT_TAB ? {} : { tab: next }, { replace: true })
   }
 
+  const handleNuevoClick = () => {
+    setTriggerNuevo((t) => t + 1)
+  }
+
   return (
     <Tabs value={active} onValueChange={onValueChange}>
-      <TabsList className="mb-4">
-        {(Object.keys(TABS) as InventarioTabKey[]).map((key) => (
-          <TabsTrigger key={key} value={key}>
-            <Icon name={TABS[key].icon} size={16} />
-            {TABS[key].label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <TabsList className="mb-0">
+          {(Object.keys(TABS) as InventarioTabKey[]).map((key) => (
+            <TabsTrigger key={key} value={key}>
+              <Icon name={TABS[key].icon} size={16} />
+              {TABS[key].label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {canManage && active !== 'variantes' && (
+          <Button onClick={handleNuevoClick}>
+            <Icon name="add" size={18} />
+            {active === 'categorias' ? 'Nueva categoría' : 'Nuevo producto'}
+          </Button>
+        )}
+      </div>
 
       <TabsContent value="categorias">
-        <CategoriasTab />
+        <CategoriasTab triggerNuevo={triggerNuevo} />
       </TabsContent>
       <TabsContent value="productos">
-        <ProductosTab />
+        <ProductosTab triggerNuevo={triggerNuevo} />
       </TabsContent>
       <TabsContent value="variantes">
         <VariantesTab />

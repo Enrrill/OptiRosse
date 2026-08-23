@@ -313,9 +313,6 @@ export function PagosTable({
                 className="w-40"
               />
             </label>
-            <Button className="sm:ml-auto" onClick={onNuevo}>
-              <Icon name="add" size={18} /> Registrar pago
-            </Button>
           </div>
         </div>
       }

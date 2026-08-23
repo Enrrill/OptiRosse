@@ -3,9 +3,9 @@ import { StatusBadge } from '@/components/data/StatusBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
+import { FilterChip } from '@/components/ui/FilterChip'
 import { estadoActivo } from '@/lib/constants/choices'
 import type { MetodoPago } from '@/types/models'
 
@@ -127,15 +127,11 @@ export function MetodosTable({
               className="pl-9"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <label htmlFor="toggle-inactivos-metodos" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-              <Switch id="toggle-inactivos-metodos" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
-              Mostrar inactivos
-            </label>
-            <Button onClick={onNuevo}>
-              <Icon name="add" size={18} /> Nuevo método
-            </Button>
-          </div>
+          <FilterChip
+            id="toggle-inactivos-metodos"
+            checked={showInactivos}
+            onCheckedChange={onToggleInactivos}
+          />
         </div>
       }
     />

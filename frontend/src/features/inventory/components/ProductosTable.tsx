@@ -3,7 +3,6 @@ import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -14,6 +13,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
 import { choice, estadoActivo, TIPO_PRODUCTO } from '@/lib/constants/choices'
+import { FilterChip } from '@/components/ui/FilterChip'
 import { formatNumber } from '@/lib/format'
 import type { Categoria, Producto } from '@/types/models'
 
@@ -187,11 +187,6 @@ export function ProductosTable({
                 className="pl-9"
               />
             </div>
-            {canManage && (
-              <Button onClick={onNuevo}>
-                <Icon name="add" size={18} /> Nuevo producto
-              </Button>
-            )}
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
             <Select
@@ -240,10 +235,13 @@ export function ProductosTable({
               />
             </div>
 
-            <label htmlFor="toggle-inactivos-productos" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-              <Switch id="toggle-inactivos-productos" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
-              Mostrar inactivos
-            </label>
+            {canManage && (
+              <FilterChip
+                id="toggle-inactivos-productos"
+                checked={showInactivos}
+                onCheckedChange={onToggleInactivos}
+              />
+            )}
           </div>
         </div>
       }

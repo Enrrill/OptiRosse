@@ -65,6 +65,13 @@ export default function DocumentosPage() {
       <PageHeader
         title="Documentos"
         description="Plantillas de documentos y generación de facturas, órdenes de trabajo, notas de entrega y recibos de pago."
+        actions={
+          canEdit ? (
+            <Button onClick={abrirNuevo}>
+              <Icon name="add" size={18} /> Nueva plantilla
+            </Button>
+          ) : undefined
+        }
       />
 
       <PlantillasTable

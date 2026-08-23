@@ -2,7 +2,7 @@ import { DataTable, type Column } from '@/components/data/DataTable'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
+import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
 import { choice, estadoActivo, TIPO_PRODUCTO } from '@/lib/constants/choices'
@@ -125,19 +125,15 @@ export function CategoriasTable({
               className="pl-9"
             />
           </div>
-          <div className="flex items-center gap-3">
-            {canManage && (
-              <label htmlFor="toggle-inactivas-categorias" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-                <Switch id="toggle-inactivas-categorias" name="show_inactivas" checked={showInactivas} onCheckedChange={onToggleInactivas} />
-                Mostrar inactivas
-              </label>
-            )}
-            {canManage && (
-              <Button onClick={onNuevo}>
-                <Icon name="add" size={18} /> Nueva categoría
-              </Button>
-            )}
-          </div>
+          {canManage && (
+            <FilterChip
+              id="toggle-inactivas-categorias"
+              checked={showInactivas}
+              onCheckedChange={onToggleInactivas}
+              label="Mostrar inactivas"
+              activeLabel="Mostrando inactivas"
+            />
+          )}
         </div>
       }
     />

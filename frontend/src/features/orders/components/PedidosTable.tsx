@@ -273,11 +273,6 @@ export function PedidosTable({
                 className="w-40"
               />
             </label>
-            {canManage && (
-              <Button className="sm:ml-auto" onClick={onNuevo}>
-                <Icon name="add" size={18} /> Nuevo pedido
-              </Button>
-            )}
           </div>
         </div>
       }

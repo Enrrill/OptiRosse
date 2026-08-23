@@ -19,7 +19,11 @@ import { PagosTable } from './PagosTable'
 import { RegistrarPagoForm } from './RegistrarPagoForm'
 import { PagoDetalleDialog } from './PagoDetalleDialog'
 
-export function PagosTab() {
+interface PagosTabProps {
+  triggerNuevo?: number
+}
+
+export function PagosTab({ triggerNuevo }: PagosTabProps) {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const pagination = usePagination()
@@ -33,6 +37,12 @@ export function PagosTab() {
   const [detalleTarget, setDetalleTarget] = useState<Pago | null>(null)
   const [aprobarTarget, setAprobarTarget] = useState<Pago | null>(null)
   const [rechazarTarget, setRechazarTarget] = useState<Pago | null>(null)
+
+  const [lastTrigger, setLastTrigger] = useState(triggerNuevo)
+  if (triggerNuevo !== undefined && triggerNuevo !== lastTrigger) {
+    setLastTrigger(triggerNuevo)
+    setDrawerOpen(true)
+  }
 
   const clienteParam = searchParams.get('cliente')
   const clientePreselectId =

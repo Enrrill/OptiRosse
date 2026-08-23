@@ -3,7 +3,7 @@ import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
+import { FilterChip } from '@/components/ui/FilterChip'
 import {
   Select,
   SelectContent,
@@ -199,10 +199,11 @@ export function UsuariosTable({
               </SelectContent>
             </Select>
           </div>
-          <label htmlFor="toggle-inactivos-usuarios" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-            <Switch id="toggle-inactivos-usuarios" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
-            Mostrar inactivos
-          </label>
+          <FilterChip
+            id="toggle-inactivos-usuarios"
+            checked={showInactivos}
+            onCheckedChange={onToggleInactivos}
+          />
         </div>
       }
       footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}

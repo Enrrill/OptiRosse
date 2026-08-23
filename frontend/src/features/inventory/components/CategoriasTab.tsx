@@ -8,13 +8,24 @@ import { CategoriasTable } from './CategoriasTable'
 import { CategoriaFormDialog } from './CategoriaFormDialog'
 import type { Categoria } from '@/types/models'
 
-export function CategoriasTab() {
+interface CategoriasTabProps {
+  triggerNuevo?: number
+}
+
+export function CategoriasTab({ triggerNuevo }: CategoriasTabProps) {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 300)
   const [showInactivas, setShowInactivas] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Categoria | null>(null)
   const [estadoTarget, setEstadoTarget] = useState<Categoria | null>(null)
+
+  const [lastTrigger, setLastTrigger] = useState(triggerNuevo)
+  if (triggerNuevo !== undefined && triggerNuevo !== lastTrigger) {
+    setLastTrigger(triggerNuevo)
+    setEditing(null)
+    setFormOpen(true)
+  }
 
   const rol = useAuthStore((s) => s.user?.rol)
   const canManage = rol === 'administrador' || rol === 'almacen'

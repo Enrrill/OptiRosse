@@ -3,11 +3,11 @@ import { StatusBadge } from '@/components/data/StatusBadge'
 import { Pagination } from '@/components/data/Pagination'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
 import { choice, estadoActivo, TIPO_DOCUMENTO } from '@/lib/constants/choices'
+import { FilterChip } from '@/components/ui/FilterChip'
 import { formatDate } from '@/lib/format'
 import type { PlantillaDocumento } from '@/types/models'
 
@@ -173,15 +173,11 @@ export function PlantillasTable({
                 ))}
               </SelectContent>
             </Select>
-            <label htmlFor="toggle-inactivos-plantillas" className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
-              <Switch id="toggle-inactivos-plantillas" name="show_inactivos" checked={showInactivos} onCheckedChange={onToggleInactivos} />
-              Mostrar inactivos
-            </label>
-            {canEdit && (
-              <Button onClick={onNuevo}>
-                <Icon name="add" size={18} /> Nueva plantilla
-              </Button>
-            )}
+            <FilterChip
+              id="toggle-inactivos-plantillas"
+              checked={showInactivos}
+              onCheckedChange={onToggleInactivos}
+            />
           </div>
         </div>
       }
