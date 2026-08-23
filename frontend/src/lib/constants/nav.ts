@@ -26,7 +26,16 @@ export function navItemsForRole(rol?: RolUsuario | null): NavItem[] {
   return NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(rol))
 }
 
+const EXTRA_TITLES: Record<string, string> = {
+  '/perfil': 'Perfil de Usuario',
+  '/pedidos/nuevo': 'Nuevo Pedido',
+}
+
 export function getNavTitle(pathname: string): string {
+  if (EXTRA_TITLES[pathname]) return EXTRA_TITLES[pathname]
+  if (pathname.startsWith('/perfil')) return 'Perfil de Usuario'
+  if (pathname.startsWith('/pedidos/')) return 'Pedidos'
+  if (pathname.startsWith('/clientes/')) return 'Clientes'
   const match = NAV_ITEMS.find(
     (item) => item.to !== '/' && pathname.startsWith(item.to),
   )

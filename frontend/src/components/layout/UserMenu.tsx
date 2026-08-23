@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router'
 import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
-import { useLogout } from '@/hooks/useLogout'
+import { useUIStore } from '@/store/useUI'
 import { ROLES } from '@/lib/constants/choices'
 import {
   DropdownMenu,
@@ -14,11 +14,16 @@ import {
 
 export function UserMenu() {
   const user = useAuthStore((s) => s.user)
+  const openLogoutModal = useUIStore((s) => s.openLogoutModal)
   const navigate = useNavigate()
-  const logout = useLogout()
 
-  const nombre = user ? `${user.nombre} ${user.apellido}`.trim() : 'Usuario'
-  const iniciales = user ? `${user.nombre[0] ?? ''}${user.apellido[0] ?? ''}`.toUpperCase() : '?'
+  const nombre = user ? `${user.nombre} ${user.apellido}`.trim() || user.nombre_usuario : 'Usuario'
+  const iniciales = user
+    ? (user.nombre?.[0] && user.apellido?.[0]
+        ? `${user.nombre[0]}${user.apellido[0]}`
+        : user.nombre?.[0] || user.nombre_usuario?.[0] || 'U'
+      ).toUpperCase()
+    : '?'
   const rol = user ? ROLES[user.rol]?.label ?? user.rol : ''
 
   return (
@@ -51,13 +56,10 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/perfil')}>
-          <Icon name="account_circle" /> Perfil
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/perfil')}>
-          <Icon name="lock" /> Cambiar contraseña
+          <Icon name="account_circle" /> Mi Perfil
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={logout}>
+        <DropdownMenuItem variant="destructive" onClick={openLogoutModal}>
           <Icon name="logout" /> Cerrar sesión
         </DropdownMenuItem>
       </DropdownMenuContent>
