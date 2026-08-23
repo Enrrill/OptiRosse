@@ -1,8 +1,8 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { FilterChip } from '@/components/ui/FilterChip'
 import {
   Select,
@@ -149,6 +149,23 @@ export function UsuariosTable({
     },
   ]
 
+  const activeCount = rolFiltro !== '' ? 1 : 0
+
+  const activeFiltersList = [
+    rolFiltro !== ''
+      ? {
+          id: 'rol',
+          label: 'Rol',
+          valueDisplay: choice(ROLES, rolFiltro).label,
+          onRemove: () => onRolChange(''),
+        }
+      : null,
+  ].filter(Boolean) as import('@/components/filters/ActiveFilterChips').ActiveFilterItem[]
+
+  const handleClearFilters = () => {
+    onRolChange('')
+  }
+
   return (
     <DataTable<Usuario>
       columns={columns}
@@ -165,46 +182,45 @@ export function UsuariosTable({
         </Button>
       }
       toolbar={
-        <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-64">
-              <Icon
-                name="search"
-                size={18}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-              />
-              <Input
-                id="search-usuarios"
-                name="search"
-                value={search}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Buscar por usuario, nombre o correo..."
-                className="pl-9"
-              />
+        <DataTableToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder="Buscar por usuario, nombre o correo..."
+          searchId="search-usuarios"
+          quickFilters={
+            <FilterChip
+              id="toggle-inactivos-usuarios"
+              checked={showInactivos}
+              onCheckedChange={onToggleInactivos}
+            />
+          }
+          activeFilterCount={activeCount}
+          activeFilters={activeFiltersList}
+          onClearFilters={handleClearFilters}
+          filterContent={
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Rol de usuario</label>
+                <Select
+                  value={rolFiltro || 'todos'}
+                  onValueChange={(value) => onRolChange(value === 'todos' ? '' : (value as RolUsuario))}
+                >
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todos los roles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los roles</SelectItem>
+                    {Object.entries(ROLES).map(([rol, display]) => (
+                      <SelectItem key={rol} value={rol}>
+                        {display.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <Select
-              value={rolFiltro || 'todos'}
-              onValueChange={(value) => onRolChange(value === 'todos' ? '' : (value as RolUsuario))}
-            >
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Todos los roles" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos los roles</SelectItem>
-                {Object.entries(ROLES).map(([rol, display]) => (
-                  <SelectItem key={rol} value={rol}>
-                    {display.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <FilterChip
-            id="toggle-inactivos-usuarios"
-            checked={showInactivos}
-            onCheckedChange={onToggleInactivos}
-          />
-        </div>
+          }
+        />
       }
       footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
     />

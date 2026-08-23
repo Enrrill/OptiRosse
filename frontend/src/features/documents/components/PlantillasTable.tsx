@@ -1,8 +1,8 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Pagination } from '@/components/data/Pagination'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
@@ -121,6 +121,23 @@ export function PlantillasTable({
     },
   ]
 
+  const activeCount = tipoFiltro !== '' && tipoFiltro !== 'todos' ? 1 : 0
+
+  const activeFiltersList = [
+    tipoFiltro && tipoFiltro !== 'todos'
+      ? {
+          id: 'tipo',
+          label: 'Tipo',
+          valueDisplay: choice(TIPO_DOCUMENTO, tipoFiltro).label,
+          onRemove: () => onTipoChange('todos'),
+        }
+      : null,
+  ].filter(Boolean) as import('@/components/filters/ActiveFilterChips').ActiveFilterItem[]
+
+  const handleClearFilters = () => {
+    onTipoChange('todos')
+  }
+
   return (
     <DataTable<PlantillaDocumento>
       columns={columns}
@@ -143,43 +160,42 @@ export function PlantillasTable({
         ) : undefined
       }
       toolbar={
-        <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-sm">
-            <Icon
-              name="search"
-              size={18}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-            />
-            <Input
-              id="search-plantillas"
-              name="search"
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Buscar por nombre..."
-              className="pl-9"
-            />
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <Select value={tipoFiltro} onValueChange={onTipoChange}>
-              <SelectTrigger className="w-44">
-                <SelectValue placeholder="Tipo de documento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos los tipos</SelectItem>
-                {Object.entries(TIPO_DOCUMENTO).map(([value, display]) => (
-                  <SelectItem key={value} value={value}>
-                    {display.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <DataTableToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder="Buscar por nombre..."
+          searchId="search-plantillas"
+          quickFilters={
             <FilterChip
               id="toggle-inactivos-plantillas"
               checked={showInactivos}
               onCheckedChange={onToggleInactivos}
             />
-          </div>
-        </div>
+          }
+          activeFilterCount={activeCount}
+          activeFilters={activeFiltersList}
+          onClearFilters={handleClearFilters}
+          filterContent={
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Tipo de documento</label>
+                <Select value={tipoFiltro} onValueChange={onTipoChange}>
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todos los tipos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los tipos</SelectItem>
+                    {Object.entries(TIPO_DOCUMENTO).map(([value, display]) => (
+                      <SelectItem key={value} value={value}>
+                        {display.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          }
+        />
       }
       footer={
         <Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />

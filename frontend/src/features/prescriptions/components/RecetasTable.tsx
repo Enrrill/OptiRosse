@@ -1,8 +1,8 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
@@ -159,28 +159,19 @@ export function RecetasTable({
         ) : undefined
       }
       toolbar={
-        <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:w-64">
-            <Icon
-              name="search"
-              size={18}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+        <DataTableToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder="Buscar por paciente..."
+          searchId="search-recetas"
+          quickFilters={
+            <FilterChip
+              id="toggle-inactivos-recetas"
+              checked={showInactivos}
+              onCheckedChange={onToggleInactivos}
             />
-            <Input
-              id="search-recetas"
-              name="search"
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Buscar por paciente..."
-              className="pl-9"
-            />
-          </div>
-          <FilterChip
-            id="toggle-inactivos-recetas"
-            checked={showInactivos}
-            onCheckedChange={onToggleInactivos}
-          />
-        </div>
+          }
+        />
       }
       footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
     />

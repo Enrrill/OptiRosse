@@ -1,8 +1,9 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTableToolbar } from '@/components/data/DataTableToolbar'
+import { DateRangePicker } from '@/components/filters/DateRangePicker'
 import { Pagination } from '@/components/data/Pagination'
 import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -139,13 +140,66 @@ export function AuditoriaTable({
     },
   ]
 
-  const hayFiltros =
-    search !== '' ||
-    usuarioFiltro != null ||
-    accionFiltro !== '' ||
-    tablaFiltro !== '' ||
-    fechaDesde !== '' ||
-    fechaHasta !== ''
+  const activeCount = [
+    usuarioFiltro !== null,
+    accionFiltro !== '',
+    tablaFiltro !== '',
+    fechaDesde !== '',
+    fechaHasta !== '',
+  ].filter(Boolean).length
+
+  const activeFiltersList = [
+    usuarioFiltro !== null
+      ? {
+          id: 'usuario',
+          label: 'Usuario',
+          valueDisplay: usuarios.find((u) => u.id === usuarioFiltro)?.nombre_usuario ?? String(usuarioFiltro),
+          onRemove: () => onUsuarioChange(null),
+        }
+      : null,
+    accionFiltro
+      ? {
+          id: 'accion',
+          label: 'Acción',
+          valueDisplay: choice(ACCION_AUDITORIA, accionFiltro).label,
+          onRemove: () => onAccionChange(''),
+        }
+      : null,
+    tablaFiltro
+      ? {
+          id: 'tabla',
+          label: 'Módulo',
+          valueDisplay: choice(TABLA_AUDITORIA, tablaFiltro).label,
+          onRemove: () => onTablaChange(''),
+        }
+      : null,
+    fechaDesde
+      ? {
+          id: 'fechaDesde',
+          label: 'Desde',
+          valueDisplay: fechaDesde,
+          onRemove: () => onFechaDesdeChange(''),
+        }
+      : null,
+    fechaHasta
+      ? {
+          id: 'fechaHasta',
+          label: 'Hasta',
+          valueDisplay: fechaHasta,
+          onRemove: () => onFechaHastaChange(''),
+        }
+      : null,
+  ].filter(Boolean) as import('@/components/filters/ActiveFilterChips').ActiveFilterItem[]
+
+  const handleClearFilters = () => {
+    onUsuarioChange(null)
+    onAccionChange('')
+    onTablaChange('')
+    onFechaDesdeChange('')
+    onFechaHastaChange('')
+  }
+
+  const hayFiltros = search !== '' || activeCount > 0
 
   return (
     <DataTable<RegistroAuditoria>
@@ -158,89 +212,86 @@ export function AuditoriaTable({
       emptyTitle={hayFiltros ? 'No hay registros con estos filtros' : 'No hay registros de actividad'}
       emptyDescription="Las acciones del personal (crear, editar, desactivar, transiciones, pagos, documentos) quedarán registradas aquí."
       toolbar={
-        <div className="flex flex-col gap-3 border-b border-outline-variant p-4">
-          <div className="relative w-full sm:max-w-sm">
-            <Icon
-              name="search"
-              size={18}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-            />
-            <Input
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Buscar por usuario, acción o módulo..."
-              className="pl-9"
-            />
-          </div>
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-            <Select
-              value={usuarioFiltro != null ? String(usuarioFiltro) : 'todos'}
-              onValueChange={(value) => onUsuarioChange(value === 'todos' ? null : Number(value))}
-            >
-              <SelectTrigger className="w-full lg:w-52">
-                <SelectValue placeholder="Usuario" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos los usuarios</SelectItem>
-                {usuarios.map((u) => (
-                  <SelectItem key={u.id} value={String(u.id)}>
-                    {u.nombre_usuario}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={accionFiltro || 'todas'} onValueChange={(value) => onAccionChange(value === 'todas' ? '' : value)}>
-              <SelectTrigger className="w-full lg:w-52">
-                <SelectValue placeholder="Acción" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todas">Todas las acciones</SelectItem>
-                {Object.entries(ACCION_AUDITORIA).map(([value, item]) => (
-                  <SelectItem key={value} value={value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={tablaFiltro || 'todas'} onValueChange={(value) => onTablaChange(value === 'todas' ? '' : value)}>
-              <SelectTrigger className="w-full lg:w-52">
-                <SelectValue placeholder="Módulo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todas">Todos los módulos</SelectItem>
-                {Object.entries(TABLA_AUDITORIA).map(([value, item]) => (
-                  <SelectItem key={value} value={value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <label htmlFor="fecha-desde" className="flex items-center gap-2 text-sm text-on-surface-variant">
-              Desde
-              <Input
-                id="fecha-desde"
-                name="fecha_desde"
-                type="date"
-                value={fechaDesde}
-                onChange={(e) => onFechaDesdeChange(e.target.value)}
-                className="w-40"
+        <DataTableToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder="Buscar por usuario, acción o módulo..."
+          searchId="search-auditoria"
+          activeFilterCount={activeCount}
+          activeFilters={activeFiltersList}
+          onClearFilters={handleClearFilters}
+          filterContent={
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Usuario</label>
+                <Select
+                  value={usuarioFiltro != null ? String(usuarioFiltro) : 'todos'}
+                  onValueChange={(value) => onUsuarioChange(value === 'todos' ? null : Number(value))}
+                >
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todos los usuarios" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los usuarios</SelectItem>
+                    {usuarios.map((u) => (
+                      <SelectItem key={u.id} value={String(u.id)}>
+                        {u.nombre_usuario}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Acción</label>
+                <Select
+                  value={accionFiltro || 'todas'}
+                  onValueChange={(value) => onAccionChange(value === 'todas' ? '' : value)}
+                >
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todas las acciones" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas las acciones</SelectItem>
+                    {Object.entries(ACCION_AUDITORIA).map(([value, item]) => (
+                      <SelectItem key={value} value={value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Módulo afectable</label>
+                <Select
+                  value={tablaFiltro || 'todas'}
+                  onValueChange={(value) => onTablaChange(value === 'todas' ? '' : value)}
+                >
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todos los módulos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todos los módulos</SelectItem>
+                    {Object.entries(TABLA_AUDITORIA).map(([value, item]) => (
+                      <SelectItem key={value} value={value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <DateRangePicker
+                fechaDesde={fechaDesde}
+                onFechaDesdeChange={onFechaDesdeChange}
+                fechaHasta={fechaHasta}
+                onFechaHastaChange={onFechaHastaChange}
+                idPrefix="auditoria-fecha"
               />
-            </label>
-            <label htmlFor="fecha-hasta" className="flex items-center gap-2 text-sm text-on-surface-variant">
-              Hasta
-              <Input
-                id="fecha-hasta"
-                name="fecha_hasta"
-                type="date"
-                value={fechaHasta}
-                onChange={(e) => onFechaHastaChange(e.target.value)}
-                className="w-40"
-              />
-            </label>
-          </div>
-        </div>
+            </div>
+          }
+        />
       }
       footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
     />

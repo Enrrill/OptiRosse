@@ -34,9 +34,9 @@ export function FilterChip({
           aria-label={currentLabel}
           onClick={() => onCheckedChange(!checked)}
           className={cn(
-            'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all duration-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
+            'inline-flex h-8.5 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all duration-200 cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary shadow-2xs',
             checked
-              ? 'border-primary/40 bg-primary-container text-on-primary-container shadow-xs'
+              ? 'border-primary/50 bg-primary-container/30 text-primary font-semibold'
               : 'border-outline-variant/80 bg-surface-container-lowest text-on-surface-variant hover:border-outline hover:bg-surface-container-low hover:text-on-surface',
             className,
           )}

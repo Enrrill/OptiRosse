@@ -1,7 +1,7 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
@@ -109,32 +109,23 @@ export function CategoriasTable({
         ) : undefined
       }
       toolbar={
-        <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-md">
-            <Icon
-              name="search"
-              size={18}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-            />
-            <Input
-              id="search-categorias"
-              name="search"
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Buscar por nombre..."
-              className="pl-9"
-            />
-          </div>
-          {canManage && (
-            <FilterChip
-              id="toggle-inactivas-categorias"
-              checked={showInactivas}
-              onCheckedChange={onToggleInactivas}
-              label="Mostrar inactivas"
-              activeLabel="Mostrando inactivas"
-            />
-          )}
-        </div>
+        <DataTableToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder="Buscar por nombre..."
+          searchId="search-categorias"
+          quickFilters={
+            canManage ? (
+              <FilterChip
+                id="toggle-inactivas-categorias"
+                checked={showInactivas}
+                onCheckedChange={onToggleInactivas}
+                label="Mostrar inactivas"
+                activeLabel="Mostrando inactivas"
+              />
+            ) : undefined
+          }
+        />
       }
     />
   )

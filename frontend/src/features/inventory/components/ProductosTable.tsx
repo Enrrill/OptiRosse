@@ -1,4 +1,5 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
@@ -152,6 +153,45 @@ export function ProductosTable({
     },
   ]
 
+  const activeCount = [
+    tipoFiltro !== '',
+    categoriaFiltro !== null,
+    marcaFiltro !== '',
+  ].filter(Boolean).length
+
+  const activeFiltersList = [
+    tipoFiltro
+      ? {
+          id: 'tipo',
+          label: 'Tipo',
+          valueDisplay: choice(TIPO_PRODUCTO, tipoFiltro).label,
+          onRemove: () => onTipoChange(''),
+        }
+      : null,
+    categoriaFiltro !== null
+      ? {
+          id: 'categoria',
+          label: 'Categoría',
+          valueDisplay: categorias.find((c) => c.id === categoriaFiltro)?.nombre ?? String(categoriaFiltro),
+          onRemove: () => onCategoriaChange(null),
+        }
+      : null,
+    marcaFiltro
+      ? {
+          id: 'marca',
+          label: 'Marca',
+          valueDisplay: marcaFiltro,
+          onRemove: () => onMarcaChange(''),
+        }
+      : null,
+  ].filter(Boolean) as import('@/components/filters/ActiveFilterChips').ActiveFilterItem[]
+
+  const handleClearFilters = () => {
+    onTipoChange('')
+    onCategoriaChange(null)
+    onMarcaChange('')
+  }
+
   return (
     <DataTable<Producto>
       columns={columns}
@@ -170,80 +210,81 @@ export function ProductosTable({
         ) : undefined
       }
       toolbar={
-        <div className="flex flex-col gap-3 border-b border-outline-variant p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative w-full sm:max-w-sm">
-              <Icon
-                name="search"
-                size={18}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-              />
-              <Input
-                id="search-productos"
-                name="search"
-                value={search}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Buscar por marca, modelo o categoría..."
-                className="pl-9"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
-            <Select
-              value={tipoFiltro || 'todos'}
-              onValueChange={(value) => onTipoChange(value === 'todos' ? '' : value)}
-            >
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Tipo de producto" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos los tipos</SelectItem>
-                {Object.entries(TIPO_PRODUCTO).map(([tipo, display]) => (
-                  <SelectItem key={tipo} value={tipo}>
-                    {display.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={categoriaFiltro != null ? String(categoriaFiltro) : 'todas'}
-              onValueChange={(value) =>
-                onCategoriaChange(value === 'todas' ? null : Number(value))
-              }
-            >
-              <SelectTrigger className="w-full sm:w-52">
-                <SelectValue placeholder="Categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todas">Todas las categorías</SelectItem>
-                {categorias.map((categoria) => (
-                  <SelectItem key={categoria.id} value={String(categoria.id)}>
-                    {categoria.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <div className="relative w-full sm:w-48">
-              <Input
-                id="search-marca"
-                name="marca"
-                value={marcaFiltro}
-                onChange={(e) => onMarcaChange(e.target.value)}
-                placeholder="Filtrar por marca"
-              />
-            </div>
-
-            {canManage && (
+        <DataTableToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder="Buscar por marca, modelo o categoría..."
+          searchId="search-productos"
+          quickFilters={
+            canManage ? (
               <FilterChip
                 id="toggle-inactivos-productos"
                 checked={showInactivos}
                 onCheckedChange={onToggleInactivos}
               />
-            )}
-          </div>
-        </div>
+            ) : undefined
+          }
+          activeFilterCount={activeCount}
+          activeFilters={activeFiltersList}
+          onClearFilters={handleClearFilters}
+          filterContent={
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Tipo de producto</label>
+                <Select
+                  value={tipoFiltro || 'todos'}
+                  onValueChange={(value) => onTipoChange(value === 'todos' ? '' : value)}
+                >
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todos los tipos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los tipos</SelectItem>
+                    {Object.entries(TIPO_PRODUCTO).map(([tipo, display]) => (
+                      <SelectItem key={tipo} value={tipo}>
+                        {display.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Categoría</label>
+                <Select
+                  value={categoriaFiltro != null ? String(categoriaFiltro) : 'todas'}
+                  onValueChange={(value) =>
+                    onCategoriaChange(value === 'todas' ? null : Number(value))
+                  }
+                >
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todas las categorías" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas las categorías</SelectItem>
+                    {categorias.map((categoria) => (
+                      <SelectItem key={categoria.id} value={String(categoria.id)}>
+                        {categoria.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="search-marca" className="text-xs font-medium text-on-surface-variant">Marca</label>
+                <Input
+                  id="search-marca"
+                  name="marca"
+                  value={marcaFiltro}
+                  onChange={(e) => onMarcaChange(e.target.value)}
+                  placeholder="Filtrar por marca..."
+                  className="h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80"
+                />
+              </div>
+            </div>
+          }
+        />
       }
       footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
     />

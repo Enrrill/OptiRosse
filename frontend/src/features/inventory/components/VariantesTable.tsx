@@ -1,8 +1,8 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { Pagination } from '@/components/data/Pagination'
 import { StockBadge } from '@/components/data/StockBadge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { FilterChip } from '@/components/ui/FilterChip'
 import {
   Select,
@@ -138,6 +138,26 @@ export function VariantesTable({
     },
   ]
 
+  const activeCount = productoFiltro !== null ? 1 : 0
+
+  const activeFiltersList = [
+    productoFiltro !== null
+      ? {
+          id: 'producto',
+          label: 'Producto',
+          valueDisplay: (() => {
+            const prod = productos.find((p) => p.id === productoFiltro)
+            return prod ? `${prod.marca} ${prod.codigo_modelo}` : String(productoFiltro)
+          })(),
+          onRemove: () => onProductoChange(null),
+        }
+      : null,
+  ].filter(Boolean) as import('@/components/filters/ActiveFilterChips').ActiveFilterItem[]
+
+  const handleClearFilters = () => {
+    onProductoChange(null)
+  }
+
   return (
     <DataTable<VarianteProducto>
       columns={columns}
@@ -149,23 +169,12 @@ export function VariantesTable({
       emptyTitle={soloStockBajo ? 'Sin variantes con stock bajo' : 'No hay variantes'}
       emptyDescription="Crea variantes desde un producto para comenzar a controlar el stock."
       toolbar={
-        <div className="flex flex-col gap-3 border-b border-outline-variant p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative w-full sm:max-w-sm">
-              <Icon
-                name="search"
-                size={18}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-              />
-              <Input
-                id="search-variantes"
-                name="search"
-                value={search}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Buscar por SKU, código de barras o marca..."
-                className="pl-9"
-              />
-            </div>
+        <DataTableToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder="Buscar por SKU, código de barras o marca..."
+          searchId="search-variantes"
+          quickFilters={
             <FilterChip
               id="toggle-stock-bajo"
               checked={soloStockBajo}
@@ -174,28 +183,36 @@ export function VariantesTable({
               label="Filtrar por stock bajo"
               activeLabel="Mostrando solo stock bajo"
             />
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Select
-              value={productoFiltro != null ? String(productoFiltro) : 'todos'}
-              onValueChange={(value) =>
-                onProductoChange(value === 'todos' ? null : Number(value))
-              }
-            >
-              <SelectTrigger className="w-full sm:w-56">
-                <SelectValue placeholder="Producto" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos los productos</SelectItem>
-                {productos.map((p) => (
-                  <SelectItem key={p.id} value={String(p.id)}>
-                    {p.marca} {p.codigo_modelo}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+          }
+          activeFilterCount={activeCount}
+          activeFilters={activeFiltersList}
+          onClearFilters={handleClearFilters}
+          filterContent={
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Producto</label>
+                <Select
+                  value={productoFiltro != null ? String(productoFiltro) : 'todos'}
+                  onValueChange={(value) =>
+                    onProductoChange(value === 'todos' ? null : Number(value))
+                  }
+                >
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todos los productos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los productos</SelectItem>
+                    {productos.map((p) => (
+                      <SelectItem key={p.id} value={String(p.id)}>
+                        {p.marca} {p.codigo_modelo}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          }
+        />
       }
       footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
     />
