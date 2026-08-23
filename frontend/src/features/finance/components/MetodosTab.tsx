@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import { useDebounce } from '@/hooks/useDebounce'
+import { usePagination } from '@/hooks/usePagination'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
 import { useMetodosPago } from '../hooks/useMetodosPago'
 import { useDesactivarMetodoPago, useReactivarMetodoPago } from '../hooks/useMetodoPagoMutations'
 import { MetodosTable } from './MetodosTable'
 import { MetodoPagoFormDialog } from './MetodoPagoFormDialog'
+import type { PaginationParams } from '@/types/api'
 import type { MetodoPago } from '@/types/models'
 
 interface MetodosTabProps {
@@ -12,8 +13,7 @@ interface MetodosTabProps {
 }
 
 export function MetodosTab({ triggerNuevo }: MetodosTabProps) {
-  const [search, setSearch] = useState('')
-  const debouncedSearch = useDebounce(search, 300)
+  const pagination = usePagination()
   const [showInactivos, setShowInactivos] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<MetodoPago | null>(null)
@@ -26,23 +26,16 @@ export function MetodosTab({ triggerNuevo }: MetodosTabProps) {
     setFormOpen(true)
   }
 
-  const params = useMemo(
-    () => ({
-      ...(debouncedSearch ? { search: debouncedSearch } : {}),
-      ...(showInactivos ? { activo: 'false' as const } : {}),
-    }),
-    [debouncedSearch, showInactivos],
-  )
+  const params = useMemo<PaginationParams>(() => {
+    const p: PaginationParams = { ...pagination.params }
+    if (showInactivos) p.activo = 'false'
+    return p
+  }, [pagination.params, showInactivos])
 
-  const { metodos, isLoading, isError, error, refetch } = useMetodosPago(params)
+  const { metodos, count, isLoading, isError, error, refetch } = useMetodosPago(params)
 
   const desactivar = useDesactivarMetodoPago(estadoTarget?.id ?? null)
   const reactivar = useReactivarMetodoPago(estadoTarget?.id ?? null)
-
-  const abrirNuevo = () => {
-    setEditing(null)
-    setFormOpen(true)
-  }
 
   const abrirEdicion = (metodo: MetodoPago) => {
     setEditing(metodo)
@@ -62,17 +55,26 @@ export function MetodosTab({ triggerNuevo }: MetodosTabProps) {
     <div className="space-y-4">
       <MetodosTable
         metodos={metodos}
+        count={count}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}
         onRetry={() => refetch()}
-        search={search}
-        onSearchChange={setSearch}
+        search={pagination.search}
+        onSearchChange={(value) => {
+          pagination.setSearch(value)
+          pagination.resetPage()
+        }}
         showInactivos={showInactivos}
-        onToggleInactivos={setShowInactivos}
+        onToggleInactivos={(value) => {
+          setShowInactivos(value)
+          pagination.resetPage()
+        }}
         onEdit={abrirEdicion}
         onToggleEstado={setEstadoTarget}
-        onNuevo={abrirNuevo}
       />
 
       <MetodoPagoFormDialog open={formOpen} onOpenChange={setFormOpen} metodo={editing} />

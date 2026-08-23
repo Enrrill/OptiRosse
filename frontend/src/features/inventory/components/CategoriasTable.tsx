@@ -134,13 +134,6 @@ export function CategoriasTable({
               />
             ) : undefined
           }
-          actions={
-            canManage ? (
-              <Button onClick={onNuevo}>
-                <Icon name="add" size={18} /> Nueva categoría
-              </Button>
-            ) : undefined
-          }
         />
       }
       footer={

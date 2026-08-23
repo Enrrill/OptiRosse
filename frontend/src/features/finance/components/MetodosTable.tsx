@@ -1,16 +1,21 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
+import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
-import { FilterChip } from '@/components/ui/FilterChip'
 import { estadoActivo } from '@/lib/constants/choices'
 import type { MetodoPago } from '@/types/models'
 
 interface MetodosTableProps {
   metodos: MetodoPago[]
+  count: number
+  page: number
+  pageSize: number
+  onPageChange: (page: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -21,11 +26,14 @@ interface MetodosTableProps {
   onToggleInactivos: (value: boolean) => void
   onEdit: (metodo: MetodoPago) => void
   onToggleEstado: (metodo: MetodoPago) => void
-  onNuevo: () => void
 }
 
 export function MetodosTable({
   metodos,
+  count,
+  page,
+  pageSize,
+  onPageChange,
   isLoading,
   isError,
   errorMessage,
@@ -36,7 +44,6 @@ export function MetodosTable({
   onToggleInactivos,
   onEdit,
   onToggleEstado,
-  onNuevo,
 }: MetodosTableProps) {
   const columns: Column<MetodoPago>[] = [
     { key: 'nombre', header: 'Nombre', cell: (row) => <span className="font-medium">{row.nombre}</span> },
@@ -105,11 +112,6 @@ export function MetodosTable({
       onRetry={onRetry}
       emptyTitle={showInactivos ? 'No hay métodos de pago inactivos' : 'No hay métodos de pago'}
       emptyDescription="Crea tu primer método de pago para registrar pagos."
-      emptyAction={
-        <Button onClick={onNuevo}>
-          <Icon name="add" size={18} /> Nuevo método
-        </Button>
-      }
       toolbar={
         <DataTableToolbar
           search={search}
@@ -125,6 +127,7 @@ export function MetodosTable({
           }
         />
       }
+      footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
     />
   )
 }
