@@ -27,6 +27,7 @@ interface DataTableProps<T> {
   toolbar?: ReactNode
   footer?: ReactNode
   className?: string
+  embedded?: boolean
 }
 
 export function DataTable<T>({
@@ -43,13 +44,16 @@ export function DataTable<T>({
   toolbar,
   footer,
   className,
+  embedded = false,
 }: DataTableProps<T>) {
   const alignClass = { left: 'text-left', center: 'text-center', right: 'text-right' }
 
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm',
+        embedded
+          ? 'overflow-hidden bg-transparent'
+          : 'overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm',
         className,
       )}
     >
@@ -62,14 +66,14 @@ export function DataTable<T>({
         <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-outline-variant bg-surface-container-low">
+              <tr className="border-b border-outline-variant/30 bg-surface-container-low/50">
                 {columns.map((col) => (
                   <th
                     key={col.key}
                     className={cn(
-                      'px-4 py-3 font-label-sm text-label-sm uppercase tracking-wider text-outline',
+                      'px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant/80',
                       alignClass[col.align ?? 'left'],
                       col.headerClassName,
                     )}
@@ -84,7 +88,7 @@ export function DataTable<T>({
                 <tr
                   key={rowKey(row)}
                   className={cn(
-                    'transition-colors hover:bg-surface-container-low',
+                    'transition-colors hover:bg-surface-container-low/50',
                     onRowClick && 'cursor-pointer',
                   )}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
@@ -93,7 +97,7 @@ export function DataTable<T>({
                     <td
                       key={col.key}
                       className={cn(
-                        'px-4 py-3 text-sm text-on-surface',
+                        'px-6 py-3.5 text-sm text-on-surface',
                         alignClass[col.align ?? 'left'],
                         col.className,
                       )}

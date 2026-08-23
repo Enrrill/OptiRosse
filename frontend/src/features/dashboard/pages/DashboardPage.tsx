@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router'
 import dayjs from 'dayjs'
+import { Icon } from '@/components/Icon'
 import { PageHeader } from '@/components/data/PageHeader'
 import { Panel } from '@/components/data/Panel'
 import { ErrorState } from '@/components/data/ErrorState'
@@ -40,7 +41,7 @@ export default function DashboardPage() {
   const { pedidos = [], pagos = [] } = resumen.recientes
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Panel de control"
         description={`Resumen de actividad para ${dayjs(resumen.fecha).format('dddd D [de] MMMM')}`}
@@ -50,12 +51,17 @@ export default function DashboardPage() {
 
       <QuickActions />
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Panel
           title="Últimos pedidos"
+          noPadding
           action={
-            <Link className="font-label-sm text-primary underline-offset-4 hover:underline" to="/pedidos">
-              Ver todos
+            <Link
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+              to="/pedidos"
+            >
+              <span>Ver todos</span>
+              <Icon name="arrow_forward" size={14} />
             </Link>
           }
         >
@@ -64,9 +70,14 @@ export default function DashboardPage() {
         {pagos !== undefined && pagos !== null && (
           <Panel
             title="Últimos pagos"
+            noPadding
             action={
-              <Link className="font-label-sm text-primary underline-offset-4 hover:underline" to="/finanzas">
-                Ver todos
+              <Link
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                to="/finanzas"
+              >
+                <span>Ver todos</span>
+                <Icon name="arrow_forward" size={14} />
               </Link>
             }
           >

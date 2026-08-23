@@ -12,18 +12,31 @@ export function RecentPayments({ pagos }: { pagos: PagoResumen[] }) {
     {
       key: 'cliente',
       header: 'Cliente',
-      cell: (r) => <span className="font-semibold">{r.cliente_nombre}</span>,
+      cell: (r) => (
+        <div className="flex items-center gap-2">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-[10px] font-bold text-on-surface-variant uppercase">
+            {r.cliente_nombre?.slice(0, 2) || 'CL'}
+          </div>
+          <span className="font-medium text-on-surface truncate max-w-[120px] sm:max-w-none">
+            {r.cliente_nombre}
+          </span>
+        </div>
+      ),
     },
     {
       key: 'metodo',
       header: 'Método',
-      cell: (r) => <span className="text-on-surface-variant">{r.metodo_pago_nombre}</span>,
+      cell: (r) => (
+        <span className="inline-flex items-center rounded-md bg-surface-container-high px-2 py-0.5 text-xs text-on-surface-variant">
+          {r.metodo_pago_nombre}
+        </span>
+      ),
     },
     {
       key: 'monto',
       header: 'Monto',
       align: 'right',
-      cell: (r) => <span className="font-bold">{formatMoney(r.monto)}</span>,
+      cell: (r) => <span className="font-bold text-on-surface">{formatMoney(r.monto)}</span>,
     },
     {
       key: 'estado',
@@ -34,7 +47,8 @@ export function RecentPayments({ pagos }: { pagos: PagoResumen[] }) {
     {
       key: 'fecha',
       header: 'Fecha',
-      cell: (r) => <span className="text-on-surface-variant">{formatDate(r.creado_en)}</span>,
+      align: 'right',
+      cell: (r) => <span className="text-xs text-on-surface-variant/80">{formatDate(r.creado_en)}</span>,
     },
   ]
 
@@ -45,7 +59,7 @@ export function RecentPayments({ pagos }: { pagos: PagoResumen[] }) {
       rowKey={(r) => r.id}
       onRowClick={() => navigate('/finanzas?tab=pagos')}
       emptyTitle="Sin pagos recientes"
-      className="border-0 shadow-none"
+      embedded
     />
   )
 }

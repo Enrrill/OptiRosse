@@ -16,43 +16,49 @@ export interface KpiCardProps {
 
 const VARIANT_CLASSES: Record<
   KpiVariant,
-  { card: string; chip: string; label: string; value: string }
+  { card: string; chip: string; label: string; value: string; link: string }
 > = {
   primary: {
-    card: 'bg-primary-container text-on-primary-container shadow-sm',
-    chip: 'bg-white/20',
-    label: 'opacity-80',
-    value: '',
+    card: 'bg-primary-container text-on-primary-container border border-primary/20 shadow-xs hover:shadow-md',
+    chip: 'bg-white/20 text-white',
+    label: 'opacity-85 text-xs font-semibold tracking-wider',
+    value: 'text-white',
+    link: 'text-white/90 hover:text-white',
   },
   secondary: {
-    card: 'bg-secondary-container text-on-secondary-container shadow-sm',
-    chip: 'bg-white/20',
-    label: 'opacity-80',
+    card: 'bg-secondary-container text-on-secondary-container border border-secondary/20 shadow-xs hover:shadow-md',
+    chip: 'bg-white/20 text-on-secondary-container',
+    label: 'opacity-85 text-xs font-semibold tracking-wider',
     value: '',
+    link: 'text-on-secondary-container/90 hover:text-on-secondary-container',
   },
   amber: {
-    card: 'border-l-4 border-amber-500 bg-surface-container-lowest shadow-sm',
+    card: 'border-l-4 border-l-amber-500 border border-outline-variant/60 bg-surface-container-lowest shadow-xs hover:shadow-md',
     chip: 'bg-amber-500/10 text-amber-600 dark:text-amber-300',
-    label: 'text-on-surface-variant',
+    label: 'text-on-surface-variant text-xs font-semibold tracking-wider',
     value: 'text-on-surface',
+    link: 'text-amber-600 dark:text-amber-400 hover:underline',
   },
   green: {
-    card: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 shadow-sm',
-    chip: 'bg-green-500/20',
-    label: 'opacity-80',
-    value: '',
+    card: 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-900 dark:text-emerald-200 shadow-xs hover:shadow-md',
+    chip: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300',
+    label: 'text-emerald-800/80 dark:text-emerald-300/80 text-xs font-semibold tracking-wider',
+    value: 'text-emerald-950 dark:text-emerald-100',
+    link: 'text-emerald-700 dark:text-emerald-300 hover:underline',
   },
   error: {
-    card: 'bg-error-container text-on-error-container shadow-sm',
-    chip: 'bg-white/20',
-    label: 'opacity-80',
+    card: 'bg-error-container text-on-error-container border border-error/20 shadow-xs hover:shadow-md',
+    chip: 'bg-white/20 text-on-error-container',
+    label: 'opacity-85 text-xs font-semibold tracking-wider',
     value: '',
+    link: 'text-on-error-container hover:underline',
   },
   default: {
-    card: 'border border-outline-variant bg-surface-container-lowest shadow-sm',
+    card: 'border border-outline-variant/70 bg-surface-container-lowest shadow-xs hover:shadow-md',
     chip: 'bg-surface-container-high text-primary',
-    label: 'text-on-surface-variant',
+    label: 'text-on-surface-variant text-xs font-semibold tracking-wider',
     value: 'text-on-surface',
+    link: 'text-primary hover:underline',
   },
 }
 
@@ -62,29 +68,29 @@ export function KpiCard({ label, value, sub, icon, variant = 'default', link }: 
   return (
     <div
       className={cn(
-        'flex h-40 flex-col justify-between rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-0.5',
+        'flex min-h-[9.25rem] flex-col justify-between rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1',
         styles.card,
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className={cn('flex h-10 w-10 items-center justify-center rounded-lg', styles.chip)}>
+        <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105', styles.chip)}>
           <Icon name={icon} size={20} filled={variant !== 'default'} />
         </span>
         {link && (
           <Link
             to={link.to}
-            className="font-label-sm font-medium underline-offset-4 hover:underline"
+            className={cn('text-xs font-medium underline-offset-4 transition-colors', styles.link)}
           >
             {link.label}
           </Link>
         )}
       </div>
-      <div>
-        <p className={cn('font-label-sm uppercase tracking-widest', styles.label)}>{label}</p>
-        <p className={cn('font-heading text-headline-lg leading-none mt-1', styles.value)}>
+      <div className="mt-3">
+        <p className={cn('uppercase', styles.label)}>{label}</p>
+        <p className={cn('font-heading text-2xl font-bold leading-tight mt-1 tracking-tight', styles.value)}>
           {value}
         </p>
-        {sub && <p className={cn('mt-1 text-sm', styles.label)}>{sub}</p>}
+        {sub && <p className={cn('mt-0.5 text-xs opacity-80', styles.label)}>{sub}</p>}
       </div>
     </div>
   )
