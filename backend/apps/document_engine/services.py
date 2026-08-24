@@ -213,3 +213,62 @@ class DocumentoService:
             nombre_archivo=nombre_archivo,
             content_type=CONTENT_TYPES[formato],
         )
+
+
+class GeneradorDocxService:
+    @staticmethod
+    def generar(documento_empresa, datos_contexto, usuario=None, direccion_ip=''):
+        import os
+        import io
+        from docxtpl import DocxTemplate
+
+        if not documento_empresa.archivo or not os.path.exists(documento_empresa.archivo.path):
+            raise ApiError(
+                'El documento no tiene un archivo físico asociado en el servidor.',
+                status_code=400,
+                code='archivo_no_encontrado',
+            )
+
+        ext = documento_empresa.extension.lower()
+        if ext not in ('docx', 'doc'):
+            raise ApiError(
+                'Solo se pueden generar documentos a partir de plantillas Word (.docx).',
+                status_code=400,
+                code='formato_invalido',
+            )
+
+        try:
+            doc = DocxTemplate(documento_empresa.archivo.path)
+            doc.render(datos_contexto)
+            output = io.BytesIO()
+            doc.save(output)
+            contenido = output.getvalue()
+        except Exception as exc:
+            raise ApiError(
+                f'Error al renderizar la plantilla Word: {exc}',
+                status_code=400,
+                code='error_render_docx',
+            ) from exc
+
+        nombre_base = os.path.splitext(os.path.basename(documento_empresa.archivo.name))[0]
+        nombre_salida = f'{nombre_base}_generado.docx'
+
+        AuditoriaService.registrar(
+            usuario=usuario,
+            accion='generar_documento',
+            tabla_afectada='documentos_empresa',
+            objeto_id=documento_empresa.pk,
+            detalles={
+                'nombre_documento': documento_empresa.nombre,
+                'nombre_salida': nombre_salida,
+                'contexto': datos_contexto,
+            },
+            direccion_ip=direccion_ip,
+        )
+
+        return DocumentoGenerado(
+            contenido=contenido,
+            nombre_archivo=nombre_salida,
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        )
+

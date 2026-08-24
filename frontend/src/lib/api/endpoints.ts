@@ -20,7 +20,9 @@ export const METODOS_PAGO = '/metodos-pago/'
 export const PAGOS = '/pagos/'
 export const LIBRO_MAYOR = '/libro-mayor/'
 export const PLANTILLAS = '/plantillas/'
+export const DOCUMENTOS_EMPRESA = '/documentos-empresa/'
 export const DASHBOARD = '/dashboard/resumen/'
+
 
 export const detalle = (base: string, id: number | string) => `${base}${id}/`
 

@@ -127,8 +127,13 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Impuesto aplicable a los pedidos (tasa fija, ej. IVA 16%)
 IMPUESTO_RATE = Decimal('0.16')
+
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True

@@ -24,11 +24,10 @@ interface ClientesTableProps {
   onRetry: () => void
   search: string
   onSearchChange: (value: string) => void
-  activoFilter: boolean | null
-  onActivoFilterChange: (value: boolean | null) => void
-  onEditar: (cliente: Cliente) => void
-  onToggleActivo: (cliente: Cliente) => void
-  isToggling: boolean
+  showInactivos: boolean
+  onToggleInactivos: (value: boolean) => void
+  onEdit: (cliente: Cliente) => void
+  onToggleEstado: (cliente: Cliente) => void
   onNuevo: () => void
 }
 
@@ -44,11 +43,10 @@ export function ClientesTable({
   onRetry,
   search,
   onSearchChange,
-  activoFilter,
-  onActivoFilterChange,
-  onEditar,
-  onToggleActivo,
-  isToggling,
+  showInactivos,
+  onToggleInactivos,
+  onEdit,
+  onToggleEstado,
   onNuevo,
 }: ClientesTableProps) {
   const navigate = useNavigate()

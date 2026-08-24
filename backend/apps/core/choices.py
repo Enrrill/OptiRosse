@@ -43,6 +43,14 @@ class TipoDocumento(models.TextChoices):
     RECIBO_PAGO = 'recibo_pago', 'Recibo de Pago'
 
 
+class CategoriaDocumentoEmpresa(models.TextChoices):
+    INSTITUCIONAL = 'institucional', 'Institucional / Legal'
+    RECURSOS_HUMANOS = 'recursos_humanos', 'Recursos Humanos'
+    FINANCIERO = 'financiero', 'Financiero / Contable'
+    OPERATIVO = 'operativo', 'Operativo / Taller'
+    OTRO = 'otro', 'Otro'
+
+
 class AccionAuditoria(models.TextChoices):
     CREAR = 'crear', 'Crear'
     ACTUALIZAR = 'actualizar', 'Actualizar'
@@ -73,4 +81,6 @@ class TablaAfectada(models.TextChoices):
     PAGOS = 'pagos', 'Pagos'
     LIBRO_MAYOR = 'libro_mayor', 'Libro mayor'
     PLANTILLAS_DOCUMENTOS = 'plantillas_documentos', 'Plantillas de documentos'
+    DOCUMENTOS_EMPRESA = 'documentos_empresa', 'Documentos de empresa'
     REGISTROS_AUDITORIA = 'registros_auditoria', 'Registros de auditoría'
+

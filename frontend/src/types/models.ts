@@ -343,3 +343,49 @@ export interface RegistroAuditoria {
   creado_en: string
   actualizado_en: string
 }
+
+export type CategoriaDocumentoEmpresa =
+  | 'institucional'
+  | 'recursos_humanos'
+  | 'financiero'
+  | 'operativo'
+  | 'otro'
+
+export interface VariableSchemaItem {
+  clave: string
+  etiqueta: string
+  tipo?: 'texto' | 'fecha' | 'numero' | 'textarea'
+  requerido?: boolean
+  valor_defecto?: string
+}
+
+export interface DocumentoEmpresa {
+  id: number
+  nombre: string
+  descripcion: string
+  categoria: CategoriaDocumentoEmpresa
+  categoria_display: string
+  archivo: string | null
+  archivo_url: string | null
+  extension: string
+  tamano_bytes: number
+  version: string
+  es_plantilla_generable: boolean
+  variables_schema: VariableSchemaItem[]
+  creado_por: number | null
+  creado_por_nombre: string | null
+  activo: boolean
+  creado_en: string
+  actualizado_en: string
+}
+
+export interface DocumentoEmpresaPayload {
+  nombre: string
+  descripcion?: string
+  categoria: CategoriaDocumentoEmpresa
+  archivo?: File | null
+  version?: string
+  es_plantilla_generable?: boolean
+  variables_schema?: VariableSchemaItem[]
+}
+
