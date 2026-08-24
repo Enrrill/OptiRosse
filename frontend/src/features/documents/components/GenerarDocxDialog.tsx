@@ -90,7 +90,7 @@ export function GenerarDocxDialog({ open, onOpenChange, documento }: GenerarDocx
         <form onSubmit={handleGenerar} className="space-y-4 py-2">
           <p className="text-xs text-on-surface-variant">
             Ingresa los valores para inyectar en las variables Jinja2 de la plantilla Word. El{' '}
-            <code className="rounded bg-surface-variant px-1 text-primary">.docx</code> generado se
+            <code className="rounded bg-primary/10 px-1 py-0.5 font-mono text-primary text-[11px]">.docx</code> generado se
             descargará automáticamente.
           </p>
 
@@ -106,7 +106,7 @@ export function GenerarDocxDialog({ open, onOpenChange, documento }: GenerarDocx
                   <Label htmlFor={`var-${key}`} className="text-xs font-semibold capitalize">
                     {label}
                     {isRequired && <span className="ml-0.5 text-error">*</span>}
-                    <span className="ml-1.5 font-mono text-[10px] text-on-surface-variant/60">
+                    <span className="ml-1.5 font-mono text-[10px] text-on-surface-variant/70">
                       {'{{ '}
                       {key}
                       {' }}'}
@@ -118,7 +118,7 @@ export function GenerarDocxDialog({ open, onOpenChange, documento }: GenerarDocx
                       value={value}
                       onChange={(e) => handleInputChange(key, e.target.value)}
                       required={isRequired}
-                      className="mt-1 text-xs min-h-[60px]"
+                      className="mt-1 text-xs min-h-[60px] bg-surface-container-lowest"
                     />
                   ) : (
                     <Input
@@ -127,7 +127,7 @@ export function GenerarDocxDialog({ open, onOpenChange, documento }: GenerarDocx
                       value={value}
                       onChange={(e) => handleInputChange(key, e.target.value)}
                       required={isRequired}
-                      className="mt-1 text-sm"
+                      className="mt-1 text-sm bg-surface-container-lowest"
                     />
                   )}
                 </div>

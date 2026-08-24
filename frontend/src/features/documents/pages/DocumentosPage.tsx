@@ -189,8 +189,8 @@ export default function DocumentosPage() {
       />
 
       {/* ── Sistema de Tabs ──────────────────────────────────────────────── */}
-      <div className="mb-6">
-        <div className="flex gap-1 rounded-2xl border border-outline-variant/40 bg-surface-variant/30 p-1.5">
+      <div className="mb-6 space-y-2">
+        <div className="flex gap-1.5 rounded-2xl border border-outline-variant/40 bg-surface-container-low p-1.5 shadow-xs">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -198,8 +198,8 @@ export default function DocumentosPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-surface shadow-sm text-primary border border-primary/20'
-                  : 'text-on-surface-variant hover:bg-surface/60 hover:text-on-surface'
+                  ? 'bg-surface-container-lowest text-primary shadow-xs border border-primary/20'
+                  : 'text-on-surface-variant hover:bg-surface-container-high/50 hover:text-on-surface'
               }`}
               aria-selected={activeTab === tab.id}
               role="tab"
@@ -210,14 +210,14 @@ export default function DocumentosPage() {
                 {tab.id === 'empresa' ? 'Empresa' : 'Sistema'}
               </span>
               {activeTab === tab.id && (
-                <span className="ml-1 rounded-full bg-primary/15 px-2 py-0.5 text-xs text-primary">
+                <span className="ml-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-mono font-medium text-primary">
                   {tab.id === 'empresa' ? countEmpresa : countSistema}
                 </span>
               )}
             </button>
           ))}
         </div>
-        <p className="mt-2 px-1 text-xs text-on-surface-variant">
+        <p className="px-1 text-xs text-on-surface-variant/80">
           {TABS.find((t) => t.id === activeTab)?.description}
         </p>
       </div>

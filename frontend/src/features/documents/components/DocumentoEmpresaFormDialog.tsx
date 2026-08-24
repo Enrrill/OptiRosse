@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Icon } from '@/components/Icon'
 import { documentoEmpresaSchema, type DocumentoEmpresaFormValues } from './documentoEmpresaSchema'
 import { useCrearDocumentoEmpresa, useActualizarDocumentoEmpresa } from '../hooks/useDocumentoEmpresaMutations'
@@ -36,7 +37,6 @@ export function DocumentoEmpresaFormDialog({
   const [dragActive, setDragActive] = useState(false)
   const [variables, setVariables] = useState<VariableSchemaItem[]>([])
 
-  // Track previous open state to init once per open, without calling setState in effect body
   const prevOpenRef = useRef(false)
   const crearMutation = useCrearDocumentoEmpresa()
   const actualizarMutation = useActualizarDocumentoEmpresa(documento?.id ?? null)
@@ -62,7 +62,6 @@ export function DocumentoEmpresaFormDialog({
 
   const esPlantillaGenerable = useWatch({ control, name: 'es_plantilla_generable', defaultValue: false })
 
-  // Sync form values when dialog opens/closes
   useEffect(() => {
     if (open && !prevOpenRef.current) {
       if (documento) {
@@ -89,8 +88,6 @@ export function DocumentoEmpresaFormDialog({
     }
     prevOpenRef.current = open
   }, [open, documento, reset])
-
-
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -196,8 +193,8 @@ export function DocumentoEmpresaFormDialog({
                 dragActive
                   ? 'border-primary bg-primary/10'
                   : selectedFile
-                  ? 'border-emerald-500/50 bg-emerald-500/5'
-                  : 'border-outline-variant/60 bg-surface-variant/20 hover:border-primary/40'
+                  ? 'border-success/50 bg-success-container/10'
+                  : 'border-outline-variant/60 bg-surface-container-lowest hover:border-primary/40'
               }`}
             >
               <input
@@ -210,14 +207,14 @@ export function DocumentoEmpresaFormDialog({
 
               {selectedFile ? (
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-container/30 text-success">
                     <Icon name="check_circle" size={24} />
                   </div>
                   <div className="text-left">
                     <p className="font-semibold text-sm text-on-surface line-clamp-1">
                       {selectedFile.name}
                     </p>
-                    <p className="text-xs text-on-surface-variant">
+                    <p className="text-xs text-on-surface-variant font-mono">
                       {formatBytes(selectedFile.size)}
                     </p>
                   </div>
@@ -225,7 +222,7 @@ export function DocumentoEmpresaFormDialog({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="ml-2 text-error"
+                    className="ml-2 text-error hover:bg-error-container/20"
                     onClick={() => setSelectedFile(null)}
                   >
                     Cambiar
@@ -257,7 +254,7 @@ export function DocumentoEmpresaFormDialog({
                 id="nombre"
                 {...register('nombre')}
                 placeholder="Ej: Constancia de Trabajo, RIF 2026..."
-                className="mt-1"
+                className="mt-1 bg-surface-container-lowest"
               />
               {errors.nombre && <p className="mt-1 text-xs text-error">{errors.nombre.message}</p>}
             </div>
@@ -266,17 +263,24 @@ export function DocumentoEmpresaFormDialog({
               <Label htmlFor="categoria" className="text-sm font-semibold">
                 Categoría <span className="text-error">*</span>
               </Label>
-              <select
-                id="categoria"
-                {...register('categoria')}
-                className="mt-1 h-10 w-full rounded-lg border border-outline-variant/60 bg-surface px-3 py-2 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40"
-              >
-                {CATEGORIAS_LIST.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="categoria"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="mt-1 w-full bg-surface-container-lowest border-outline-variant/80">
+                      <SelectValue placeholder="Selecciona una categoría" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIAS_LIST.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {cat.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
 
@@ -286,20 +290,25 @@ export function DocumentoEmpresaFormDialog({
               <Label htmlFor="version" className="text-sm font-semibold">
                 Versión <span className="text-error">*</span>
               </Label>
-              <Input id="version" {...register('version')} placeholder="1.0" className="mt-1 font-mono text-sm" />
+              <Input
+                id="version"
+                {...register('version')}
+                placeholder="1.0"
+                className="mt-1 font-mono text-sm bg-surface-container-lowest"
+              />
               {errors.version && <p className="mt-1 text-xs text-error">{errors.version.message}</p>}
             </div>
 
-            <div className="pt-4">
-              <label className="flex items-center gap-2 cursor-pointer">
+            <div className="pt-2">
+              <label className="flex items-center gap-2.5 cursor-pointer rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-3">
                 <input
                   type="checkbox"
                   {...register('es_plantilla_generable')}
-                  className="rounded border-outline-variant text-primary focus:ring-primary/40 h-4 w-4"
+                  className="rounded border-outline-variant text-primary focus:ring-primary/40 h-4 w-4 shrink-0"
                 />
                 <div>
-                  <span className="text-sm font-semibold text-on-surface">Es plantilla Word generable (.docx)</span>
-                  <p className="text-xs text-on-surface-variant">Permite inyectar variables Jinja2 con docxtpl</p>
+                  <span className="text-xs font-semibold text-on-surface block">Es plantilla Word generable (.docx)</span>
+                  <p className="text-[11px] text-on-surface-variant">Inyecta variables Jinja2 con docxtpl</p>
                 </div>
               </label>
             </div>
@@ -314,7 +323,7 @@ export function DocumentoEmpresaFormDialog({
               id="descripcion"
               {...register('descripcion')}
               placeholder="Detalles acerca de este documento o su uso dentro de la compañía..."
-              className="mt-1 text-sm min-h-[70px]"
+              className="mt-1 text-sm min-h-[70px] bg-surface-container-lowest"
             />
           </div>
 
@@ -330,7 +339,7 @@ export function DocumentoEmpresaFormDialog({
                     Define los campos Jinja2 que el usuario rellenará al generar este documento (ej: {'{{ nombre_empleado }}'})
                   </p>
                 </div>
-                <Button type="button" variant="outline" size="sm" onClick={agregarVariable} className="gap-1">
+                <Button type="button" variant="outline" size="sm" onClick={agregarVariable} className="gap-1 bg-surface-container-lowest">
                   <Icon name="add" size={16} /> Variable
                 </Button>
               </div>
@@ -342,34 +351,38 @@ export function DocumentoEmpresaFormDialog({
               ) : (
                 <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
                   {variables.map((v, idx) => (
-                    <div key={idx} className="flex items-center gap-2 rounded-lg border border-outline-variant/40 bg-surface p-2">
+                    <div key={idx} className="flex items-center gap-2 rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-2">
                       <Input
                         placeholder="clave (ej: nombre)"
                         value={v.clave}
                         onChange={(e) => actualizarVariable(idx, 'clave', e.target.value)}
-                        className="h-8 text-xs font-mono flex-1"
+                        className="h-8 text-xs font-mono flex-1 bg-surface"
                       />
                       <Input
                         placeholder="Etiqueta visible"
                         value={v.etiqueta}
                         onChange={(e) => actualizarVariable(idx, 'etiqueta', e.target.value)}
-                        className="h-8 text-xs flex-1"
+                        className="h-8 text-xs flex-1 bg-surface"
                       />
-                      <select
+                      <Select
                         value={v.tipo || 'texto'}
-                        onChange={(e) => actualizarVariable(idx, 'tipo', e.target.value)}
-                        className="h-8 rounded-md border border-outline-variant/60 bg-surface px-2 text-xs text-on-surface"
+                        onValueChange={(val) => actualizarVariable(idx, 'tipo', val)}
                       >
-                        <option value="texto">Texto</option>
-                        <option value="fecha">Fecha</option>
-                        <option value="numero">Número</option>
-                        <option value="textarea">Texto largo</option>
-                      </select>
+                        <SelectTrigger className="h-8 w-28 text-xs bg-surface border-outline-variant/60">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="texto">Texto</SelectItem>
+                          <SelectItem value="fecha">Fecha</SelectItem>
+                          <SelectItem value="numero">Número</SelectItem>
+                          <SelectItem value="textarea">Texto largo</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 text-error hover:bg-error/10"
+                        className="h-8 w-8 p-0 text-error hover:bg-error-container/20 shrink-0"
                         onClick={() => eliminarVariable(idx)}
                       >
                         <Icon name="delete" size={16} />
@@ -395,3 +408,4 @@ export function DocumentoEmpresaFormDialog({
     </Dialog>
   )
 }
+
