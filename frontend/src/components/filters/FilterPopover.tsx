@@ -64,7 +64,7 @@ export function FilterPopover({
           )}
         </div>
 
-        <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-0.5">
+        <div className="space-y-3 max-h-[70vh] overflow-y-auto p-1 pr-1.5 -m-1">
           {children}
         </div>
       </PopoverContent>
