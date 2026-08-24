@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { Icon } from '@/components/Icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { cn } from '@/lib/utils'
 
 const Dialog = DialogPrimitive.Root
@@ -39,9 +39,8 @@ function DialogContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface focus:outline-none focus:ring-2 focus:ring-ring">
-          <Icon name="close" />
-          <span className="sr-only">Cerrar</span>
+        <DialogPrimitive.Close asChild>
+          <CloseButton size="md" className="absolute right-4 top-4" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPortal>

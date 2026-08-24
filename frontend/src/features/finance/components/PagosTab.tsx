@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
-import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { useApiQuery } from '@/hooks/useApi'
 import { usePagination } from '@/hooks/usePagination'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
@@ -167,9 +166,7 @@ export function PagosTab({ triggerNuevo }: PagosTabProps) {
               </DrawerDescription>
             </div>
             <DrawerClose asChild>
-              <Button variant="ghost" size="icon" aria-label="Cerrar">
-                <Icon name="close" />
-              </Button>
+              <CloseButton size="md" />
             </DrawerClose>
           </DrawerHeader>
 

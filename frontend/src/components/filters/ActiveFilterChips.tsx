@@ -1,5 +1,5 @@
-import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/button'
+import { CloseButton } from '@/components/ui/close-button'
 
 export interface ActiveFilterItem {
   id: string
@@ -26,14 +26,12 @@ export function ActiveFilterChips({ filters, onClearAll }: ActiveFilterChipsProp
         >
           <span className="font-medium text-on-surface-variant">{filter.label}:</span>
           <span className="font-semibold text-primary">{filter.valueDisplay}</span>
-          <button
-            type="button"
+          <CloseButton
+            size="xs"
+            label={`Remover filtro ${filter.label}`}
             onClick={filter.onRemove}
-            className="ml-0.5 rounded-full p-0.5 text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors cursor-pointer"
-            aria-label={`Remover filtro ${filter.label}`}
-          >
-            <Icon name="close" size={12} />
-          </button>
+            className="-mr-1"
+          />
         </span>
       ))}
       {filters.length > 1 && (

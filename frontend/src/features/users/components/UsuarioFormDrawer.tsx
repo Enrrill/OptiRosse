@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import {
   Drawer,
   DrawerClose,
@@ -7,7 +6,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { Icon } from '@/components/Icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { UsuarioForm } from './UsuarioForm'
 import type { Usuario } from '@/types/models'
 
@@ -34,9 +33,7 @@ export function UsuarioFormDrawer({ open, onOpenChange, usuario }: UsuarioFormDr
             <DrawerDescription className="mt-1">{description}</DrawerDescription>
           </div>
           <DrawerClose asChild>
-            <Button variant="ghost" size="icon" aria-label="Cerrar">
-              <Icon name="close" />
-            </Button>
+            <CloseButton size="md" />
           </DrawerClose>
         </DrawerHeader>
 

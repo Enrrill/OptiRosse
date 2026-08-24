@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
+import { CloseButton } from '@/components/ui/close-button'
 import { Icon } from '@/components/Icon'
 import {
   Command,
@@ -78,17 +79,14 @@ export function SearchableSelect<T>({
           </span>
           <span className="ml-2 flex shrink-0 items-center gap-1">
             {value != null && (
-              <span
-                role="button"
-                tabIndex={-1}
-                className="rounded-full p-0.5 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+              <CloseButton
+                size="xs"
+                label="Limpiar selección"
                 onClick={(e) => {
                   e.stopPropagation()
                   onChange(null)
                 }}
-              >
-                <Icon name="close" size={16} />
-              </span>
+              />
             )}
             <Icon name="expand_more" size={18} className="text-on-surface-variant" />
           </span>

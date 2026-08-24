@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Icon } from '@/components/Icon'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { CloseButton } from '@/components/ui/close-button'
 import { ActiveFilterChips, type ActiveFilterItem } from '@/components/filters/ActiveFilterChips'
 import { FilterPopover } from '@/components/filters/FilterPopover'
 import { cn } from '@/lib/utils'
@@ -54,14 +55,12 @@ export function DataTableToolbar({
               className="pl-9 pr-8 bg-surface-container-lowest border-outline-variant/70 focus:border-primary"
             />
             {search && (
-              <button
-                type="button"
+              <CloseButton
+                size="xs"
+                label="Limpiar búsqueda"
                 onClick={() => onSearchChange('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
-                aria-label="Limpiar búsqueda"
-              >
-                <Icon name="close" size={14} />
-              </button>
+                className="absolute right-2.5 top-1/2 -translate-y-1/2"
+              />
             )}
           </div>
         )}
