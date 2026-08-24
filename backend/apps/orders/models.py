@@ -5,9 +5,10 @@ from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
 from backend.apps.core.choices import EstadoPedido
 from backend.apps.core.models import Usuario
 from backend.apps.inventory.models import VarianteProducto
+from backend.common.utils import SanitizedModelMixin
 
 
-class RecetaOptica(ActivoMixin):
+class RecetaOptica(SanitizedModelMixin, ActivoMixin):
     nombre_paciente = models.CharField('nombre del paciente', max_length=100, blank=True, default='')
 
     od_esfera = models.DecimalField('OD esfera', max_digits=4, decimal_places=2, blank=True, null=True)
@@ -32,7 +33,7 @@ class RecetaOptica(ActivoMixin):
         return f'Receta #{self.id} - {self.nombre_paciente or "Sin paciente"}'
 
 
-class Pedido(TimeStampedModel):
+class Pedido(SanitizedModelMixin, TimeStampedModel):
     numero_pedido = models.CharField('número de pedido', max_length=20, unique=True)
     cliente = models.ForeignKey(ClienteOptica, on_delete=models.RESTRICT, verbose_name='cliente')
     usuario = models.ForeignKey(Usuario, on_delete=models.RESTRICT, verbose_name='usuario')

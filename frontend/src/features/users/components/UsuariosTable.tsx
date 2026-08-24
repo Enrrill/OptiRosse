@@ -14,7 +14,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
 import { choice, estadoActivo, ROLES } from '@/lib/constants/choices'
-import { formatDate } from '@/lib/format'
+import { formatDate, formatEmail, formatName } from '@/lib/format'
 import type { RolUsuario, Usuario } from '@/types/models'
 
 interface UsuariosTableProps {
@@ -61,7 +61,7 @@ export function UsuariosTable({
   onNuevo,
 }: UsuariosTableProps) {
   const nombreCompleto = (usuario: Usuario) =>
-    [usuario.nombre, usuario.apellido].filter(Boolean).join(' ').trim()
+    formatName([usuario.nombre, usuario.apellido].filter(Boolean).join(' '))
 
   const columns: Column<Usuario>[] = [
     {
@@ -78,7 +78,7 @@ export function UsuariosTable({
       key: 'correo',
       header: 'Correo',
       cell: (row) => (
-        <span className="block max-w-[320px] truncate text-on-surface-variant">{row.correo}</span>
+        <span className="block max-w-[320px] truncate text-on-surface-variant">{formatEmail(row.correo)}</span>
       ),
     },
     {

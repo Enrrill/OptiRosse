@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { estadoActivo } from '@/lib/constants/choices'
-import { formatDate, formatMoney, formatNumber } from '@/lib/format'
+import { formatDate, formatMoney, formatNumber, formatRIF, formatPhone, formatName, formatEmail } from '@/lib/format'
 import { FilterChip } from '@/components/ui/FilterChip'
 import type { Cliente } from '@/types/models'
 
@@ -24,10 +24,11 @@ interface ClientesTableProps {
   onRetry: () => void
   search: string
   onSearchChange: (value: string) => void
-  showInactivos: boolean
-  onToggleInactivos: (value: boolean) => void
-  onEdit: (cliente: Cliente) => void
-  onToggleEstado: (cliente: Cliente) => void
+  activoFilter: boolean | null
+  onActivoFilterChange: (value: boolean | null) => void
+  onEditar: (cliente: Cliente) => void
+  onToggleActivo: (cliente: Cliente) => void
+  isToggling: boolean
   onNuevo: () => void
 }
 
@@ -43,10 +44,11 @@ export function ClientesTable({
   onRetry,
   search,
   onSearchChange,
-  showInactivos,
-  onToggleInactivos,
-  onEdit,
-  onToggleEstado,
+  activoFilter,
+  onActivoFilterChange,
+  onEditar,
+  onToggleActivo,
+  isToggling,
   onNuevo,
 }: ClientesTableProps) {
   const navigate = useNavigate()
@@ -58,22 +60,26 @@ export function ClientesTable({
       header: 'Cliente',
       cell: (row) => (
         <div>
-          <p className="font-medium text-on-surface">{row.nombre_comercial}</p>
-          <p className="text-xs text-on-surface-variant">{row.razon_social}</p>
+          <p className="font-medium text-on-surface">{formatName(row.nombre_comercial)}</p>
+          <p className="text-xs text-on-surface-variant">{formatName(row.razon_social)}</p>
         </div>
       ),
     },
     {
       key: 'identificacion_fiscal',
       header: 'RIF',
-      cell: (row) => <span className="font-mono text-xs">{row.identificacion_fiscal}</span>,
+      cell: (row) => <span className="font-mono text-xs font-semibold">{formatRIF(row.identificacion_fiscal)}</span>,
     },
     {
       key: 'correo',
       header: 'Correo',
-      cell: (row) => <span className="block max-w-[320px] truncate text-on-surface-variant">{row.correo}</span>,
+      cell: (row) => <span className="block max-w-[320px] truncate text-on-surface-variant">{formatEmail(row.correo)}</span>,
     },
-    { key: 'telefono', header: 'Teléfono' },
+    {
+      key: 'telefono',
+      header: 'Teléfono',
+      cell: (row) => <span className="text-on-surface-variant whitespace-nowrap">{formatPhone(row.telefono)}</span>,
+    },
     {
       key: 'limite_credito',
       header: 'Límite de crédito',

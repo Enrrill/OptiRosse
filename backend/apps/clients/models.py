@@ -1,9 +1,10 @@
 from django.db import models
 
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
+from backend.common.utils import SanitizedModelMixin
 
 
-class ClienteOptica(TimeStampedModel, ActivoMixin):
+class ClienteOptica(SanitizedModelMixin, TimeStampedModel, ActivoMixin):
     razon_social = models.CharField('razón social', max_length=150)
     nombre_comercial = models.CharField('nombre comercial', max_length=150)
     identificacion_fiscal = models.CharField('identificación fiscal', max_length=30, unique=True)

@@ -1,19 +1,38 @@
 import { z } from 'zod'
 import type { Cliente } from '@/types/models'
+import { formatEmail, formatName, formatPhone, formatRIF } from '@/lib/formatters'
 
 export const clienteSchema = z.object({
-  razon_social: z.string().min(1, 'La razón social es obligatoria').max(150, 'Máximo 150 caracteres'),
+  razon_social: z
+    .string()
+    .min(1, 'La razón social es obligatoria')
+    .max(150, 'Máximo 150 caracteres')
+    .transform((val) => formatName(val)),
   nombre_comercial: z
     .string()
     .min(1, 'El nombre comercial es obligatorio')
-    .max(150, 'Máximo 150 caracteres'),
+    .max(150, 'Máximo 150 caracteres')
+    .transform((val) => formatName(val)),
   identificacion_fiscal: z
     .string()
     .min(1, 'La identificación fiscal es obligatoria')
-    .max(30, 'Máximo 30 caracteres'),
-  correo: z.string().min(1, 'El correo es obligatorio').email('Ingresa un correo válido').max(254),
-  telefono: z.string().min(1, 'El teléfono es obligatorio').max(30, 'Máximo 30 caracteres'),
-  direccion: z.string().min(1, 'La dirección es obligatoria'),
+    .max(30, 'Máximo 30 caracteres')
+    .transform((val) => formatRIF(val)),
+  correo: z
+    .string()
+    .min(1, 'El correo es obligatorio')
+    .email('Ingresa un correo válido')
+    .max(254)
+    .transform((val) => formatEmail(val)),
+  telefono: z
+    .string()
+    .min(1, 'El teléfono es obligatorio')
+    .max(30, 'Máximo 30 caracteres')
+    .transform((val) => formatPhone(val)),
+  direccion: z
+    .string()
+    .min(1, 'La dirección es obligatoria')
+    .transform((val) => val.trim()),
   limite_credito: z
     .number('Ingresa un monto válido')
     .finite('Ingresa un monto válido')

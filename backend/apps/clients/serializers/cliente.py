@@ -2,9 +2,10 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from backend.apps.clients.models import ClienteOptica
+from backend.common.utils import SanitizedSerializerMixin, validate_rif_format
 
 
-class ClienteOpticaSerializer(serializers.ModelSerializer):
+class ClienteOpticaSerializer(SanitizedSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = ClienteOptica
         fields = (

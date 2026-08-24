@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 
+export * from './formatters'
+
 dayjs.locale('es')
 
 const MONEY_FORMATTER = new Intl.NumberFormat('es-VE', {

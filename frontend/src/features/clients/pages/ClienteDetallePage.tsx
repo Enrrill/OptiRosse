@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { estadoActivo } from '@/lib/constants/choices'
-import { formatDateTime, formatMoney } from '@/lib/format'
+import { formatDateTime, formatMoney, formatName, formatRIF, formatPhone, formatEmail } from '@/lib/format'
 import { useCliente } from '../hooks/useCliente'
 import { useSaldoCliente } from '@/hooks/useSaldoCliente'
 import { useDesactivarCliente, useReactivarCliente } from '../hooks/useClienteMutations'
@@ -87,8 +87,8 @@ export default function ClienteDetallePage() {
         </Link>
 
         <PageHeader
-          title={cliente.nombre_comercial}
-          description={`Razón Social: ${cliente.razon_social} · RIF: ${cliente.identificacion_fiscal}`}
+          title={formatName(cliente.nombre_comercial)}
+          description={`Razón Social: ${formatName(cliente.razon_social)} · RIF: ${formatRIF(cliente.identificacion_fiscal)}`}
           actions={
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge display={estadoActivo(cliente.activo)} />
@@ -208,28 +208,28 @@ export default function ClienteDetallePage() {
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">
                   <Icon name="mail" size={16} className="text-primary" /> Correo electrónico
                 </div>
-                <p className="font-medium text-on-surface break-all">{cliente.correo}</p>
+                <p className="font-medium text-on-surface break-all">{formatEmail(cliente.correo)}</p>
               </div>
 
               <div className="rounded-xl border border-outline-variant/70 bg-surface-container-low/50 p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">
                   <Icon name="call" size={16} className="text-primary" /> Teléfono
                 </div>
-                <p className="font-medium text-on-surface">{cliente.telefono}</p>
+                <p className="font-medium text-on-surface">{formatPhone(cliente.telefono)}</p>
               </div>
 
               <div className="rounded-xl border border-outline-variant/70 bg-surface-container-low/50 p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">
                   <Icon name="business" size={16} className="text-primary" /> Razón social
                 </div>
-                <p className="font-medium text-on-surface">{cliente.razon_social}</p>
+                <p className="font-medium text-on-surface">{formatName(cliente.razon_social)}</p>
               </div>
 
               <div className="rounded-xl border border-outline-variant/70 bg-surface-container-low/50 p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">
                   <Icon name="badge" size={16} className="text-primary" /> Identificación fiscal (RIF)
                 </div>
-                <p className="font-mono font-semibold text-on-surface">{cliente.identificacion_fiscal}</p>
+                <p className="font-mono font-semibold text-on-surface">{formatRIF(cliente.identificacion_fiscal)}</p>
               </div>
 
               <div className="sm:col-span-2 rounded-xl border border-outline-variant/70 bg-surface-container-low/50 p-4">

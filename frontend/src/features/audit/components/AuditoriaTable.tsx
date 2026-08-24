@@ -124,7 +124,7 @@ export function AuditoriaTable({
     },
     {
       key: 'detalle',
-      header: '',
+      header: 'Acciones',
       align: 'right',
       cell: (row) => (
         <Button
@@ -161,7 +161,7 @@ export function AuditoriaTable({
       ? {
           id: 'accion',
           label: 'Acción',
-          valueDisplay: choice(ACCION_AUDITORIA, accionFiltro).label,
+          valueDisplay: choice(ACCION_AUDITORIA, accionFiltro)?.label ?? accionFiltro,
           onRemove: () => onAccionChange(''),
         }
       : null,
@@ -169,7 +169,7 @@ export function AuditoriaTable({
       ? {
           id: 'tabla',
           label: 'Módulo',
-          valueDisplay: choice(TABLA_AUDITORIA, tablaFiltro).label,
+          valueDisplay: choice(TABLA_AUDITORIA, tablaFiltro)?.label ?? tablaFiltro,
           onRemove: () => onTablaChange(''),
         }
       : null,

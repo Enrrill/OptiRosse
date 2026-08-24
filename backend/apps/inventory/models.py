@@ -5,9 +5,10 @@ from django.contrib.postgres.indexes import GinIndex
 
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
 from backend.apps.core.choices import TipoProducto
+from backend.common.utils import SanitizedModelMixin
 
 
-class Categoria(ActivoMixin):
+class Categoria(SanitizedModelMixin, ActivoMixin):
     nombre = models.CharField('nombre', max_length=100)
     tipo_producto = models.CharField('tipo de producto', max_length=20, choices=TipoProducto.choices)
 
@@ -26,7 +27,7 @@ class Categoria(ActivoMixin):
         return f'{self.nombre} ({self.get_tipo_producto_display()})'
 
 
-class Producto(TimeStampedModel, ActivoMixin):
+class Producto(SanitizedModelMixin, TimeStampedModel, ActivoMixin):
     categoria = models.ForeignKey(Categoria, on_delete=models.RESTRICT, verbose_name='categoría')
     marca = models.CharField('marca', max_length=100)
     codigo_modelo = models.CharField('código del modelo', max_length=100)
@@ -52,11 +53,12 @@ class Producto(TimeStampedModel, ActivoMixin):
         return f'{self.marca} {self.codigo_modelo}'
 
     def save(self, *args, **kwargs):
-        self.search_vector = SearchVector('nombre', 'descripcion', 'marca')
+        self.sanitize_fields()
+        self.search_vector = SearchVector('marca', 'codigo_modelo', 'descripcion')
         super().save(*args, **kwargs)
 
 
-class VarianteProducto(ActivoMixin):
+class VarianteProducto(SanitizedModelMixin, ActivoMixin):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='variantes', verbose_name='producto')
     sku = models.CharField('SKU', max_length=100, unique=True)
     codigo_barras = models.CharField('código de barras', max_length=100, unique=True, blank=True, null=True)

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Icon } from '@/components/Icon'
-import { formatMoney } from '@/lib/format'
+import { formatMoney, formatName, formatSKU } from '@/lib/format'
 import type { Producto, VarianteProducto } from '@/types/models'
 
 interface VariantesTableProps {
@@ -80,18 +80,21 @@ export function VariantesTable({
     {
       key: 'sku',
       header: 'SKU',
-      cell: (row) => <span className="font-mono text-xs">{row.sku}</span>,
+      cell: (row) => <span className="font-mono text-xs font-semibold">{formatSKU(row.sku)}</span>,
     },
     {
       key: 'producto',
       header: 'Producto',
-      cell: (row) => <span className="font-medium text-on-surface">{productoLabel(row)}</span>,
+      cell: (row) => <span className="font-medium text-on-surface">{formatName(productoLabel(row))}</span>,
     },
     {
       key: 'color_tamano',
       header: 'Color / Tamaño',
       cell: (row) => {
-        const texto = [row.color, row.tamano].filter(Boolean).join(' · ') || '—'
+        const color = formatName(row.color)
+        const tamano = formatName(row.tamano)
+        const partes = [color !== '—' ? color : '', tamano !== '—' ? tamano : ''].filter(Boolean)
+        const texto = partes.join(' · ') || '—'
         return <span className="text-on-surface-variant">{texto}</span>
       },
     },

@@ -4,6 +4,7 @@ from django.db import models
 
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
 from backend.apps.core.choices import AccionAuditoria, RolUsuario, TablaAfectada
+from backend.common.utils import SanitizedModelMixin
 
 
 class UsuarioManager(BaseUserManager):
@@ -23,7 +24,7 @@ class UsuarioManager(BaseUserManager):
         return self.create_user(nombre_usuario, correo, password, **extra_fields)
 
 
-class Usuario(AbstractBaseUser, PermissionsMixin, TimeStampedModel, ActivoMixin):
+class Usuario(SanitizedModelMixin, AbstractBaseUser, PermissionsMixin, TimeStampedModel, ActivoMixin):
     nombre_usuario = models.CharField('nombre de usuario', max_length=150, unique=True)
     correo = models.EmailField('correo electrónico', max_length=254, unique=True)
     nombre = models.CharField('nombre', max_length=150, blank=True, default='')
@@ -53,6 +54,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin, TimeStampedModel, ActivoMixin)
         return f'{self.nombre_usuario} ({self.get_rol_display()})'
 
     def save(self, *args, **kwargs):
+        self.sanitize_fields()
         if self.password and not self.password.startswith(('pbkdf2_', 'bcrypt', 'argon2')):
             self.password = make_password(self.password)
         super().save(*args, **kwargs)

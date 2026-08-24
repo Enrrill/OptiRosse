@@ -4,9 +4,10 @@ from backend.apps.clients.models import ClienteOptica
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
 from backend.apps.core.choices import EstadoPago, TipoAsiento
 from backend.apps.orders.models import Pedido
+from backend.common.utils import SanitizedModelMixin
 
 
-class MetodoPago(ActivoMixin):
+class MetodoPago(SanitizedModelMixin, ActivoMixin):
     nombre = models.CharField('nombre', max_length=50)
     moneda = models.CharField('moneda', max_length=10, default='USD')
     requiere_referencia = models.BooleanField('requiere referencia', default=True)
@@ -20,7 +21,7 @@ class MetodoPago(ActivoMixin):
         return f'{self.nombre} ({self.moneda})'
 
 
-class Pago(TimeStampedModel):
+class Pago(SanitizedModelMixin, TimeStampedModel):
     cliente = models.ForeignKey(ClienteOptica, on_delete=models.RESTRICT, verbose_name='cliente')
     pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='pedido')
     metodo_pago = models.ForeignKey(MetodoPago, on_delete=models.RESTRICT, verbose_name='método de pago')
@@ -50,7 +51,7 @@ class Pago(TimeStampedModel):
         return f'Pago #{self.id} - {self.cliente.nombre_comercial} ({self.get_estado_display()})'
 
 
-class LibroMayor(TimeStampedModel):
+class LibroMayor(SanitizedModelMixin, TimeStampedModel):
     cliente = models.ForeignKey(ClienteOptica, on_delete=models.RESTRICT, verbose_name='cliente')
     pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='pedido')
     pago = models.ForeignKey(Pago, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='pago')
