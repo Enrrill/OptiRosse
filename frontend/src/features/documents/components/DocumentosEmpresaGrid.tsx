@@ -9,6 +9,7 @@ import { ErrorState } from '@/components/data/ErrorState'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Pagination } from '@/components/data/Pagination'
 import { FilterChip } from '@/components/ui/FilterChip'
+import { ViewToggle, type ViewMode } from '@/components/ui/ViewToggle'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { DocumentoEmpresaCard } from './DocumentoEmpresaCard'
 import { formatBytes, getFileConfig, getCategoriaBadge } from './documentoEmpresaUtils'
@@ -82,7 +83,7 @@ export function DocumentosEmpresaGrid({
   onGenerar,
   onNuevo,
 }: DocumentosEmpresaGridProps) {
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
   const hayFiltros = search !== '' || categoriaFiltro !== '' || extensionFiltro !== '' || showInactivos
   const activeCount = (categoriaFiltro ? 1 : 0) + (extensionFiltro ? 1 : 0)
@@ -262,40 +263,18 @@ export function DocumentosEmpresaGrid({
       searchPlaceholder="Buscar documento por nombre o descripción..."
       searchId="search-documentos-empresa"
       quickFilters={
-        <div className="flex items-center gap-2">
-          <FilterChip
-            id="toggle-inactivos-empresa"
-            checked={showInactivos}
-            onCheckedChange={onToggleInactivos}
-          />
-          {/* Segmented view mode toggle */}
-          <div className="flex h-8 items-center rounded-lg border border-outline-variant/70 bg-surface-container-low p-0.5">
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-150 ${
-                viewMode === 'grid'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
-                  : 'text-on-surface-variant/70 hover:text-on-surface hover:bg-surface-container-high/50'
-              }`}
-              title="Vista de cuadrícula"
-            >
-              <Icon name="grid_view" size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('table')}
-              className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-150 ${
-                viewMode === 'table'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
-                  : 'text-on-surface-variant/70 hover:text-on-surface hover:bg-surface-container-high/50'
-              }`}
-              title="Vista de lista/tabla"
-            >
-              <Icon name="format_list_bulleted" size={16} />
-            </button>
-          </div>
-        </div>
+        <FilterChip
+          id="toggle-inactivos-empresa"
+          checked={showInactivos}
+          onCheckedChange={onToggleInactivos}
+        />
+      }
+      viewToggle={
+        <ViewToggle
+          id="toggle-modo-vista-empresa"
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
       }
       activeFilterCount={activeCount}
       activeFilters={activeFiltersList}
@@ -426,9 +405,13 @@ export function DocumentosEmpresaGrid({
             ))}
           </div>
 
-          <div className="mt-5">
-            <Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />
-          </div>
+          <Pagination
+            variant="card"
+            page={page}
+            pageSize={pageSize}
+            count={count}
+            onPageChange={onPageChange}
+          />
         </>
       )}
     </div>

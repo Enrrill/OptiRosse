@@ -18,6 +18,7 @@ export interface PaginationProps {
   pageSizeOptions?: number[]
   onPageSizeChange?: (pageSize: number) => void
   pageRange?: number[]
+  variant?: 'default' | 'card'
   className?: string
 }
 
@@ -30,6 +31,7 @@ export function Pagination({
   pageSizeOptions = [10, 15, 25, 50, 100],
   onPageSizeChange,
   pageRange,
+  variant = 'default',
   className,
 }: PaginationProps) {
   const totalPages = Math.max(1, Math.ceil(count / pageSize))
@@ -39,10 +41,16 @@ export function Pagination({
 
   const paginationRange = pageRange ?? getPaginationRange(page, totalPages)
 
+  const variantStyles =
+    variant === 'card'
+      ? 'rounded-xl border border-outline-variant/70 bg-surface-container-lowest shadow-xs'
+      : 'border-t border-outline-variant/40 bg-surface-container-lowest'
+
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-between gap-3 border-t border-outline-variant/40 bg-surface-container-lowest px-4 py-3 sm:flex-row sm:px-6',
+        'flex flex-col items-center justify-between gap-3 px-4 py-3 sm:flex-row sm:px-6',
+        variantStyles,
         className,
       )}
     >

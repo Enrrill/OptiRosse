@@ -17,6 +17,7 @@ interface DataTableToolbarProps {
   activeFilterCount?: number
   activeFilters?: ActiveFilterItem[]
   onClearFilters?: () => void
+  viewToggle?: ReactNode
   actions?: ReactNode
   className?: string
 }
@@ -31,6 +32,7 @@ export function DataTableToolbar({
   activeFilterCount = 0,
   activeFilters = [],
   onClearFilters,
+  viewToggle,
   actions,
   className,
 }: DataTableToolbarProps) {
@@ -85,6 +87,8 @@ export function DataTableToolbar({
               Limpiar
             </Button>
           )}
+
+          {viewToggle}
 
           {actions}
         </div>
