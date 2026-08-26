@@ -14,7 +14,7 @@ import { UsuarioFormDrawer } from '../components/UsuarioFormDrawer'
 import type { RolUsuario, Usuario } from '@/types/models'
 
 export default function UsuariosPage() {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'usuarios', pageSize: 8 })
   const [showInactivos, setShowInactivos] = useState(false)
   const [rolFiltro, setRolFiltro] = useState<RolUsuario | ''>('')
   const [formOpen, setFormOpen] = useState(false)
@@ -127,6 +127,7 @@ export default function UsuariosPage() {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

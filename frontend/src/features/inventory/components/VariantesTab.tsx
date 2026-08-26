@@ -9,7 +9,7 @@ import type { PaginationParams } from '@/types/api'
 import type { VarianteProducto } from '@/types/models'
 
 export function VariantesTab() {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'inventario-variantes', pageSize: 8 })
   const [productoFiltro, setProductoFiltro] = useState<number | null>(null)
   const [soloStockBajo, setSoloStockBajo] = useState(false)
   const [ajusteTarget, setAjusteTarget] = useState<VarianteProducto | null>(null)
@@ -35,6 +35,7 @@ export function VariantesTab() {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

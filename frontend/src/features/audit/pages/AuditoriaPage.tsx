@@ -20,7 +20,7 @@ const leerId = (value: string | null): number | null => {
 }
 
 export default function AuditoriaPage() {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'auditoria', pageSize: 10 })
   const [searchParams] = useSearchParams()
   const [usuarioFiltro, setUsuarioFiltro] = useState<number | null>(() =>
     leerId(searchParams.get('usuario')),
@@ -101,6 +101,7 @@ export default function AuditoriaPage() {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

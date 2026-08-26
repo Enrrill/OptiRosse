@@ -16,7 +16,7 @@ interface ProductosTabProps {
 }
 
 export function ProductosTab({ triggerNuevo }: ProductosTabProps) {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'inventario-productos', pageSize: 8 })
   const [tipoFiltro, setTipoFiltro] = useState('')
   const [categoriaFiltro, setCategoriaFiltro] = useState<number | null>(null)
   const [marcaFiltro, setMarcaFiltro] = useState('')
@@ -78,6 +78,7 @@ export function ProductosTab({ triggerNuevo }: ProductosTabProps) {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

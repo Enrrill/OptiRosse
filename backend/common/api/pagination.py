@@ -5,11 +5,11 @@ from rest_framework.response import Response
 class HybridPagination(PageNumberPagination):
     """
     Paginación híbrida: PageNumber con page_size reducido + page_range para navegación numerada.
-    - page_size = 15 (mejor UX, menos scrolling)
+    - page_size = 8 (mejor UX, sin scroll en 1080p)
     - page_range: muestra páginas alrededor de la actual
     - Mantiene compatibilidad con next/prev links existentes
     """
-    page_size = 15
+    page_size = 8
     page_size_query_param = 'page_size'
     max_page_size = 100
 

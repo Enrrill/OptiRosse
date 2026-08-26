@@ -21,7 +21,7 @@ export default function PedidosPage() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'pedidos', pageSize: 8 })
   const rol = useAuthStore((s) => s.user?.rol)
   const canManage = puedeGestionarPedidos(rol)
 
@@ -88,6 +88,7 @@ export default function PedidosPage() {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

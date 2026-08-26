@@ -17,6 +17,7 @@ interface PlantillasTableProps {
   page: number
   pageSize: number
   onPageChange: (page: number) => void
+  onPageSizeChange?: (pageSize: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -39,6 +40,7 @@ export function PlantillasTable({
   page,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   isLoading,
   isError,
   errorMessage,
@@ -128,7 +130,7 @@ export function PlantillasTable({
       ? {
           id: 'tipo',
           label: 'Tipo',
-          valueDisplay: choice(TIPO_DOCUMENTO, tipoFiltro).label,
+          valueDisplay: choice(TIPO_DOCUMENTO, tipoFiltro)?.label ?? '',
           onRemove: () => onTipoChange('todos'),
         }
       : null,
@@ -198,7 +200,13 @@ export function PlantillasTable({
         />
       }
       footer={
-        <Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          count={count}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
       }
     />
   )

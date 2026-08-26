@@ -24,6 +24,7 @@ interface ProductosTableProps {
   page: number
   pageSize: number
   onPageChange: (page: number) => void
+  onPageSizeChange?: (pageSize: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -51,6 +52,7 @@ export function ProductosTable({
   page,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   isLoading,
   isError,
   errorMessage,
@@ -164,7 +166,7 @@ export function ProductosTable({
       ? {
           id: 'tipo',
           label: 'Tipo',
-          valueDisplay: choice(TIPO_PRODUCTO, tipoFiltro).label,
+          valueDisplay: choice(TIPO_PRODUCTO, tipoFiltro)?.label ?? '',
           onRemove: () => onTipoChange(''),
         }
       : null,
@@ -286,7 +288,15 @@ export function ProductosTable({
           }
         />
       }
-      footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
+      footer={
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          count={count}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      }
     />
   )
 }

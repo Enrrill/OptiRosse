@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { PAGE_SIZE_OPTIONS } from '@/lib/constants/pagination'
 
 export interface PaginationProps {
   page: number
@@ -27,8 +28,8 @@ export function Pagination({
   pageSize,
   count,
   onPageChange,
-  showPageSizeSelector = false,
-  pageSizeOptions = [10, 15, 25, 50, 100],
+  showPageSizeSelector = true,
+  pageSizeOptions = PAGE_SIZE_OPTIONS,
   onPageSizeChange,
   pageRange,
   variant = 'default',

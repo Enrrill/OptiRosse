@@ -8,7 +8,7 @@ import { useClientesOpciones } from '../hooks/useClientesOpciones'
 import { LibroMayorTable } from './LibroMayorTable'
 
 export function LibroMayorTab() {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'finanzas-libromayor', pageSize: 8 })
   const [clienteFiltro, setClienteFiltro] = useState<number | null>(null)
   const [tipoFiltro, setTipoFiltro] = useState('')
   const [fechaDesde, setFechaDesde] = useState('')
@@ -57,6 +57,7 @@ export function LibroMayorTab() {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

@@ -13,7 +13,7 @@ interface CategoriasTabProps {
 }
 
 export function CategoriasTab({ triggerNuevo }: CategoriasTabProps) {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'inventario-categorias', pageSize: 8 })
   const [showInactivas, setShowInactivas] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Categoria | null>(null)
@@ -67,6 +67,7 @@ export function CategoriasTab({ triggerNuevo }: CategoriasTabProps) {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

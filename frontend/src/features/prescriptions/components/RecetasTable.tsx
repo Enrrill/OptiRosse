@@ -16,6 +16,7 @@ interface RecetasTableProps {
   page: number
   pageSize: number
   onPageChange: (page: number) => void
+  onPageSizeChange?: (pageSize: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -43,6 +44,7 @@ export function RecetasTable({
   page,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   isLoading,
   isError,
   errorMessage,
@@ -173,7 +175,15 @@ export function RecetasTable({
           }
         />
       }
-      footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
+      footer={
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          count={count}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      }
     />
   )
 }

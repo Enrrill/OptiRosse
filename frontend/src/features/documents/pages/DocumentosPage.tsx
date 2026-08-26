@@ -64,7 +64,7 @@ export default function DocumentosPage() {
   const canEdit = !!rol && ROLES_ESCRITURA.includes(rol)
 
   // ── Tab: Archivos de Empresa ───────────────────────────────────────────────
-  const paginationEmpresa = usePagination()
+  const paginationEmpresa = usePagination({ storageKey: 'documentos-empresa', pageSize: 8 })
   const [showInactivosEmpresa, setShowInactivosEmpresa] = useState(false)
   const [categoriaFiltro, setCategoriaFiltro] = useState('')
   const [extensionFiltro, setExtensionFiltro] = useState('')
@@ -115,7 +115,7 @@ export default function DocumentosPage() {
   }
 
   // ── Tab: Plantillas del Sistema ────────────────────────────────────────────
-  const paginacionSistema = usePagination()
+  const paginacionSistema = usePagination({ storageKey: 'documentos-sistema', pageSize: 8 })
   const [showInactivosSistema, setShowInactivosSistema] = useState(false)
   const [tipoFiltro, setTipoFiltro] = useState('')
   const [formSistemaOpen, setFormSistemaOpen] = useState(false)
@@ -230,6 +230,7 @@ export default function DocumentosPage() {
           page={paginationEmpresa.page}
           pageSize={paginationEmpresa.pageSize}
           onPageChange={paginationEmpresa.setPage}
+          onPageSizeChange={paginationEmpresa.setPageSize}
           isLoading={isLoadingEmpresa}
           isError={isErrorEmpresa}
           errorMessage={errorEmpresa?.defaultMessage}
@@ -273,6 +274,7 @@ export default function DocumentosPage() {
             page={paginacionSistema.page}
             pageSize={paginacionSistema.pageSize}
             onPageChange={paginacionSistema.setPage}
+            onPageSizeChange={paginacionSistema.setPageSize}
             isLoading={isLoadingSistema}
             isError={isErrorSistema}
             errorMessage={errorSistema?.defaultMessage}

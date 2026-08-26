@@ -25,7 +25,7 @@ interface PagosTabProps {
 export function PagosTab({ triggerNuevo }: PagosTabProps) {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'finanzas-pagos', pageSize: 8 })
   const [estadoFiltro, setEstadoFiltro] = useState('')
   const [clienteFiltro, setClienteFiltro] = useState<number | null>(null)
   const [metodoFiltro, setMetodoFiltro] = useState<number | null>(null)
@@ -89,7 +89,7 @@ export function PagosTab({ triggerNuevo }: PagosTabProps) {
   const confirmarAprobacion = async () => {
     if (!aprobarTarget) return
     try {
-      await aprobar.mutateAsync()
+      await aprobar.mutateAsync({})
       setAprobarTarget(null)
     } catch (err) {
       toast.error(err instanceof ApiError ? err.defaultMessage : 'No se pudo aprobar el pago')
@@ -114,6 +114,7 @@ export function PagosTab({ triggerNuevo }: PagosTabProps) {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

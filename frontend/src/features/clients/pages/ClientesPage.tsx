@@ -13,7 +13,7 @@ import { ClienteFormDrawer } from '../components/ClienteFormDrawer'
 import type { Cliente } from '@/types/models'
 
 export default function ClientesPage() {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'clientes', pageSize: 8 })
   const [showInactivos, setShowInactivos] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Cliente | null>(null)
@@ -116,6 +116,7 @@ export default function ClientesPage() {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

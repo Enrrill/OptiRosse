@@ -23,6 +23,7 @@ interface PagosTableProps {
   page: number
   pageSize: number
   onPageChange: (page: number) => void
+  onPageSizeChange?: (pageSize: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -53,6 +54,7 @@ export function PagosTable({
   page,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   isLoading,
   isError,
   errorMessage,
@@ -211,7 +213,7 @@ export function PagosTable({
       ? {
           id: 'estado',
           label: 'Estado',
-          valueDisplay: choice(ESTADO_PAGO, estadoFiltro).label,
+          valueDisplay: choice(ESTADO_PAGO, estadoFiltro)?.label ?? '',
           onRemove: () => onEstadoChange(''),
         }
       : null,
@@ -357,7 +359,15 @@ export function PagosTable({
           }
         />
       }
-      footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
+      footer={
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          count={count}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      }
     />
   )
 }

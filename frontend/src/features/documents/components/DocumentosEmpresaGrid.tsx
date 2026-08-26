@@ -23,6 +23,7 @@ interface DocumentosEmpresaGridProps {
   page: number
   pageSize: number
   onPageChange: (page: number) => void
+  onPageSizeChange?: (pageSize: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -64,6 +65,7 @@ export function DocumentosEmpresaGrid({
   page,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   isLoading,
   isError,
   errorMessage,
@@ -343,7 +345,13 @@ export function DocumentosEmpresaGrid({
         }
         toolbar={toolbarComponent}
         footer={
-          <Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />
+          <Pagination
+            page={page}
+            pageSize={pageSize}
+            count={count}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+          />
         }
       />
     )
@@ -411,6 +419,7 @@ export function DocumentosEmpresaGrid({
             pageSize={pageSize}
             count={count}
             onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
           />
         </>
       )}

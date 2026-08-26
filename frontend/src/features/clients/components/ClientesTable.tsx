@@ -18,6 +18,7 @@ interface ClientesTableProps {
   page: number
   pageSize: number
   onPageChange: (page: number) => void
+  onPageSizeChange?: (pageSize: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -37,6 +38,7 @@ export function ClientesTable({
   page,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   isLoading,
   isError,
   errorMessage,
@@ -196,7 +198,15 @@ export function ClientesTable({
           }
         />
       }
-      footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
+      footer={
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          count={count}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      }
     />
   )
 }

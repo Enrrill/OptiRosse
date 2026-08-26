@@ -13,7 +13,7 @@ interface MetodosTabProps {
 }
 
 export function MetodosTab({ triggerNuevo }: MetodosTabProps) {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'finanzas-metodos', pageSize: 8 })
   const [showInactivos, setShowInactivos] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<MetodoPago | null>(null)
@@ -59,6 +59,7 @@ export function MetodosTab({ triggerNuevo }: MetodosTabProps) {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

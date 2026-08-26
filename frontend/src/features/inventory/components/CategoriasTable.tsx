@@ -15,6 +15,7 @@ interface CategoriasTableProps {
   page: number
   pageSize: number
   onPageChange: (page: number) => void
+  onPageSizeChange?: (pageSize: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -35,6 +36,7 @@ export function CategoriasTable({
   page,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   isLoading,
   isError,
   errorMessage,
@@ -137,7 +139,13 @@ export function CategoriasTable({
         />
       }
       footer={
-        <Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          count={count}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
       }
     />
   )

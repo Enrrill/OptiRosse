@@ -14,7 +14,7 @@ import { puedeEditarRecetas } from '../permissions'
 import type { RecetaOptica } from '@/types/models'
 
 export default function RecetasPage() {
-  const pagination = usePagination()
+  const pagination = usePagination({ storageKey: 'recetas', pageSize: 8 })
   const [showInactivos, setShowInactivos] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<RecetaOptica | null>(null)
@@ -74,6 +74,7 @@ export default function RecetasPage() {
         page={pagination.page}
         pageSize={pagination.pageSize}
         onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
         isLoading={isLoading}
         isError={isError}
         errorMessage={error?.defaultMessage}

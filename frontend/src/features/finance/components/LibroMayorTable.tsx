@@ -19,6 +19,7 @@ interface LibroMayorTableProps {
   page: number
   pageSize: number
   onPageChange: (page: number) => void
+  onPageSizeChange?: (pageSize: number) => void
   isLoading: boolean
   isError: boolean
   errorMessage?: string
@@ -42,6 +43,7 @@ export function LibroMayorTable({
   page,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   isLoading,
   isError,
   errorMessage,
@@ -168,7 +170,7 @@ export function LibroMayorTable({
       ? {
           id: 'tipo',
           label: 'Tipo',
-          valueDisplay: choice(TIPO_ASIENTO, tipoFiltro).label,
+          valueDisplay: choice(TIPO_ASIENTO, tipoFiltro)?.label ?? '',
           onRemove: () => onTipoChange(''),
         }
       : null,
@@ -271,7 +273,15 @@ export function LibroMayorTable({
           }
         />
       }
-      footer={<Pagination page={page} pageSize={pageSize} count={count} onPageChange={onPageChange} />}
+      footer={
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          count={count}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      }
     />
   )
 }
