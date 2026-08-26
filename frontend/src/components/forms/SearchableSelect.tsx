@@ -97,10 +97,11 @@ export function SearchableSelect<T>({
         sideOffset={4}
         className="w-[var(--radix-popover-trigger-width)] p-0"
       >
-        <Command shouldFilter={false}>
+        <Command shouldFilter={false} className="rounded-xl">
           <CommandInput
             value={query}
             onValueChange={setQuery}
+            onClear={query ? () => setQuery('') : undefined}
             placeholder={placeholder}
             className="h-11"
           />

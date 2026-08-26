@@ -29,7 +29,7 @@ export const pedidoLineaSchema = z.object({
   id: z.number().int().optional(),
   variante: varianteSeleccion
     .nullable()
-    .refine((v) => v !== null, { message: 'Selecciona una variante' }),
+    .refine((v): boolean => v !== null, { message: 'Selecciona una variante' }),
   cantidad: z
     .number('Ingresa un valor válido')
     .int('Debe ser un número entero')
@@ -44,7 +44,7 @@ export const pedidoFormSchema = z
   .object({
     cliente: clienteSeleccion
       .nullable()
-      .refine((v) => v !== null, { message: 'Selecciona un cliente' }),
+      .refine((v): boolean => v !== null, { message: 'Selecciona un cliente' }),
     receta: recetaSeleccion.nullable(),
     notas: z.string().trim(),
     detalles: z.array(pedidoLineaSchema).min(1, 'Agrega al menos una línea'),

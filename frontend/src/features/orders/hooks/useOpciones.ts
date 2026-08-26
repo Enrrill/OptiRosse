@@ -3,13 +3,14 @@ import { RECETAS, VARIANTES } from '@/lib/api/endpoints'
 import { formatGradienteCompleto } from '@/lib/format'
 import type { SearchableOption } from '@/components/forms/SearchableSelect'
 import type { RecetaOptica, VarianteProducto } from '@/types/models'
+import type { ApiResponse } from '@/types/api'
 
 const PAGE_SIZE = 20
 
 export async function buscarRecetas(
   query: string,
-): Promise<SearchableOption<RecetaOptica>> {
-  const res = await apiClient.get<RecetaOptica[]>(RECETAS, {
+): Promise<SearchableOption<RecetaOptica>[]> {
+  const res = await apiClient.get<ApiResponse<RecetaOptica[]>>(RECETAS, {
     params: { search: query || undefined, activo: true, page_size: PAGE_SIZE },
   })
   return (res.data.data ?? []).map((r) => ({
@@ -22,8 +23,8 @@ export async function buscarRecetas(
 
 export async function buscarVariantes(
   query: string,
-): Promise<SearchableOption<VarianteProducto>> {
-  const res = await apiClient.get<VarianteProducto[]>(VARIANTES, {
+): Promise<SearchableOption<VarianteProducto>[]> {
+  const res = await apiClient.get<ApiResponse<VarianteProducto[]>>(VARIANTES, {
     params: { search: query || undefined, activo: true, page_size: PAGE_SIZE },
   })
   return (res.data.data ?? []).map((v) => ({

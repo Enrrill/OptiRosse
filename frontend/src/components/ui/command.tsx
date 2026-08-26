@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
 import { Icon } from '@/components/Icon'
+import { CloseButton } from '@/components/ui/close-button'
 import { cn } from '@/lib/utils'
 
 const Command = React.forwardRef<
@@ -18,26 +19,46 @@ const Command = React.forwardRef<
 ))
 Command.displayName = CommandPrimitive.displayName
 
+interface CommandInputProps
+  extends React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> {
+  /** Si se pasa, muestra un botón × a la derecha del input cuando hay texto. */
+  onClear?: () => void
+}
+
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <div className="relative border-b border-outline-variant">
-    <Icon
-      name="search"
-      size={18}
-      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-    />
-    <CommandPrimitive.Input
-      ref={ref}
-      className={cn(
-        'flex h-11 w-full bg-transparent py-3 pl-10 pr-4 text-sm text-on-surface outline-none placeholder:text-outline disabled:cursor-not-allowed disabled:opacity-50',
-        className,
+  CommandInputProps
+>(({ className, onClear, value, ...props }, ref) => {
+  const hasValue = value !== undefined && value !== ''
+
+  return (
+    <div className="relative border-b border-outline-variant">
+      <Icon
+        name="search"
+        size={18}
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+      />
+      <CommandPrimitive.Input
+        ref={ref}
+        value={value}
+        className={cn(
+          'flex h-11 w-full bg-transparent py-3 pl-10 text-sm text-on-surface outline-none placeholder:text-outline disabled:cursor-not-allowed disabled:opacity-50',
+          hasValue && onClear ? 'pr-9' : 'pr-4',
+          className,
+        )}
+        {...props}
+      />
+      {hasValue && onClear && (
+        <CloseButton
+          size="xs"
+          label="Limpiar búsqueda"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2"
+          onClick={onClear}
+        />
       )}
-      {...props}
-    />
-  </div>
-))
+    </div>
+  )
+})
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
 const CommandList = React.forwardRef<
