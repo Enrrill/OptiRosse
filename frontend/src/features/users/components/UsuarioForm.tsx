@@ -79,94 +79,96 @@ export function UsuarioForm({ usuario, onSuccess, onCancel }: UsuarioFormProps) 
   })
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      <SectionCard icon="manage_accounts" title="Cuenta">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="nombre_usuario">Nombre de usuario</Label>
-            <Input
-              id="nombre_usuario"
-              placeholder="usuario.optirose"
-              autoComplete="username"
-              {...register('nombre_usuario')}
-            />
-            <FieldError message={errors.nombre_usuario?.message} />
+    <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <SectionCard icon="manage_accounts" title="Cuenta">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="nombre_usuario">Nombre de usuario</Label>
+              <Input
+                id="nombre_usuario"
+                placeholder="usuario.optirose"
+                autoComplete="username"
+                {...register('nombre_usuario')}
+              />
+              <FieldError message={errors.nombre_usuario?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="correo">Correo electrónico</Label>
+              <Input
+                id="correo"
+                type="email"
+                placeholder="usuario@empresa.com"
+                autoComplete="email"
+                {...register('correo')}
+              />
+              <FieldError message={errors.correo?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="rol">Rol</Label>
+              <Controller
+                control={control}
+                name="rol"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="rol">
+                      <SelectValue placeholder="Selecciona un rol" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROLES_ARRAY.map((rol) => (
+                        <SelectItem key={rol} value={rol}>
+                          {ROLES[rol].label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FieldError message={errors.rol?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="password">
+                {esEdicion ? 'Contraseña (opcional)' : 'Contraseña'}
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder={esEdicion ? 'Déjala vacía para mantener la actual' : 'Mínimo 8 caracteres'}
+                autoComplete="new-password"
+                {...register('password')}
+              />
+              <FieldError message={errors.password?.message} />
+              <p className="text-xs text-on-surface-variant">
+                {esEdicion
+                  ? 'Solo se actualiza si escribes una nueva.'
+                  : 'Solo se muestra al crear. Mínimo 8 caracteres.'}
+              </p>
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="correo">Correo electrónico</Label>
-            <Input
-              id="correo"
-              type="email"
-              placeholder="usuario@empresa.com"
-              autoComplete="email"
-              {...register('correo')}
-            />
-            <FieldError message={errors.correo?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="rol">Rol</Label>
-            <Controller
-              control={control}
-              name="rol"
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="rol">
-                    <SelectValue placeholder="Selecciona un rol" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ROLES_ARRAY.map((rol) => (
-                      <SelectItem key={rol} value={rol}>
-                        {ROLES[rol].label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldError message={errors.rol?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="password">
-              {esEdicion ? 'Contraseña (opcional)' : 'Contraseña'}
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder={esEdicion ? 'Déjala vacía para mantener la actual' : 'Mínimo 8 caracteres'}
-              autoComplete="new-password"
-              {...register('password')}
-            />
-            <FieldError message={errors.password?.message} />
-            <p className="text-xs text-on-surface-variant">
-              {esEdicion
-                ? 'Solo se actualiza si escribes una nueva.'
-                : 'Solo se muestra al crear. Mínimo 8 caracteres.'}
-            </p>
-          </div>
-        </div>
-      </SectionCard>
+        </SectionCard>
 
-      <SectionCard icon="badge" title="Datos personales">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="nombre">Nombre</Label>
-            <Input id="nombre" placeholder="Ana" {...register('nombre')} />
-            <FieldError message={errors.nombre?.message} />
+        <SectionCard icon="badge" title="Datos personales">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="nombre">Nombre</Label>
+              <Input id="nombre" placeholder="Ana" {...register('nombre')} />
+              <FieldError message={errors.nombre?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="apellido">Apellido</Label>
+              <Input id="apellido" placeholder="Pérez" {...register('apellido')} />
+              <FieldError message={errors.apellido?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="telefono">Teléfono</Label>
+              <Input id="telefono" placeholder="+58 000 000 0000" {...register('telefono')} />
+              <FieldError message={errors.telefono?.message} />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="apellido">Apellido</Label>
-            <Input id="apellido" placeholder="Pérez" {...register('apellido')} />
-            <FieldError message={errors.apellido?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="telefono">Teléfono</Label>
-            <Input id="telefono" placeholder="+58 000 000 0000" {...register('telefono')} />
-            <FieldError message={errors.telefono?.message} />
-          </div>
-        </div>
-      </SectionCard>
+        </SectionCard>
+      </div>
 
-      <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-6 bg-surface-container-lowest px-6 py-4 border-t border-outline-variant/60 flex items-center justify-end gap-2">
+      <div className="flex-none border-t border-outline-variant/60 bg-surface-container-lowest px-6 py-4 flex items-center justify-end gap-3 z-10">
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
             Cancelar

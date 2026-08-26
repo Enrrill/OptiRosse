@@ -32,16 +32,18 @@ type Lado = 'od' | 'oi'
 interface OjoCampo {
   nombre: 'esfera' | 'cilindro' | 'eje' | 'adicion'
   label: string
+  sublabel: string
   step: string
+  placeholder: string
   min?: number
   max?: number
 }
 
 const OJO_CAMPOS: OjoCampo[] = [
-  { nombre: 'esfera', label: 'Esfera', step: '0.25', min: -30, max: 30 },
-  { nombre: 'cilindro', label: 'Cilindro', step: '0.25', min: -30, max: 30 },
-  { nombre: 'eje', label: 'Eje', step: '1', min: 0, max: 180 },
-  { nombre: 'adicion', label: 'Adición', step: '0.25', min: 0 },
+  { nombre: 'esfera', label: 'Esfera', sublabel: 'SPH', step: '0.25', placeholder: '0.00', min: -30, max: 30 },
+  { nombre: 'cilindro', label: 'Cilindro', sublabel: 'CYL', step: '0.25', placeholder: '0.00', min: -30, max: 30 },
+  { nombre: 'eje', label: 'Eje', sublabel: 'AXIS', step: '1', placeholder: '180°', min: 0, max: 180 },
+  { nombre: 'adicion', label: 'Adición', sublabel: 'ADD', step: '0.25', placeholder: '+0.00', min: 0 },
 ]
 
 function numeroOpcional(value: unknown): number | null {
@@ -58,10 +60,16 @@ function OjoFields({ lado }: { lado: Lado }) {
     (errors as Record<string, { message?: string } | undefined>)[`${lado}_${campo}`]?.message
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-3.5 sm:grid-cols-2">
       {OJO_CAMPOS.map((campo) => (
-        <div key={campo.nombre} className="space-y-1.5">
-          <Label htmlFor={`${lado}_${campo.nombre}`}>{campo.label}</Label>
+        <div key={campo.nombre} className="flex flex-col justify-end gap-1.5">
+          <Label
+            htmlFor={`${lado}_${campo.nombre}`}
+            className="flex items-center gap-1 min-h-[1.5rem]"
+          >
+            <span>{campo.label}</span>
+            <span className="text-[10px] font-mono text-outline font-semibold">({campo.sublabel})</span>
+          </Label>
           <Input
             id={`${lado}_${campo.nombre}`}
             type="number"
@@ -69,7 +77,7 @@ function OjoFields({ lado }: { lado: Lado }) {
             step={campo.step}
             min={campo.min}
             max={campo.max}
-            placeholder="—"
+            placeholder={campo.placeholder}
             className={cn(errorAt(campo.nombre) && 'border-error')}
             {...register(`${lado}_${campo.nombre}`, { setValueAs: numeroOpcional })}
           />
@@ -90,6 +98,15 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
     resolver: zodResolver(recetaSchema),
     defaultValues: receta ? toRecetaFormValues(receta) : RECETA_DEFAULT_VALUES,
   })
+
+  const copiarOdAOi = () => {
+    const values = form.getValues()
+    form.setValue('oi_esfera', values.od_esfera, { shouldDirty: true, shouldValidate: true })
+    form.setValue('oi_cilindro', values.od_cilindro, { shouldDirty: true, shouldValidate: true })
+    form.setValue('oi_eje', values.od_eje, { shouldDirty: true, shouldValidate: true })
+    form.setValue('oi_adicion', values.od_adicion, { shouldDirty: true, shouldValidate: true })
+    toast.success('Valores de OD copiados a OI')
+  }
 
   const onSubmit = form.handleSubmit(async (values) => {
     setSubmitting(true)
@@ -118,57 +135,90 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={onSubmit} className="space-y-6">
-        <SectionCard icon="person" title="Paciente">
-          <div className="space-y-1.5">
-            <Label htmlFor="nombre_paciente">Nombre del paciente</Label>
-            <Input
-              id="nombre_paciente"
-              placeholder="Nombre completo del paciente"
-              {...form.register('nombre_paciente')}
-            />
-            <FieldError message={form.formState.errors.nombre_paciente?.message} />
-          </div>
-        </SectionCard>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <SectionCard icon="visibility" title="OD — Ojo derecho">
-            <OjoFields lado="od" />
+      <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <SectionCard icon="person" title="Paciente">
+            <div className="space-y-1.5">
+              <Label htmlFor="nombre_paciente">Nombre del paciente</Label>
+              <Input
+                id="nombre_paciente"
+                placeholder="Nombre completo del paciente"
+                {...form.register('nombre_paciente')}
+              />
+              <FieldError message={form.formState.errors.nombre_paciente?.message} />
+            </div>
           </SectionCard>
-          <SectionCard icon="visibility_off" title="OI — Ojo izquierdo">
-            <OjoFields lado="oi" />
+
+          <div className="space-y-4">
+            {/* Ojo Derecho Card */}
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-4 shadow-xs">
+              <div className="flex items-center gap-2.5 text-primary border-b border-primary/10 pb-2.5">
+                <span className="px-2 py-0.5 rounded-md bg-primary-container text-on-primary-container text-xs font-mono font-bold tracking-wider">
+                  OD
+                </span>
+                <Icon name="visibility" size={20} />
+                <h4 className="font-semibold text-sm">Ojo Derecho (OD)</h4>
+              </div>
+              <OjoFields lado="od" />
+            </div>
+
+            {/* Ojo Izquierdo Card */}
+            <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4 space-y-4 shadow-xs">
+              <div className="flex items-center justify-between border-b border-secondary/10 pb-2.5">
+                <div className="flex items-center gap-2.5 text-secondary">
+                  <span className="px-2 py-0.5 rounded-md bg-secondary-container text-on-secondary-container text-xs font-mono font-bold tracking-wider">
+                    OI
+                  </span>
+                  <Icon name="visibility" size={20} />
+                  <h4 className="font-semibold text-sm">Ojo Izquierdo (OI)</h4>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={copiarOdAOi}
+                  className="h-7 text-xs px-2.5 border-secondary/30 text-secondary hover:bg-secondary/10"
+                >
+                  <Icon name="content_copy" size={14} className="mr-1" /> Copiar OD
+                </Button>
+              </div>
+              <OjoFields lado="oi" />
+            </div>
+          </div>
+
+          <SectionCard icon="straighten" title="Medidas y notas">
+            <div className="grid gap-4 sm:grid-cols-1">
+              <div className="space-y-1.5">
+                <Label htmlFor="distancia_pupilar">Distancia pupilar (mm)</Label>
+                <Input
+                  id="distancia_pupilar"
+                  type="number"
+                  inputMode="decimal"
+                  step="0.1"
+                  min={0}
+                  max={100}
+                  placeholder="Ej: 64.0"
+                  className={cn(form.formState.errors.distancia_pupilar && 'border-error')}
+                  {...form.register('distancia_pupilar', { setValueAs: numeroOpcional })}
+                />
+                <FieldError message={form.formState.errors.distancia_pupilar?.message} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="notas">Notas</Label>
+                <Textarea
+                  id="notas"
+                  rows={3}
+                  className="min-h-[80px] max-h-48 resize-y"
+                  placeholder="Indicaciones, observaciones o recomendaciones..."
+                  {...form.register('notas')}
+                />
+                <FieldError message={form.formState.errors.notas?.message} />
+              </div>
+            </div>
           </SectionCard>
         </div>
 
-        <SectionCard icon="straighten" title="Medidas y notas">
-          <div className="space-y-1.5">
-            <Label htmlFor="distancia_pupilar">Distancia pupilar (mm)</Label>
-            <Input
-              id="distancia_pupilar"
-              type="number"
-              inputMode="decimal"
-              step="0.1"
-              min={0}
-              max={100}
-              placeholder="—"
-              className={cn(form.formState.errors.distancia_pupilar && 'border-error')}
-              {...form.register('distancia_pupilar', { setValueAs: numeroOpcional })}
-            />
-            <FieldError message={form.formState.errors.distancia_pupilar?.message} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="notas">Notas</Label>
-            <Textarea
-              id="notas"
-              rows={3}
-              placeholder="Indicaciones, observaciones o recomendaciones..."
-              {...form.register('notas')}
-            />
-            <FieldError message={form.formState.errors.notas?.message} />
-          </div>
-        </SectionCard>
-
-        <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-6 bg-surface-container-lowest px-6 py-4 border-t border-outline-variant/60 flex items-center justify-end gap-2">
+        <div className="flex-none border-t border-outline-variant/60 bg-surface-container-lowest px-6 py-4 flex items-center justify-end gap-3 z-10">
           {onCancel && (
             <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
               Cancelar

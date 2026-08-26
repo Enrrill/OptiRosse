@@ -157,8 +157,11 @@ export function PagosTab({ triggerNuevo }: PagosTabProps) {
       />
 
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerContent side="right" className="sm:w-[540px] md:w-[640px]">
-          <DrawerHeader className="p-6 pb-4">
+        <DrawerContent
+          side="right"
+          className="sm:w-[540px] md:w-[640px] flex flex-col h-full overflow-hidden"
+        >
+          <DrawerHeader className="p-6 pb-4 flex-none border-b border-outline-variant">
             <div>
               <DrawerTitle className="text-xl font-bold">Registrar pago</DrawerTitle>
               <DrawerDescription className="mt-1">
@@ -170,16 +173,14 @@ export function PagosTab({ triggerNuevo }: PagosTabProps) {
             </DrawerClose>
           </DrawerHeader>
 
-          <div className="flex-1 overflow-y-auto p-6 pt-2">
-            {preselectCliente.isLoading ? null : (
-              <RegistrarPagoForm
-                key={clientePreselectId ?? 'nuevo'}
-                preselectCliente={preselectCliente.data?.data ?? null}
-                onSuccess={cerrarDrawer}
-                onCancel={cerrarDrawer}
-              />
-            )}
-          </div>
+          {preselectCliente.isLoading ? null : (
+            <RegistrarPagoForm
+              key={clientePreselectId ?? 'nuevo'}
+              preselectCliente={preselectCliente.data?.data ?? null}
+              onSuccess={cerrarDrawer}
+              onCancel={cerrarDrawer}
+            />
+          )}
         </DrawerContent>
       </Drawer>
 

@@ -27,8 +27,11 @@ export function RecetaFormDrawer({ open, onOpenChange, receta }: RecetaFormDrawe
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent side="right" className="sm:w-[540px] md:w-[640px]">
-        <DrawerHeader className="p-6 pb-4">
+      <DrawerContent
+        side="right"
+        className="sm:w-[540px] md:w-[680px] flex flex-col h-full overflow-hidden"
+      >
+        <DrawerHeader className="p-6 pb-4 flex-none border-b border-outline-variant">
           <div>
             <DrawerTitle className="text-xl font-bold">{title}</DrawerTitle>
             <DrawerDescription className="mt-1">{description}</DrawerDescription>
@@ -38,14 +41,12 @@ export function RecetaFormDrawer({ open, onOpenChange, receta }: RecetaFormDrawe
           </DrawerClose>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-y-auto p-6 pt-2">
-          <RecetaForm
-            key={receta?.id ?? 'nuevo'}
-            receta={receta}
-            onSuccess={close}
-            onCancel={close}
-          />
-        </div>
+        <RecetaForm
+          key={receta?.id ?? 'nuevo'}
+          receta={receta}
+          onSuccess={close}
+          onCancel={close}
+        />
       </DrawerContent>
     </Drawer>
   )

@@ -69,84 +69,92 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
   })
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      <SectionCard icon="badge" title="Identificación">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="razon_social">Razón social</Label>
-            <Input id="razon_social" placeholder="OptiRosse C.A." {...register('razon_social')} />
-            <FieldError message={errors.razon_social?.message} />
+    <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <SectionCard icon="badge" title="Identificación">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="razon_social">Razón social</Label>
+              <Input id="razon_social" placeholder="OptiRosse C.A." {...register('razon_social')} />
+              <FieldError message={errors.razon_social?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="nombre_comercial">Nombre comercial</Label>
+              <Input id="nombre_comercial" placeholder="OptiRosse" {...register('nombre_comercial')} />
+              <FieldError message={errors.nombre_comercial?.message} />
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="identificacion_fiscal">Identificación fiscal (RIF)</Label>
+              <Input
+                id="identificacion_fiscal"
+                placeholder="J-00000000-0"
+                {...register('identificacion_fiscal')}
+              />
+              <FieldError message={errors.identificacion_fiscal?.message} />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="nombre_comercial">Nombre comercial</Label>
-            <Input id="nombre_comercial" placeholder="OptiRosse" {...register('nombre_comercial')} />
-            <FieldError message={errors.nombre_comercial?.message} />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="identificacion_fiscal">Identificación fiscal (RIF)</Label>
-            <Input
-              id="identificacion_fiscal"
-              placeholder="J-00000000-0"
-              {...register('identificacion_fiscal')}
-            />
-            <FieldError message={errors.identificacion_fiscal?.message} />
-          </div>
-        </div>
-      </SectionCard>
+        </SectionCard>
 
-      <SectionCard icon="contact_mail" title="Contacto">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="correo">Correo electrónico</Label>
-            <Input
-              id="correo"
-              type="email"
-              placeholder="contacto@empresa.com"
-              {...register('correo')}
-            />
-            <FieldError message={errors.correo?.message} />
+        <SectionCard icon="contact_mail" title="Contacto">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="correo">Correo electrónico</Label>
+              <Input
+                id="correo"
+                type="email"
+                placeholder="contacto@empresa.com"
+                {...register('correo')}
+              />
+              <FieldError message={errors.correo?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="telefono">Teléfono</Label>
+              <Input id="telefono" placeholder="+58 000 000 0000" {...register('telefono')} />
+              <FieldError message={errors.telefono?.message} />
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="direccion">Dirección</Label>
+              <Textarea
+                id="direccion"
+                rows={3}
+                className="min-h-[80px] max-h-40 resize-y"
+                placeholder="Calle, sector, ciudad..."
+                {...register('direccion')}
+              />
+              <FieldError message={errors.direccion?.message} />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="telefono">Teléfono</Label>
-            <Input id="telefono" placeholder="+58 000 000 0000" {...register('telefono')} />
-            <FieldError message={errors.telefono?.message} />
-          </div>
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="direccion">Dirección</Label>
-            <Textarea id="direccion" rows={3} placeholder="Calle, sector, ciudad..." {...register('direccion')} />
-            <FieldError message={errors.direccion?.message} />
-          </div>
-        </div>
-      </SectionCard>
+        </SectionCard>
 
-      <SectionCard icon="credit_card" title="Crédito">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="limite_credito">Límite de crédito</Label>
-            <MoneyInput
-              id="limite_credito"
-              step="0.01"
-              placeholder="0.00"
-              {...register('limite_credito', { valueAsNumber: true })}
-            />
-            <FieldError message={errors.limite_credito?.message} />
+        <SectionCard icon="credit_card" title="Crédito">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="limite_credito">Límite de crédito</Label>
+              <MoneyInput
+                id="limite_credito"
+                step="0.01"
+                placeholder="0.00"
+                {...register('limite_credito', { valueAsNumber: true })}
+              />
+              <FieldError message={errors.limite_credito?.message} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="dias_credito">Días de crédito</Label>
+              <Input
+                id="dias_credito"
+                type="number"
+                min={0}
+                step={1}
+                placeholder="0"
+                {...register('dias_credito', { valueAsNumber: true })}
+              />
+              <FieldError message={errors.dias_credito?.message} />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="dias_credito">Días de crédito</Label>
-            <Input
-              id="dias_credito"
-              type="number"
-              min={0}
-              step={1}
-              placeholder="0"
-              {...register('dias_credito', { valueAsNumber: true })}
-            />
-            <FieldError message={errors.dias_credito?.message} />
-          </div>
-        </div>
-      </SectionCard>
+        </SectionCard>
+      </div>
 
-      <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-6 bg-surface-container-lowest px-6 py-4 border-t border-outline-variant/60 flex items-center justify-end gap-2">
+      <div className="flex-none border-t border-outline-variant/60 bg-surface-container-lowest px-6 py-4 flex items-center justify-end gap-3 z-10">
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
             Cancelar

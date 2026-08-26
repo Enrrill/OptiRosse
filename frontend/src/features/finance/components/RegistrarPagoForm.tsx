@@ -122,8 +122,8 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate>
-      <div className="space-y-6">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
         <SectionCard icon="person" title="Cliente y pedido">
           <div className="space-y-4">
             <div className="space-y-2">
@@ -244,7 +244,7 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
         </SectionCard>
       </div>
 
-      <div className="mt-6 flex items-center justify-end gap-2">
+      <div className="flex-none border-t border-outline-variant/60 bg-surface-container-lowest px-6 py-4 flex items-center justify-end gap-3 z-10">
         <Button type="button" variant="outline" onClick={onCancel} disabled={crear.isPending}>
           Cancelar
         </Button>

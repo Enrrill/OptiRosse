@@ -26,8 +26,11 @@ export function UsuarioFormDrawer({ open, onOpenChange, usuario }: UsuarioFormDr
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent side="right" className="sm:w-[540px] md:w-[640px]">
-        <DrawerHeader className="p-6 pb-4">
+      <DrawerContent
+        side="right"
+        className="sm:w-[540px] md:w-[640px] flex flex-col h-full overflow-hidden"
+      >
+        <DrawerHeader className="p-6 pb-4 flex-none border-b border-outline-variant">
           <div>
             <DrawerTitle className="text-xl font-bold">{title}</DrawerTitle>
             <DrawerDescription className="mt-1">{description}</DrawerDescription>
@@ -37,14 +40,12 @@ export function UsuarioFormDrawer({ open, onOpenChange, usuario }: UsuarioFormDr
           </DrawerClose>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-y-auto p-6 pt-2">
-          <UsuarioForm
-            key={usuario?.id ?? 'nuevo'}
-            usuario={usuario}
-            onSuccess={close}
-            onCancel={close}
-          />
-        </div>
+        <UsuarioForm
+          key={usuario?.id ?? 'nuevo'}
+          usuario={usuario}
+          onSuccess={close}
+          onCancel={close}
+        />
       </DrawerContent>
     </Drawer>
   )
