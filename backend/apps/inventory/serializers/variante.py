@@ -75,7 +75,8 @@ class VarianteProductoSerializer(_ValidacionVarianteMixin, serializers.ModelSeri
                 queryset = queryset.exclude(pk=self.instance.pk)
             if queryset.exists():
                 raise serializers.ValidationError('Este código de barras ya está registrado')
-        return value
+        return value or None
+
 
 
 class VarianteEnProductoSerializer(_ValidacionVarianteMixin, serializers.ModelSerializer):

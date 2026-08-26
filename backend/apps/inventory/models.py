@@ -54,8 +54,19 @@ class Producto(SanitizedModelMixin, TimeStampedModel, ActivoMixin):
 
     def save(self, *args, **kwargs):
         self.sanitize_fields()
-        self.search_vector = SearchVector('marca', 'codigo_modelo', 'descripcion')
-        super().save(*args, **kwargs)
+        is_new = self.pk is None
+        if is_new:
+            super().save(*args, **kwargs)
+            Producto.objects.filter(pk=self.pk).update(
+                search_vector=SearchVector('marca', 'codigo_modelo', 'descripcion')
+            )
+        else:
+            self.search_vector = SearchVector('marca', 'codigo_modelo', 'descripcion')
+            update_fields = kwargs.get('update_fields')
+            if update_fields is not None:
+                kwargs['update_fields'] = set(update_fields) | {'search_vector'}
+            super().save(*args, **kwargs)
+
 
 
 class VarianteProducto(SanitizedModelMixin, ActivoMixin):
