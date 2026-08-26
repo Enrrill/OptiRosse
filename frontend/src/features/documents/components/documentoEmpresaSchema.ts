@@ -7,10 +7,10 @@ export const documentoEmpresaSchema = z.object({
     .max(150, 'Máximo 150 caracteres'),
   descripcion: z.string().optional(),
   categoria: z.enum(['institucional', 'recursos_humanos', 'financiero', 'operativo', 'otro'], {
-    required_error: 'Selecciona una categoría',
+    message: 'Selecciona una categoría',
   }),
   version: z.string().min(1, 'La versión es requerida'),
-  es_plantilla_generable: z.boolean().default(false),
+  es_plantilla_generable: z.boolean(),
 })
 
 export type DocumentoEmpresaFormValues = z.infer<typeof documentoEmpresaSchema>
