@@ -171,7 +171,12 @@ function FormCuerpo({
         </SectionCard>
 
         <SectionCard icon="notes" title="Notas">
-          <Textarea {...register('notas')} placeholder="Notas internas del pedido..." rows={3} />
+          <Textarea
+            {...register('notas')}
+            placeholder="Notas internas del pedido..."
+            rows={3}
+            className="min-h-[80px] max-h-48 resize-y"
+          />
         </SectionCard>
 
         <PedidoTotalesPanel
@@ -182,8 +187,8 @@ function FormCuerpo({
         />
       </div>
 
-      <div className="sticky bottom-0 z-10 -mx-4 mt-6 border-t border-outline-variant bg-surface-container-lowest/95 px-4 py-4 backdrop-blur sm:-mx-8 sm:px-8">
-        <div className="flex items-center justify-end gap-2">
+      <div className="sticky bottom-0 z-20 -mx-4 -mb-4 mt-6 border-t border-outline-variant/60 bg-surface-container-lowest px-4 py-4 shadow-lg sm:-mx-8 sm:-mb-8 sm:px-8">
+        <div className="flex items-center justify-end gap-3">
           <Button type="button" variant="outline" onClick={onCancel} disabled={mutation.isPending}>
             Cancelar
           </Button>
