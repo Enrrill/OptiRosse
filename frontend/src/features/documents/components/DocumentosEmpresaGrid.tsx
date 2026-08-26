@@ -12,6 +12,7 @@ import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { DocumentoEmpresaCard } from './DocumentoEmpresaCard'
 import { formatBytes, getFileConfig, getCategoriaBadge } from './documentoEmpresaUtils'
+import { estadoActivo } from '@/lib/constants/choices'
 import type { DocumentoEmpresa } from '@/types/models'
 import type { ActiveFilterItem } from '@/components/filters/ActiveFilterChips'
 
@@ -167,15 +168,7 @@ export function DocumentosEmpresaGrid({
     {
       key: 'estado',
       header: 'Estado',
-      cell: (doc) => (
-        <StatusBadge
-          display={
-            doc.activo
-              ? { label: 'Disponible', variant: 'success' }
-              : { label: 'Inactivo', variant: 'error' }
-          }
-        />
-      ),
+      cell: (doc) => <StatusBadge display={estadoActivo(doc.activo)} />,
     },
     {
       key: 'acciones',
@@ -396,11 +389,7 @@ export function DocumentosEmpresaGrid({
         </div>
       ) : isError ? (
         <div className="rounded-xl border border-outline-variant/70 bg-surface-container-lowest p-6 shadow-xs">
-          <ErrorState
-            title="Error al cargar los documentos"
-            description={errorMessage || 'Inténtalo de nuevo más tarde'}
-            onRetry={onRetry}
-          />
+          <ErrorState message={errorMessage || 'Error al cargar los documentos'} onRetry={onRetry} />
         </div>
       ) : documentos.length === 0 ? (
         <div className="rounded-xl border border-outline-variant/70 bg-surface-container-lowest p-6 shadow-xs">

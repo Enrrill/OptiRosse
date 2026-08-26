@@ -86,90 +86,101 @@ export function ProductoForm({ producto, onSuccess, onCancel }: ProductoFormProp
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={onSubmit} className="space-y-6">
-        <SectionCard icon="inventory_2" title="Datos del producto">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="marca">Marca</Label>
-              <Input id="marca" placeholder="OptiLook" {...register('marca')} />
-              <FieldError message={errors.marca?.message} />
+      <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <SectionCard icon="inventory_2" title="Datos del producto">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="marca">Marca</Label>
+                <Input id="marca" placeholder="OptiLook" {...register('marca')} />
+                <FieldError message={errors.marca?.message} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="codigo_modelo">Código / modelo</Label>
+                <Input id="codigo_modelo" placeholder="MT-2201" {...register('codigo_modelo')} />
+                <FieldError message={errors.codigo_modelo?.message} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="categoria">Categoría</Label>
+                <Controller
+                  control={control}
+                  name="categoria"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value ? String(field.value) : ''}
+                      onValueChange={(value) => field.onChange(value ? Number(value) : 0)}
+                    >
+                      <SelectTrigger id="categoria">
+                        <SelectValue placeholder="Selecciona una categoría" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categorias.categorias.map((categoria) => (
+                          <SelectItem key={categoria.id} value={String(categoria.id)}>
+                            {categoria.nombre}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <FieldError message={errors.categoria?.message} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="descripcion">Descripción</Label>
+                <Textarea
+                  id="descripcion"
+                  rows={2}
+                  className="min-h-[80px] max-h-48 resize-y"
+                  placeholder="Descripción general del producto..."
+                  {...register('descripcion')}
+                />
+                <FieldError message={errors.descripcion?.message} />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="codigo_modelo">Código / modelo</Label>
-              <Input id="codigo_modelo" placeholder="MT-2201" {...register('codigo_modelo')} />
-              <FieldError message={errors.codigo_modelo?.message} />
-            </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="categoria">Categoría</Label>
-              <Controller
-                control={control}
-                name="categoria"
-                render={({ field }) => (
-                  <Select
-                    value={field.value ? String(field.value) : ''}
-                    onValueChange={(value) => field.onChange(value ? Number(value) : 0)}
-                  >
-                    <SelectTrigger id="categoria">
-                      <SelectValue placeholder="Selecciona una categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categorias.categorias.map((categoria) => (
-                        <SelectItem key={categoria.id} value={String(categoria.id)}>
-                          {categoria.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <FieldError message={errors.categoria?.message} />
-            </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="descripcion">Descripción</Label>
-              <Textarea
-                id="descripcion"
-                rows={2}
-                placeholder="Descripción general del producto..."
-                {...register('descripcion')}
-              />
-              <FieldError message={errors.descripcion?.message} />
-            </div>
-          </div>
-        </SectionCard>
+          </SectionCard>
 
-        <SectionCard icon="tune" title="Opciones técnicas">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="indice_refraccion">Índice de refracción</Label>
-              <Input id="indice_refraccion" placeholder="1.67" {...register('indice_refraccion')} />
-              <FieldError message={errors.indice_refraccion?.message} />
+          <SectionCard icon="tune" title="Opciones técnicas">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="flex flex-col justify-end gap-1.5">
+                <Label htmlFor="indice_refraccion" className="min-h-[2.25rem] flex items-end pb-1">
+                  Índice de refracción
+                </Label>
+                <Input id="indice_refraccion" placeholder="1.67" {...register('indice_refraccion')} />
+                <FieldError message={errors.indice_refraccion?.message} />
+              </div>
+              <div className="flex flex-col justify-end gap-1.5">
+                <Label htmlFor="material" className="min-h-[2.25rem] flex items-end pb-1">
+                  Material
+                </Label>
+                <Input id="material" placeholder="Policarbonato" {...register('material')} />
+                <FieldError message={errors.material?.message} />
+              </div>
+              <div className="flex flex-col justify-end gap-1.5">
+                <Label htmlFor="tratamiento" className="min-h-[2.25rem] flex items-end pb-1">
+                  Tratamiento
+                </Label>
+                <Input id="tratamiento" placeholder="Antirreflejo" {...register('tratamiento')} />
+                <FieldError message={errors.tratamiento?.message} />
+              </div>
+              <div className="flex flex-col justify-end gap-1.5">
+                <Label htmlFor="diseno" className="min-h-[2.25rem] flex items-end pb-1">
+                  Diseño
+                </Label>
+                <Input id="diseno" placeholder="Rectangular" {...register('diseno')} />
+                <FieldError message={errors.diseno?.message} />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="material">Material</Label>
-              <Input id="material" placeholder="Policarbonato" {...register('material')} />
-              <FieldError message={errors.material?.message} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="tratamiento">Tratamiento</Label>
-              <Input id="tratamiento" placeholder="Antirreflejo" {...register('tratamiento')} />
-              <FieldError message={errors.tratamiento?.message} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="diseno">Diseño</Label>
-              <Input id="diseno" placeholder="Rectangular" {...register('diseno')} />
-              <FieldError message={errors.diseno?.message} />
-            </div>
-          </div>
-        </SectionCard>
+          </SectionCard>
 
-        <SectionCard icon="barcode_scanner" title="Variantes">
-          <VariantesEditor />
-          <p className="text-xs text-on-surface-variant">
-            Al guardar, las variantes eliminadas se desactivan automáticamente.
-          </p>
-        </SectionCard>
+          <SectionCard icon="barcode_scanner" title="Variantes">
+            <VariantesEditor />
+            <p className="text-xs text-on-surface-variant/80 mt-2">
+              Al guardar, las variantes eliminadas se desactivan automáticamente.
+            </p>
+          </SectionCard>
+        </div>
 
-        <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-6 bg-surface-container-lowest px-6 py-4 border-t border-outline-variant/60 flex items-center justify-end gap-2">
+        <div className="flex-none border-t border-outline-variant/60 bg-surface-container-lowest px-6 py-4 flex items-center justify-end gap-3 z-10">
           {onCancel && (
             <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
               Cancelar

@@ -104,38 +104,40 @@ export function VariantesEditor() {
   })
 
   return (
-    <div>
-      <div className="overflow-x-auto rounded-lg border border-outline-variant">
-        <table className="w-full min-w-[1320px] text-sm">
-          <thead>
-            <tr className="border-b border-outline-variant bg-surface-container-low">
-              {COLS.map((col) => (
-                <th
-                  key={col.name}
-                  className={cn(
-                    'px-2 py-2.5 text-left font-label-sm text-label-sm uppercase tracking-wider text-outline',
-                    col.className,
-                  )}
-                >
-                  {col.label}
+    <div className="space-y-3">
+      <div className="rounded-xl border border-outline-variant/60 bg-surface-container-lowest overflow-hidden shadow-xs">
+        <div className="overflow-x-auto p-0.5">
+          <table className="w-full min-w-[1320px] text-sm">
+            <thead>
+              <tr className="border-b border-outline-variant/60 bg-surface-container-low/80">
+                {COLS.map((col) => (
+                  <th
+                    key={col.name}
+                    className={cn(
+                      'px-2.5 py-3 text-left font-label-sm text-label-sm uppercase tracking-wider text-outline select-none',
+                      col.className,
+                    )}
+                  >
+                    {col.label}
+                  </th>
+                ))}
+                <th className="px-2.5 py-3 text-left font-label-sm text-label-sm uppercase tracking-wider text-outline">
+                  <span className="sr-only">Acciones</span>
                 </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-outline-variant/30">
+              {fields.map((field, index) => (
+                <VarianteRow key={field.id} index={index} onRemove={() => remove(index)} />
               ))}
-              <th className="px-2 py-2.5 text-left font-label-sm text-label-sm uppercase tracking-wider text-outline">
-                <span className="sr-only">Acciones</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant/30">
-            {fields.map((field, index) => (
-              <VarianteRow key={field.id} index={index} onRemove={() => remove(index)} />
-            ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
       <Button
         type="button"
         variant="outline"
-        className="mt-3"
+        className="inline-flex items-center gap-1.5"
         onClick={() => append(DEFAULT_VARIANTE_ROW())}
       >
         <Icon name="add" size={18} /> Agregar variante
