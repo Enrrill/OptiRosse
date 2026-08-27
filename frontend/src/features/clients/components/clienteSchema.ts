@@ -31,8 +31,9 @@ export const clienteSchema = z.object({
     .transform((val) => formatPhone(val)),
   direccion: z
     .string()
-    .min(1, 'La dirección es obligatoria')
-    .transform((val) => val.trim()),
+    .max(500, 'Máximo 500 caracteres')
+    .optional()
+    .transform((val) => (val ?? '').trim()),
   limite_credito: z
     .number({ invalid_type_error: 'Ingresa un monto válido' })
     .finite('Ingresa un monto válido')

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
@@ -43,6 +43,10 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
     resolver: zodResolver(clienteSchema),
     defaultValues: cliente ? toClienteFormValues(cliente) : CLIENTE_DEFAULT_VALUES,
   })
+
+  // Observa el límite en tiempo real para habilitar/deshabilitar días de crédito
+  const limiteActual = useWatch({ control, name: 'limite_credito' })
+  const sinLimite = limiteActual === null
 
   const onSubmit = handleSubmit(async (values) => {
     setSubmitting(true)
@@ -114,12 +118,15 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
               <FieldError message={errors.telefono?.message} />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="direccion">Dirección</Label>
+              <Label htmlFor="direccion">
+                Dirección
+                <span className="ml-1.5 text-xs font-normal text-on-surface-variant">(Opcional)</span>
+              </Label>
               <Textarea
                 id="direccion"
                 rows={3}
                 className="min-h-[80px] max-h-40 resize-y"
-                placeholder="Calle, sector, ciudad..."
+                placeholder="Av. Principal, Edificio Centro, Piso 2..."
                 {...register('direccion')}
               />
               <FieldError message={errors.direccion?.message} />
@@ -142,7 +149,7 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
                     value={field.value ?? ''}
                     onChange={(e) => {
                       const raw = e.target.value
-                      field.onChange(raw === '' ? null : Number(raw))
+                      field.onChange(raw === '' ? null : parseFloat(raw))
                     }}
                     onBlur={field.onBlur}
                   />
@@ -151,7 +158,12 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
               <FieldError message={errors.limite_credito?.message} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="dias_credito">Días de crédito</Label>
+              <Label
+                htmlFor="dias_credito"
+                className={sinLimite ? 'text-on-surface-variant/50' : undefined}
+              >
+                Días de crédito
+              </Label>
               <Controller
                 name="dias_credito"
                 control={control}
@@ -161,11 +173,12 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
                     type="number"
                     min={0}
                     step={1}
-                    placeholder="Sin plazo"
+                    disabled={sinLimite}
+                    placeholder={sinLimite ? 'Requiere límite' : 'Sin plazo'}
                     value={field.value ?? ''}
                     onChange={(e) => {
                       const raw = e.target.value
-                      field.onChange(raw === '' ? null : Number(raw))
+                      field.onChange(raw === '' ? null : parseInt(raw, 10))
                     }}
                     onBlur={field.onBlur}
                   />
