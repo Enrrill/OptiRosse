@@ -83,7 +83,7 @@ export const PAGO_DEFAULT_VALUES: PagoFormValues = {
   cliente: null,
   pedido: null,
   metodo_pago: null,
-  monto: 0,
+  monto: undefined as unknown as number,
   tasa_cambio: 1,
   numero_referencia: '',
   fecha_pago: '',
