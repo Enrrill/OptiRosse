@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { estadoActivo } from '@/lib/constants/choices'
-import { formatDateTime, formatMoney, formatName, formatRIF, formatPhone, formatEmail } from '@/lib/format'
+import { formatDateTime, formatMoney, formatName, formatRIF, formatPhone, formatEmail, formatDireccion } from '@/lib/format'
 import { useCliente } from '../hooks/useCliente'
 import { useSaldoCliente } from '@/hooks/useSaldoCliente'
 import { useDesactivarCliente, useReactivarCliente } from '../hooks/useClienteMutations'
@@ -236,7 +236,15 @@ export default function ClienteDetallePage() {
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">
                   <Icon name="location_on" size={16} className="text-primary" /> Dirección fiscal
                 </div>
-                <p className="font-medium text-on-surface leading-relaxed">{cliente.direccion}</p>
+                <p
+                  className={`leading-relaxed ${
+                    cliente.direccion && cliente.direccion.trim()
+                      ? 'font-medium text-on-surface'
+                      : 'text-sm font-normal text-on-surface-variant/70 italic'
+                  }`}
+                >
+                  {formatDireccion(cliente.direccion)}
+                </p>
               </div>
             </div>
           </Panel>

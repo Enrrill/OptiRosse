@@ -109,3 +109,13 @@ export function formatSKU(sku?: string | null): string {
   if (!sku) return '—'
   return sku.replace(/\s+/g, '').toUpperCase()
 }
+
+/**
+ * Normaliza y formatea una dirección fiscal.
+ * Retorna un texto explicativo de fallback si la dirección no está especificada.
+ */
+export function formatDireccion(direccion?: string | null, fallback = 'Sin dirección fiscal registrada'): string {
+  if (!direccion || !direccion.trim()) return fallback
+  return direccion.trim()
+}
+
