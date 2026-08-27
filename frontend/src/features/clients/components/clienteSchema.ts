@@ -32,15 +32,15 @@ export const clienteSchema = z.object({
   direccion: z
     .string()
     .max(500, 'Máximo 500 caracteres')
-    .optional()
-    .transform((val) => (val ?? '').trim()),
+    .default('')
+    .transform((val) => val.trim()),
   limite_credito: z
-    .number({ invalid_type_error: 'Ingresa un monto válido' })
+    .number({ error: 'Ingresa un monto válido' })
     .finite('Ingresa un monto válido')
     .min(0, 'No puede ser un valor negativo')
     .nullable(),
   dias_credito: z
-    .number({ invalid_type_error: 'Ingresa un número válido' })
+    .number({ error: 'Ingresa un número válido' })
     .int('Debe ser un número entero')
     .min(0, 'No puede ser un valor negativo')
     .nullable(),
