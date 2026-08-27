@@ -59,6 +59,13 @@ class PagoSerializer(serializers.ModelSerializer):
         if tasa_cambio is not None and tasa_cambio <= 0:
             raise serializers.ValidationError({'tasa_cambio': 'La tasa de cambio debe ser mayor a cero'})
 
+        metodo_pago = attrs.get('metodo_pago')
+        ref = (attrs.get('numero_referencia') or '').strip()
+        if metodo_pago and metodo_pago.requiere_referencia and not ref:
+            raise serializers.ValidationError(
+                {'numero_referencia': 'Este método de pago requiere número de referencia'}
+            )
+
         pedido = attrs.get('pedido')
         if pedido is not None:
             cliente = attrs.get('cliente')

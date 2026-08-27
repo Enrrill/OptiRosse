@@ -21,33 +21,58 @@ export const metodoPagoSeleccion = z.object({
   requiere_referencia: z.boolean().optional(),
 })
 
+export type ClienteSeleccion = z.infer<typeof clienteSeleccion>
+export type PedidoSeleccion = z.infer<typeof pedidoSeleccion>
+export type MetodoPagoSeleccion = z.infer<typeof metodoPagoSeleccion>
+
 export const pagoSchema = z
   .object({
-    cliente: clienteSeleccion
-      .nullable()
-      .refine((v) => v !== null, { message: 'Selecciona un cliente' }),
+    cliente: clienteSeleccion.nullable(),
     pedido: pedidoSeleccion.nullable(),
-    metodo_pago: metodoPagoSeleccion
-      .nullable()
-      .refine((v) => v !== null, { message: 'Selecciona un método de pago' }),
+    metodo_pago: metodoPagoSeleccion.nullable(),
     monto: z
-      .number('Ingresa un monto válido')
+      .number({ message: 'Ingresa un monto válido' })
       .finite('Ingresa un monto válido')
-      .refine((v) => v > 0, { message: 'El monto debe ser mayor a cero' }),
+      .refine((v) => !isNaN(v) && v > 0, { message: 'El monto debe ser mayor a cero' }),
     tasa_cambio: z
-      .number('Ingresa un valor válido')
-      .finite('Ingresa un valor válido')
-      .refine((v) => v > 0, { message: 'La tasa de cambio debe ser mayor a cero' }),
+      .number({ message: 'Ingresa una tasa de cambio válida' })
+      .finite('Ingresa una tasa de cambio válida')
+      .refine((v) => !isNaN(v) && v > 0, { message: 'La tasa de cambio debe ser mayor a cero' }),
     numero_referencia: z.string().trim(),
     fecha_pago: z.string(),
     comprobante_imagen_url: z.string().trim(),
   })
   .superRefine((data, ctx) => {
+    if (!data.cliente) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['cliente'],
+        message: 'Selecciona un cliente',
+      })
+    }
+    if (!data.metodo_pago) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['metodo_pago'],
+        message: 'Selecciona un método de pago',
+      })
+    }
     if (data.metodo_pago?.requiere_referencia && !data.numero_referencia) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['numero_referencia'],
         message: 'Este método de pago requiere número de referencia',
+      })
+    }
+    if (
+      data.cliente &&
+      data.pedido &&
+      data.pedido.cliente_detalle.id !== data.cliente.id
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['pedido'],
+        message: 'El pedido seleccionado no pertenece al cliente seleccionado',
       })
     }
   })

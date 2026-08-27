@@ -11,6 +11,7 @@ import { SearchableSelect } from '@/components/forms/SearchableSelect'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
 import { formatMoney } from '@/lib/format'
+import { preventScientificNotationKeys, preventScientificNotationPaste } from '@/lib/utils'
 import { buscarClientes } from '@/lib/api/opciones'
 import { buscarMetodosPago, buscarPedidos } from '../hooks/useOpcionesPago'
 import { useCrearPago } from '../hooks/usePagoMutations'
@@ -131,9 +132,13 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
               <SearchableSelect<ClienteSeleccion>
                 keyId="pago-cliente"
                 value={cliente}
-                onChange={(value) =>
+                onChange={(value) => {
                   setValue('cliente', value, { shouldDirty: true, shouldValidate: true })
-                }
+                  // Si cambia el cliente y el pedido actual no pertenece al nuevo cliente, limpiamos el pedido
+                  if (pedido && (!value || pedido.cliente_detalle.id !== value.id)) {
+                    setValue('pedido', null, { shouldDirty: true, shouldValidate: true })
+                  }
+                }}
                 searchOptions={buscarClientes}
                 formatSelected={(c) => c.nombre_comercial}
                 placeholder="Buscar cliente por nombre o RIF..."
@@ -142,23 +147,38 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
             </div>
 
             <div className="space-y-2">
-              <Label>Pedido (opcional)</Label>
+              <div className="flex items-center justify-between">
+                <Label>Pedido (opcional)</Label>
+                {cliente ? (
+                  <span className="text-xs text-primary font-medium">
+                    Filtrado por: {cliente.nombre_comercial}
+                  </span>
+                ) : (
+                  <span className="text-xs text-on-surface-variant/80">
+                    Selecciona un cliente para filtrar
+                  </span>
+                )}
+              </div>
               <SearchableSelect<NonNullable<PagoFormValues['pedido']>>
-                keyId="pago-pedido"
+                keyId={`pago-pedido-cliente-${cliente?.id ?? 'all'}`}
                 value={pedido}
                 onChange={(value) => {
-                  setValue('pedido', value, { shouldDirty: true })
-                  // El pedido trae su cliente; lo autocompletamos si aún no hay cliente.
-                  if (value.cliente_detalle && !cliente) {
+                  setValue('pedido', value, { shouldDirty: true, shouldValidate: true })
+                  // Si se selecciona un pedido y no hay cliente o es distinto, autocompletar cliente
+                  if (value?.cliente_detalle) {
                     seleccionarClienteDesdePedido(value.cliente_detalle)
                   }
                 }}
-                searchOptions={buscarPedidos}
+                searchOptions={(q) => buscarPedidos(q, cliente?.id)}
                 formatSelected={(p) => p.numero_pedido}
-                placeholder="Buscar pedido por N.º o cliente..."
+                placeholder={
+                  cliente
+                    ? `Buscar pedidos de ${cliente.nombre_comercial}...`
+                    : 'Buscar pedido por N.º o cliente...'
+                }
               />
               {pedido && (
-                <p className="text-xs text-on-surface-variant">
+                <p className="text-xs text-on-surface-variant font-medium">
                   Pedido {pedido.numero_pedido} · Total {formatMoney(pedido.total)}
                 </p>
               )}
@@ -193,7 +213,6 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
               <Label htmlFor="pago-monto">Monto *</Label>
               <MoneyInput
                 id="pago-monto"
-                inputMode="decimal"
                 placeholder="0.00"
                 {...register('monto', { valueAsNumber: true })}
                 aria-invalid={!!errors.monto}
@@ -205,8 +224,13 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
               <Label htmlFor="pago-tasa">Tasa de cambio</Label>
               <Input
                 id="pago-tasa"
+                type="number"
                 inputMode="decimal"
+                step="any"
+                min="0"
                 defaultValue={1}
+                onKeyDown={preventScientificNotationKeys}
+                onPaste={preventScientificNotationPaste}
                 {...register('tasa_cambio', { valueAsNumber: true })}
                 aria-invalid={!!errors.tasa_cambio}
               />

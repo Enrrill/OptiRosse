@@ -9,9 +9,10 @@ const PAGE_SIZE = 20
 
 export async function buscarPedidos(
   query: string,
+  clienteId?: number,
 ): Promise<SearchableOption<Pedido>[]> {
   const res = await apiClient.get<ApiResponse<Pedido[]>>(PEDIDOS, {
-    params: { search: query || undefined, page_size: PAGE_SIZE },
+    params: { search: query || undefined, cliente: clienteId, page_size: PAGE_SIZE },
   })
   return (res.data.data ?? []).map((p) => ({
     value: String(p.id),
