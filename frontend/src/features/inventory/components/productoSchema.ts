@@ -17,18 +17,18 @@ export const varianteRowSchema = z.object({
   color: z.string().trim().max(50, 'Máximo 50 caracteres').optional(),
   tamano: z.string().trim().max(50, 'Máximo 50 caracteres').optional(),
   esfera: opticoNullable.refine((v) => v === null || (v >= -30 && v <= 30), {
-    message: 'Debe estar entre -30 y 30',
+    message: 'Debe estar entre -30.00 y +30.00',
   }),
   cilindro: opticoNullable.refine((v) => v === null || (v >= -30 && v <= 30), {
-    message: 'Debe estar entre -30 y 30',
+    message: 'Debe estar entre -30.00 y +30.00',
   }),
   eje: z
     .number('Ingresa un valor válido')
     .int('Debe ser un número entero')
     .nullable()
-    .refine((v) => v === null || (v >= 0 && v <= 180), { message: 'Debe estar entre 0 y 180' }),
-  adicion: opticoNullable.refine((v) => v === null || v >= 0, {
-    message: 'No puede ser un valor negativo',
+    .refine((v) => v === null || (v >= 0 && v <= 180), { message: 'Debe estar entre 0° y 180°' }),
+  adicion: opticoNullable.refine((v) => v === null || (v >= 0 && v <= 10), {
+    message: 'Debe estar entre +0.00 y +10.00',
   }),
   stock: z
     .number('Ingresa un número válido')
@@ -209,4 +209,43 @@ export function toProductoPayload(values: ProductoFormValues): ProductoPayload {
     diseno: values.diseno ?? '',
     variantes: values.variantes.map(toVariantePayload),
   }
+}
+
+export function generarSKUAuto(
+  marca: string,
+  codigoModelo: string,
+  row: VarianteRowFormValues,
+  index: number
+): string {
+  const mClean = marca.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'OPT'
+  const cClean = codigoModelo.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') || 'MOD'
+
+  const parts: string[] = [mClean, cClean]
+
+  if (row.color) {
+    parts.push(row.color.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4))
+  }
+  if (row.tamano) {
+    parts.push(row.tamano.trim().toUpperCase().replace(/[^A-Z0-9]/g, ''))
+  }
+  if (row.esfera !== null) {
+    const esfStr = row.esfera >= 0 ? `E+${row.esfera.toFixed(2)}` : `E${row.esfera.toFixed(2)}`
+    parts.push(esfStr.replace('.', ''))
+  }
+  if (row.cilindro !== null) {
+    const cilStr = row.cilindro >= 0 ? `C+${row.cilindro.toFixed(2)}` : `C${row.cilindro.toFixed(2)}`
+    parts.push(cilStr.replace('.', ''))
+  }
+  if (row.eje !== null) {
+    parts.push(`A${row.eje}`)
+  }
+  if (row.adicion !== null) {
+    parts.push(`ADD${row.adicion.toFixed(2).replace('.', '')}`)
+  }
+
+  if (parts.length === 2) {
+    parts.push(`V${index + 1}`)
+  }
+
+  return parts.join('-')
 }

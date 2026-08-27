@@ -8,6 +8,18 @@ from backend.apps.core.choices import TipoProducto
 from backend.common.utils import SanitizedModelMixin
 
 
+class Marca(SanitizedModelMixin, ActivoMixin):
+    nombre = models.CharField('nombre', max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = 'marca'
+        verbose_name_plural = 'marcas'
+        db_table = 'marcas'
+
+    def __str__(self):
+        return self.nombre
+
+
 class Categoria(SanitizedModelMixin, ActivoMixin):
     nombre = models.CharField('nombre', max_length=100)
     tipo_producto = models.CharField('tipo de producto', max_length=20, choices=TipoProducto.choices)

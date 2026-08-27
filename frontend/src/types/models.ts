@@ -61,6 +61,12 @@ export type TipoProducto =
   | 'bloque_tallado'
   | 'accesorio'
 
+export interface Marca {
+  id: number
+  nombre: string
+  activo: boolean
+}
+
 export interface Categoria {
   id: number
   nombre: string

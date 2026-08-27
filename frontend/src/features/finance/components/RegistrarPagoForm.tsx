@@ -135,7 +135,7 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
                 onChange={(value) => {
                   setValue('cliente', value, { shouldDirty: true, shouldValidate: true })
                   // Si cambia el cliente y el pedido actual no pertenece al nuevo cliente, limpiamos el pedido
-                  if (pedido && (!value || pedido.cliente_detalle.id !== value.id)) {
+                  if (pedido && (!value || pedido.cliente_detalle?.id !== value.id)) {
                     setValue('pedido', null, { shouldDirty: true, shouldValidate: true })
                   }
                 }}

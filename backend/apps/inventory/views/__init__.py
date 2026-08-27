@@ -1,6 +1,8 @@
 from backend.apps.inventory.views.categoria import CategoriaViewSet
+from backend.apps.inventory.views.marca import MarcaViewSet
 from backend.apps.inventory.views.producto import ProductoViewSet
 from backend.apps.inventory.views.stock import AjustarStockView
 from backend.apps.inventory.views.variante import VarianteProductoViewSet
 
-__all__ = ['CategoriaViewSet', 'ProductoViewSet', 'VarianteProductoViewSet', 'AjustarStockView']
+__all__ = ['CategoriaViewSet', 'MarcaViewSet', 'ProductoViewSet', 'VarianteProductoViewSet', 'AjustarStockView']
+

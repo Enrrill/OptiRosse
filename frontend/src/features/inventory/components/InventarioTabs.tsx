@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { CategoriasTab } from './CategoriasTab'
+import { MarcasTab } from './MarcasTab'
 import { ProductosTab } from './ProductosTab'
 import { VariantesTab } from './VariantesTab'
 
 const TABS = {
   categorias: { label: 'Categorías', icon: 'category' },
+  marcas: { label: 'Marcas', icon: 'loyalty' },
   productos: { label: 'Productos', icon: 'inventory_2' },
   variantes: { label: 'Variantes', icon: 'barcode_scanner' },
 } as const
@@ -53,13 +55,20 @@ export function InventarioTabs() {
         {canManage && active !== 'variantes' && (
           <Button onClick={handleNuevoClick}>
             <Icon name="add" size={18} />
-            {active === 'categorias' ? 'Nueva categoría' : 'Nuevo producto'}
+            {active === 'categorias'
+              ? 'Nueva categoría'
+              : active === 'marcas'
+                ? 'Nueva marca'
+                : 'Nuevo producto'}
           </Button>
         )}
       </div>
 
       <TabsContent value="categorias">
         <CategoriasTab triggerNuevo={triggerNuevo} />
+      </TabsContent>
+      <TabsContent value="marcas">
+        <MarcasTab triggerNuevo={triggerNuevo} />
       </TabsContent>
       <TabsContent value="productos">
         <ProductosTab triggerNuevo={triggerNuevo} />

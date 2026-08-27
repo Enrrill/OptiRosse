@@ -1,23 +1,23 @@
 import { useApiQuery } from '@/hooks/useApi'
-import { CATEGORIAS } from '@/lib/api/endpoints'
+import { MARCAS } from '@/lib/api/endpoints'
 import type { PaginationParams } from '@/types/api'
-import type { Categoria } from '@/types/models'
+import type { Marca } from '@/types/models'
 
-export interface CategoriaParams extends PaginationParams {
+export interface MarcaParams extends PaginationParams {
   activo?: boolean | 'false'
 }
 
-export function useCategorias(params: CategoriaParams = {}) {
+export function useMarcas(params: MarcaParams = {}) {
   const clean: Record<string, unknown> = { ...params }
   if (!clean.search) delete clean.search
   if (!clean.activo) delete clean.activo
 
-  const query = useApiQuery<Categoria[]>(['categorias', clean], CATEGORIAS, {
+  const query = useApiQuery<Marca[]>(['marcas', clean], MARCAS, {
     params: clean,
   })
 
   return {
-    categorias: query.data?.data ?? [],
+    marcas: query.data?.data ?? [],
     count: query.data?.meta?.count ?? 0,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
