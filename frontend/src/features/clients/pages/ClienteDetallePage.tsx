@@ -154,7 +154,7 @@ export default function ClienteDetallePage() {
             </div>
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-on-surface">
-            {formatMoney(cliente.limite_credito)}
+            {cliente.limite_credito != null ? formatMoney(cliente.limite_credito) : 'Sin crédito'}
           </p>
           <p className="mt-1 text-xs text-on-surface-variant">Monto máximo autorizado</p>
         </div>
@@ -167,7 +167,7 @@ export default function ClienteDetallePage() {
             </div>
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-on-surface">
-            {cliente.dias_credito} días
+            {cliente.dias_credito != null ? `${cliente.dias_credito} días` : 'Sin plazo'}
           </p>
           <p className="mt-1 text-xs text-on-surface-variant">Plazo de pago asignado</p>
         </div>

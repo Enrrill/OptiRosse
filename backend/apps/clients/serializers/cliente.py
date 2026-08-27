@@ -35,8 +35,16 @@ class ClienteOpticaSerializer(SanitizedSerializerMixin, serializers.ModelSeriali
         }
 
     def validate(self, attrs):
-        if attrs.get('limite_credito', 0) < 0:
+        limite = attrs.get('limite_credito')
+        dias = attrs.get('dias_credito')
+
+        if limite is not None and limite < 0:
             raise serializers.ValidationError({'limite_credito': 'No puede ser un valor negativo'})
-        if attrs.get('dias_credito', 0) < 0:
+        if dias is not None and dias < 0:
             raise serializers.ValidationError({'dias_credito': 'No puede ser un valor negativo'})
+        if dias is not None and limite is None:
+            raise serializers.ValidationError(
+                {'dias_credito': 'No se pueden asignar días de crédito sin un límite de crédito'}
+            )
+
         return attrs

@@ -34,19 +34,23 @@ export const clienteSchema = z.object({
     .min(1, 'La dirección es obligatoria')
     .transform((val) => val.trim()),
   limite_credito: z
-    .number('Ingresa un monto válido')
+    .number({ invalid_type_error: 'Ingresa un monto válido' })
     .finite('Ingresa un monto válido')
-    .min(0, 'No puede ser un valor negativo'),
+    .min(0, 'No puede ser un valor negativo')
+    .nullable(),
   dias_credito: z
-    .number('Ingresa un número válido')
+    .number({ invalid_type_error: 'Ingresa un número válido' })
     .int('Debe ser un número entero')
-    .min(0, 'No puede ser un valor negativo'),
+    .min(0, 'No puede ser un valor negativo')
+    .nullable(),
 })
 
 export type ClienteFormValues = z.infer<typeof clienteSchema>
 
 /** Payload enviado al backend: el decimal se serializa como string para preservar precisión. */
-export type ClientePayload = Omit<ClienteFormValues, 'limite_credito'> & { limite_credito: string }
+export type ClientePayload = Omit<ClienteFormValues, 'limite_credito'> & {
+  limite_credito: string | null
+}
 
 export const CLIENTE_DEFAULT_VALUES: ClienteFormValues = {
   razon_social: '',
@@ -55,8 +59,8 @@ export const CLIENTE_DEFAULT_VALUES: ClienteFormValues = {
   correo: '',
   telefono: '',
   direccion: '',
-  limite_credito: 0,
-  dias_credito: 0,
+  limite_credito: null,
+  dias_credito: null,
 }
 
 export function toClienteFormValues(cliente: Cliente): ClienteFormValues {
@@ -67,14 +71,14 @@ export function toClienteFormValues(cliente: Cliente): ClienteFormValues {
     correo: cliente.correo,
     telefono: cliente.telefono,
     direccion: cliente.direccion,
-    limite_credito: Number(cliente.limite_credito),
-    dias_credito: cliente.dias_credito,
+    limite_credito: cliente.limite_credito != null ? Number(cliente.limite_credito) : null,
+    dias_credito: cliente.dias_credito ?? null,
   }
 }
 
 export function toClientePayload(values: ClienteFormValues): ClientePayload {
   return {
     ...values,
-    limite_credito: String(values.limite_credito),
+    limite_credito: values.limite_credito !== null ? String(values.limite_credito) : null,
   }
 }

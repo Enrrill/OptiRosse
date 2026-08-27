@@ -84,13 +84,13 @@ export function ClientesTable({
       key: 'limite_credito',
       header: 'Límite de crédito',
       align: 'right',
-      cell: (row) => formatMoney(row.limite_credito),
+      cell: (row) => row.limite_credito != null ? formatMoney(row.limite_credito) : '—',
     },
     {
       key: 'dias_credito',
       header: 'Días de crédito',
       align: 'right',
-      cell: (row) => formatNumber(row.dias_credito),
+      cell: (row) => row.dias_credito != null ? formatNumber(row.dias_credito) : '—',
     },
     {
       key: 'estado',

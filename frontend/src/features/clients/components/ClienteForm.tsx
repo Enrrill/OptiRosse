@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
@@ -35,6 +35,7 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
 
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors },
@@ -130,23 +131,45 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="limite_credito">Límite de crédito</Label>
-              <MoneyInput
-                id="limite_credito"
-                step="0.01"
-                placeholder="0.00"
-                {...register('limite_credito', { valueAsNumber: true })}
+              <Controller
+                name="limite_credito"
+                control={control}
+                render={({ field }) => (
+                  <MoneyInput
+                    id="limite_credito"
+                    step="0.01"
+                    placeholder="Sin límite"
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const raw = e.target.value
+                      field.onChange(raw === '' ? null : Number(raw))
+                    }}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <FieldError message={errors.limite_credito?.message} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="dias_credito">Días de crédito</Label>
-              <Input
-                id="dias_credito"
-                type="number"
-                min={0}
-                step={1}
-                placeholder="0"
-                {...register('dias_credito', { valueAsNumber: true })}
+              <Controller
+                name="dias_credito"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="dias_credito"
+                    type="number"
+                    min={0}
+                    step={1}
+                    placeholder="Sin plazo"
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const raw = e.target.value
+                      field.onChange(raw === '' ? null : Number(raw))
+                    }}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <FieldError message={errors.dias_credito?.message} />
             </div>

@@ -11,8 +11,11 @@ class ClienteOptica(SanitizedModelMixin, TimeStampedModel, ActivoMixin):
     correo = models.EmailField('correo electrónico', max_length=254)
     telefono = models.CharField('teléfono', max_length=30)
     direccion = models.TextField('dirección')
-    limite_credito = models.DecimalField('límite de crédito', max_digits=12, decimal_places=2, default=0.00)
-    dias_credito = models.IntegerField('días de crédito', default=0)
+    limite_credito = models.DecimalField(
+        'límite de crédito', max_digits=12, decimal_places=2,
+        null=True, blank=True, default=None,
+    )
+    dias_credito = models.IntegerField('días de crédito', null=True, blank=True, default=None)
 
     class Meta:
         verbose_name = 'cliente óptica'

@@ -41,8 +41,8 @@ export interface Cliente {
   correo: string
   telefono: string
   direccion: string
-  limite_credito: string
-  dias_credito: number
+  limite_credito: string | null
+  dias_credito: number | null
   activo: boolean
   creado_en: string
   actualizado_en: string
