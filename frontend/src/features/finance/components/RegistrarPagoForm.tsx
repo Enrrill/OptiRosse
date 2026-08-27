@@ -61,7 +61,7 @@ function datetimeLocalNow(): string {
 }
 
 function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'preselectCliente'>) {
-  const { register, handleSubmit, watch, setValue, setError, formState } =
+  const { register, handleSubmit, watch, setValue, getValues, setError, formState } =
     useFormContext<PagoFormValues>()
   const errors = formState.errors
 
@@ -167,6 +167,16 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
                   // Si se selecciona un pedido y no hay cliente o es distinto, autocompletar cliente
                   if (value?.cliente_detalle) {
                     seleccionarClienteDesdePedido(value.cliente_detalle)
+                  }
+                  // Si hay total en el pedido y el monto actual está vacío o en 0, autocompletar el monto
+                  if (value?.total) {
+                    const montoActual = getValues('monto')
+                    if (montoActual === undefined || isNaN(montoActual) || montoActual === 0) {
+                      const totalNum = parseFloat(value.total)
+                      if (!isNaN(totalNum) && totalNum > 0) {
+                        setValue('monto', totalNum, { shouldDirty: true, shouldValidate: true })
+                      }
+                    }
                   }
                 }}
                 searchOptions={(q) => buscarPedidos(q, cliente?.id)}
