@@ -139,7 +139,9 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <SectionCard icon="person" title="Paciente">
             <div className="space-y-1.5">
-              <Label htmlFor="nombre_paciente">Nombre del paciente</Label>
+              <Label htmlFor="nombre_paciente">
+                Nombre del paciente <span className="text-error">*</span>
+              </Label>
               <Input
                 id="nombre_paciente"
                 placeholder="Nombre completo del paciente"

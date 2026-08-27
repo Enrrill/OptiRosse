@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from backend.apps.clients.models import ClienteOptica
@@ -29,8 +30,36 @@ class RecetaOptica(SanitizedModelMixin, ActivoMixin):
         verbose_name_plural = 'recetas ópticas'
         db_table = 'recetas_opticas'
 
+    def clean(self):
+        super().clean()
+        errors = {}
+
+        if not self.nombre_paciente or not self.nombre_paciente.strip() or len(self.nombre_paciente.strip()) < 2:
+            errors['nombre_paciente'] = 'El nombre del paciente es obligatorio (mínimo 2 caracteres).'
+
+        for lado in ('od', 'oi'):
+            cilindro = getattr(self, f'{lado}_cilindro')
+            eje = getattr(self, f'{lado}_eje')
+
+            if cilindro is not None and cilindro != 0 and eje is None:
+                errors[f'{lado}_eje'] = 'El eje es obligatorio si se indica cilindro.'
+            if eje is not None and (cilindro is None or cilindro == 0):
+                errors[f'{lado}_cilindro'] = 'Debe indicar un cilindro válido para el eje especificado.'
+
+        valores_opticos = [
+            self.od_esfera, self.od_cilindro, self.od_adicion,
+            self.oi_esfera, self.oi_cilindro, self.oi_adicion,
+            self.distancia_pupilar,
+        ]
+        if all(v is None for v in valores_opticos):
+            errors['__all__'] = 'Debe ingresar la graduación de al menos un ojo (Esfera/Cilindro) o la distancia pupilar.'
+
+        if errors:
+            raise ValidationError(errors)
+
     def __str__(self):
         return f'Receta #{self.id} - {self.nombre_paciente or "Sin paciente"}'
+
 
 
 class Pedido(SanitizedModelMixin, TimeStampedModel):
