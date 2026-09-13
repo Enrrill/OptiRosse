@@ -15,7 +15,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import {
-  DashboardLayout,
+  LayoutDashboard,
   ShoppingCart,
   FileText,
   Users,
@@ -34,7 +34,7 @@ import {
 import { useTheme } from '@/app/ThemeProvider'
 
 const ICON_MAP: Record<string, LucideIcon> = {
-  dashboard: DashboardLayout,
+  dashboard: LayoutDashboard,
   shopping_cart: ShoppingCart,
   description: FileText,
   groups: Users,
