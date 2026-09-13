@@ -29,7 +29,7 @@ class Usuario(SanitizedModelMixin, AbstractBaseUser, PermissionsMixin, TimeStamp
     correo = models.EmailField('correo electrónico', max_length=254, unique=True)
     nombre = models.CharField('nombre', max_length=150, blank=True, default='')
     apellido = models.CharField('apellido', max_length=150, blank=True, default='')
-    rol = models.CharField('rol', max_length=20, choices=RolUsuario.choices, default=RolUsuario.VENDEDORA)
+    rol = models.CharField('rol', max_length=20, choices=RolUsuario.choices, default=RolUsuario.EMPLEADO)
     telefono = models.CharField('teléfono', max_length=30, blank=True, default='')
 
     objects = UsuarioManager()

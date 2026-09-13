@@ -3,7 +3,7 @@ from django.db import models
 
 class RolUsuario(models.TextChoices):
     ADMINISTRADOR = 'administrador', 'Administrador'
-    VENDEDORA = 'vendedora', 'Vendedora'
+    EMPLEADO = 'empleado', 'Empleado'
 
 
 class TipoProducto(models.TextChoices):

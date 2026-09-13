@@ -327,7 +327,7 @@ class DashboardService:
         kpis = {}
         recientes = {}
 
-        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA):
+        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO):
             kpis['pedidos_por_estado'] = cls._pedidos_por_estado()
             kpis['total_vendido_mes'] = cls._total_vendido_mes(desde, fecha)
             kpis['clientes'] = ClienteOptica.objects.filter(activo=True).count()

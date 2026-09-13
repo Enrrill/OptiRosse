@@ -18,30 +18,30 @@ class TransicionesPedido:
     # Flujo completo: pedidos con laboratorio externo
     PIPELINE_LABORATORIO = {
         EstadoPedido.BORRADOR: {
-            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
         },
         EstadoPedido.CONFIRMADO: {
-            EstadoPedido.EN_LABORATORIO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
-            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.EN_LABORATORIO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
         },
         EstadoPedido.EN_LABORATORIO: {
-            EstadoPedido.LISTO_PARA_ENTREGA: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
-            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.LISTO_PARA_ENTREGA: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
         },
         EstadoPedido.LISTO_PARA_ENTREGA: {
-            EstadoPedido.ENTREGADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
-            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.ENTREGADO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
         },
     }
 
     # Flujo corto: venta de mostrador
     PIPELINE_MOSTRADOR = {
         EstadoPedido.BORRADOR: {
-            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
         },
         EstadoPedido.CONFIRMADO: {
-            EstadoPedido.ENTREGADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
-            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.ENTREGADO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.EMPLEADO),
         },
     }
 
