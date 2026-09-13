@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import type { LucideIcon } from 'lucide-react'
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -29,7 +30,6 @@ import {
   Sun,
   Moon,
   Menu,
-  LucideIcon,
 } from 'lucide-react'
 import { useTheme } from '@/app/ThemeProvider'
 
