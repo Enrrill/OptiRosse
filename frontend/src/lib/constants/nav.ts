@@ -13,6 +13,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: 'dashboard', end: true },
   { to: '/clientes', label: 'Clientes', icon: 'groups' },
   { to: '/inventario', label: 'Catálogos', icon: 'inventory_2' },
+  { to: '/productos', label: 'Productos', icon: 'boxes', roles: ['administrador', 'empleado'] },
   { to: '/recetas', label: 'Recetas', icon: 'description' },
   { to: '/pedidos', label: 'Pedidos', icon: 'shopping_cart' },
   { to: '/finanzas', label: 'Finanzas', icon: 'payments', roles: ['administrador', 'empleado'] },
@@ -43,6 +44,9 @@ export function getNavBreadcrumb(pathname: string): BreadcrumbSegment[] {
   // Rutas especiales con subnivel
   if (pathname.startsWith('/perfil')) {
     return [root, { label: 'Perfil' }]
+  }
+  if (pathname.startsWith('/productos')) {
+    return [root, { label: 'Productos' }]
   }
   if (pathname.startsWith('/pedidos/nuevo')) {
     return [root, { label: 'Pedidos', to: '/pedidos' }, { label: 'Nuevo pedido' }]

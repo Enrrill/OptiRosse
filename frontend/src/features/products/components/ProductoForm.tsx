@@ -17,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useCategorias } from '../hooks/useCategorias'
-import { useMarcas } from '../hooks/useMarcas'
+import { useCategorias } from '@/features/inventory/hooks/useCategorias'
+import { useMarcas } from '@/features/inventory/hooks/useMarcas'
 import { useCrearProducto, useActualizarProducto } from '../hooks/useProductoMutations'
 import {
   productoSchema,

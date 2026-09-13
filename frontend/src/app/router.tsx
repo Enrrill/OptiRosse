@@ -14,6 +14,7 @@ const ClienteDetalle = lazy(() => import('@/features/clients/pages/ClienteDetall
 const Usuarios = lazy(() => import('@/features/users/pages/UsuariosPage'))
 const Auditoria = lazy(() => import('@/features/audit/pages/AuditoriaPage'))
 const Inventario = lazy(() => import('@/features/inventory/pages/InventarioPage'))
+const Productos = lazy(() => import('@/features/products/pages/ProductosPage'))
 const Recetas = lazy(() => import('@/features/prescriptions/pages/RecetasPage'))
 const Pedidos = lazy(() => import('@/features/orders/pages/PedidosPage'))
 const PedidoNuevo = lazy(() => import('@/features/orders/pages/PedidoFormPage'))
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
           { path: '/usuarios', element: <RoleRoute roles={adminOnly} />, children: [{ index: true, element: withSuspense(<Usuarios />) }] },
           { path: '/auditoria', element: <RoleRoute roles={adminOnly} />, children: [{ index: true, element: withSuspense(<Auditoria />) }] },
           { path: '/inventario', element: <RoleRoute roles={adminEmpleado} />, children: [{ index: true, element: withSuspense(<Inventario />) }] },
+          { path: '/productos', element: <RoleRoute roles={adminEmpleado} />, children: [{ index: true, element: withSuspense(<Productos />) }] },
           { path: '/recetas', element: withSuspense(<Recetas />) },
           { path: '/pedidos', element: withSuspense(<Pedidos />) },
           { path: '/pedidos/nuevo', element: withSuspense(<PedidoNuevo />) },

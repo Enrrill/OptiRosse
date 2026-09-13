@@ -29,6 +29,7 @@ import {
   User,
   Sun,
   Moon,
+  LayoutGrid,
 } from 'lucide-react'
 import { useTheme } from '@/app/ThemeProvider'
 
@@ -38,6 +39,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   description: FileText,
   groups: Users,
   inventory_2: Package,
+  boxes: LayoutGrid,
   payments: DollarSign,
   folder_shared: FolderOpen,
   history: Activity,

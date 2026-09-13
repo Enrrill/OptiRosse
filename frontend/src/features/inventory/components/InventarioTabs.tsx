@@ -1,18 +1,16 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { Tag, Package, ScanBarcode, Plus } from 'lucide-react'
+import { Tag, ScanBarcode, Plus } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/useAuth'
 import { CategoriasTab } from './CategoriasTab'
 import { MarcasTab } from './MarcasTab'
-import { ProductosTab } from './ProductosTab'
 import { VariantesTab } from './VariantesTab'
 
 const TABS = {
   categorias: { label: 'Categorías', icon: Tag },
   marcas: { label: 'Marcas', icon: Tag },
-  productos: { label: 'Productos', icon: Package },
   variantes: { label: 'Variantes', icon: ScanBarcode },
 } as const
 
@@ -55,14 +53,12 @@ export function InventarioTabs() {
           })}
         </TabsList>
 
-        {canManage && active !== 'variantes' && (
+        {canManage && (
           <Button onClick={handleNuevoClick}>
             <Plus size={18} />
             {active === 'categorias'
               ? 'Nueva categoría'
-              : active === 'marcas'
-                ? 'Nueva marca'
-                : 'Nuevo producto'}
+              : 'Nueva marca'}
           </Button>
         )}
       </div>
@@ -72,9 +68,6 @@ export function InventarioTabs() {
       </TabsContent>
       <TabsContent value="marcas">
         <MarcasTab triggerNuevo={triggerNuevo} />
-      </TabsContent>
-      <TabsContent value="productos">
-        <ProductosTab triggerNuevo={triggerNuevo} />
       </TabsContent>
       <TabsContent value="variantes">
         <VariantesTab />
