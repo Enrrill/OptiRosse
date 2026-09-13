@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Download, Wand2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Icon } from '@/components/Icon'
 import type { DocumentoEmpresa, VariableSchemaItem } from '@/types/models'
 import { useGenerarDocx } from '../hooks/useDocumentoEmpresaMutations'
 
@@ -82,7 +82,7 @@ export function GenerarDocxDialog({ open, onOpenChange, documento }: GenerarDocx
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl text-primary">
-            <Icon name="auto_fix_high" size={24} />
+            <Wand2 size={24} />
             Generar: {documento.nombre}
           </DialogTitle>
         </DialogHeader>
@@ -140,7 +140,7 @@ export function GenerarDocxDialog({ open, onOpenChange, documento }: GenerarDocx
               Cancelar
             </Button>
             <Button type="submit" disabled={loading} className="gap-2">
-              <Icon name="download" size={18} />
+              <Download size={18} />
               {loading ? 'Generando...' : 'Generar y Descargar .docx'}
             </Button>
           </DialogFooter>

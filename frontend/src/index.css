@@ -3,7 +3,6 @@
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/manrope";
 @import "@fontsource/jetbrains-mono";
-@import "material-symbols";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

@@ -1,3 +1,4 @@
+import { Pencil, EyeOff, RotateCcw, Plus } from 'lucide-react'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { Pagination } from '@/components/data/Pagination'
@@ -12,7 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { choice, estadoActivo, TIPO_PRODUCTO } from '@/lib/constants/choices'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { formatNumber } from '@/lib/format'
@@ -131,7 +131,7 @@ export function ProductosTable({
                     aria-label="Editar producto"
                     onClick={() => onEdit(row)}
                   >
-                    <Icon name="edit" size={18} />
+                    <Pencil size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Editar</TooltipContent>
@@ -144,7 +144,7 @@ export function ProductosTable({
                     aria-label={row.activo ? 'Desactivar producto' : 'Reactivar producto'}
                     onClick={() => onToggleEstado(row)}
                   >
-                    <Icon name={row.activo ? 'visibility_off' : 'restart_alt'} size={18} />
+                    {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
@@ -207,7 +207,7 @@ export function ProductosTable({
       emptyAction={
         canManage ? (
           <Button onClick={onNuevo}>
-            <Icon name="add" size={18} /> Nuevo producto
+            <Plus size={18} /> Nuevo producto
           </Button>
         ) : undefined
       }

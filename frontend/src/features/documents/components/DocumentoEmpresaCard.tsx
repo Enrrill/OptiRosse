@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Icon } from '@/components/Icon'
+import { Download, Eye, EyeOff, Pencil, RotateCcw, Tag, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import type { DocumentoEmpresa } from '@/types/models'
@@ -25,6 +25,7 @@ export function DocumentoEmpresaCard({
   const [downloading, setDownloading] = useState(false)
   const fileConfig = getFileConfig(documento.extension)
   const catConfig = getCategoriaBadge(documento.categoria)
+  const FileIcon = fileConfig.icon
 
   const handleDownloadOriginal = () => {
     if (!documento.archivo_url) return
@@ -56,7 +57,7 @@ export function DocumentoEmpresaCard({
           <div
             className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${fileConfig.iconBg}`}
           >
-            <Icon name={fileConfig.icon} size={24} />
+            <FileIcon size={24} />
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-1.5">
@@ -93,7 +94,7 @@ export function DocumentoEmpresaCard({
       <div className="mt-4 pt-3 border-t border-outline-variant/30">
         <div className="flex items-center justify-between text-xs text-on-surface-variant/80 mb-3">
           <span className="flex items-center gap-1 font-mono text-[11px]">
-            <Icon name="tag" size={13} /> v{documento.version}
+            <Tag size={13} /> v{documento.version}
           </span>
           <span className="font-mono text-[11px]">{formatBytes(documento.tamano_bytes)}</span>
         </div>
@@ -111,7 +112,7 @@ export function DocumentoEmpresaCard({
                       className="gap-1.5 text-xs h-8 px-3"
                       onClick={() => onGenerar(documento)}
                     >
-                      <Icon name="auto_fix_high" size={15} /> Generar
+                      <Wand2 size={15} /> Generar
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Generar archivo Word con datos</TooltipContent>
@@ -126,7 +127,7 @@ export function DocumentoEmpresaCard({
                       onClick={handleDownloadOriginal}
                       disabled={downloading || !documento.archivo_url}
                     >
-                      <Icon name="download" size={15} /> Descargar
+                      <Download size={15} /> Descargar
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Descargar documento original</TooltipContent>
@@ -146,7 +147,7 @@ export function DocumentoEmpresaCard({
                       onClick={handleDownloadOriginal}
                       disabled={downloading || !documento.archivo_url}
                     >
-                      <Icon name="download" size={16} />
+                      <Download size={16} />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Descargar plantilla original</TooltipContent>
@@ -162,7 +163,7 @@ export function DocumentoEmpresaCard({
                       className="h-8 w-8 text-on-surface-variant hover:text-on-surface"
                       onClick={() => onPrevisualizar(documento)}
                     >
-                      <Icon name="visibility" size={16} />
+                      <Eye size={16} />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Abrir vista previa</TooltipContent>
@@ -179,7 +180,7 @@ export function DocumentoEmpresaCard({
                         className="h-8 w-8 text-on-surface-variant hover:text-on-surface"
                         onClick={() => onEdit(documento)}
                       >
-                        <Icon name="edit" size={16} />
+                        <Pencil size={16} />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Editar metadatos</TooltipContent>
@@ -197,7 +198,7 @@ export function DocumentoEmpresaCard({
                         }`}
                         onClick={() => onToggleEstado(documento)}
                       >
-                        <Icon name={documento.activo ? 'visibility_off' : 'restart_alt'} size={16} />
+                        {documento.activo ? <EyeOff size={16} /> : <RotateCcw size={16} />}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>{documento.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
@@ -211,5 +212,3 @@ export function DocumentoEmpresaCard({
     </div>
   )
 }
-
-

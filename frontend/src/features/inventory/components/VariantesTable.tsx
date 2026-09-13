@@ -1,3 +1,4 @@
+import { ArrowUpDown } from 'lucide-react'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { Pagination } from '@/components/data/Pagination'
@@ -12,7 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { formatMoney, formatName, formatSKU } from '@/lib/format'
 import type { Producto, VarianteProducto } from '@/types/models'
 
@@ -132,7 +132,7 @@ export function VariantesTable({
                     size="sm"
                     onClick={() => onAjustarStock(row)}
                   >
-                    <Icon name="swap_vert" size={16} /> Ajustar
+                    <ArrowUpDown size={16} /> Ajustar
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Ajustar stock</TooltipContent>

@@ -1,3 +1,4 @@
+import { Pencil, EyeOff, RotateCcw } from 'lucide-react'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { Pagination } from '@/components/data/Pagination'
@@ -6,7 +7,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { estadoActivo } from '@/lib/constants/choices'
 import type { MetodoPago } from '@/types/models'
 
@@ -80,7 +80,7 @@ export function MetodosTable({
                   aria-label="Editar método de pago"
                   onClick={() => onEdit(row)}
                 >
-                  <Icon name="edit" size={18} />
+                  <Pencil size={18} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Editar</TooltipContent>
@@ -93,7 +93,7 @@ export function MetodosTable({
                   aria-label={row.activo ? 'Desactivar método de pago' : 'Reactivar método de pago'}
                   onClick={() => onToggleEstado(row)}
                 >
-                  <Icon name={row.activo ? 'visibility_off' : 'restart_alt'} size={18} />
+                  {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>

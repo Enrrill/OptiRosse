@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
+import { Plus, Users, UserX, ShieldCheck, ListOrdered } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuth'
 import { usePagination } from '@/hooks/usePagination'
 import type { PaginationParams } from '@/types/api'
@@ -59,7 +59,7 @@ export default function ClientesPage() {
         actions={
           canManage ? (
             <Button onClick={abrirNuevo}>
-              <Icon name="add" size={18} /> Nuevo cliente
+              <Plus size={18} /> Nuevo cliente
             </Button>
           ) : undefined
         }
@@ -72,7 +72,7 @@ export default function ClientesPage() {
               Total Cartera
             </span>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-container text-on-primary-container">
-              <Icon name="groups" size={20} />
+              <Users size={20} />
             </div>
           </div>
           <p className="mt-2 font-heading text-3xl font-bold text-on-surface">{count}</p>
@@ -85,7 +85,7 @@ export default function ClientesPage() {
               Filtro Actual
             </span>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container">
-              <Icon name={showInactivos ? 'person_off' : 'verified_user'} size={20} />
+              {showInactivos ? <UserX size={20} /> : <ShieldCheck size={20} />}
             </div>
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-on-surface">
@@ -102,7 +102,7 @@ export default function ClientesPage() {
               En Pantalla
             </span>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-tertiary-container text-on-tertiary-container">
-              <Icon name="list_alt" size={20} />
+              <ListOrdered size={20} />
             </div>
           </div>
           <p className="mt-2 font-heading text-3xl font-bold text-on-surface">{clientes.length}</p>

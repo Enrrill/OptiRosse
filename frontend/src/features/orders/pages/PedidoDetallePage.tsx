@@ -1,5 +1,15 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
+import {
+  ArrowLeft,
+  CheckCircle2,
+  ChevronRight,
+  Pencil,
+  Trash2,
+  Ban,
+  FileText,
+  History,
+} from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { Panel } from '@/components/data/Panel'
 import { StatusBadge } from '@/components/data/StatusBadge'
@@ -9,7 +19,6 @@ import { MotivoDialog } from '@/components/forms/MotivoDialog'
 import { GenerarDocumentoDialog } from '@/components/forms/GenerarDocumentoDialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { useToast } from '@/store/useToast'
 import { ApiError } from '@/lib/api/errors'
@@ -133,7 +142,7 @@ export default function PedidoDetallePage() {
           to="/pedidos"
           className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
         >
-          <Icon name="arrow_back" size={18} /> Volver a Pedidos
+          <ArrowLeft size={18} /> Volver a Pedidos
         </Link>
 
         <PageHeader
@@ -144,19 +153,19 @@ export default function PedidoDetallePage() {
               <StatusBadge display={choice(ESTADO_PEDIDO, pedido.estado)} />
               {puedeConfirmar && (
                 <Button onClick={() => setConfirmarOpen(true)}>
-                  <Icon name="check_circle" size={18} /> Confirmar pedido
+                  <CheckCircle2 size={18} /> Confirmar pedido
                 </Button>
               )}
               {siguiente && (
                 <Button onClick={() => setSiguienteOpen(true)}>
-                  <Icon name="chevron_right" size={18} /> Marcar como {ESTADO_LABEL[siguiente].toLowerCase()}
+                  <ChevronRight size={18} /> Marcar como {ESTADO_LABEL[siguiente].toLowerCase()}
                 </Button>
               )}
               {puedeEditar && (
                 <>
                   <Button asChild variant="outline">
                     <Link to={`/pedidos/${pedido.id}/editar`}>
-                      <Icon name="edit" size={18} /> Editar
+                      <Pencil size={18} /> Editar
                     </Link>
                   </Button>
                   <Button
@@ -164,24 +173,24 @@ export default function PedidoDetallePage() {
                     className="text-error hover:bg-error-container/40 hover:text-error"
                     onClick={() => setEliminarOpen(true)}
                   >
-                    <Icon name="delete" size={18} /> Eliminar
+                    <Trash2 size={18} /> Eliminar
                   </Button>
                 </>
               )}
               {puedeCancelarPedido && (
                 <Button variant="destructive" onClick={() => setCancelarOpen(true)}>
-                  <Icon name="block" size={18} /> Cancelar pedido
+                  <Ban size={18} /> Cancelar pedido
                 </Button>
               )}
               {puedeGenerarDocumentos(rol) && (
                 <Button variant="outline" onClick={() => setDocumentoOpen(true)}>
-                  <Icon name="description" size={18} /> Generar documento
+                  <FileText size={18} /> Generar documento
                 </Button>
               )}
               {rol === 'administrador' && (
                 <Button asChild variant="outline">
                   <Link to={`/auditoria?tabla=pedidos&objeto_id=${pedido.id}`}>
-                    <Icon name="history" size={18} /> Ver historial
+                    <History size={18} /> Ver historial
                   </Link>
                 </Button>
               )}

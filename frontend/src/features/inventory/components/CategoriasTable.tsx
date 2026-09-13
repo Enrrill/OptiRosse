@@ -1,3 +1,4 @@
+import { Pencil, EyeOff, RotateCcw, Plus } from 'lucide-react'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
@@ -5,7 +6,6 @@ import { Pagination } from '@/components/data/Pagination'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { choice, estadoActivo, TIPO_PRODUCTO } from '@/lib/constants/choices'
 import type { Categoria } from '@/types/models'
 
@@ -78,7 +78,7 @@ export function CategoriasTable({
                     aria-label="Editar categoría"
                     onClick={() => onEdit(row)}
                   >
-                    <Icon name="edit" size={18} />
+                    <Pencil size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Editar</TooltipContent>
@@ -91,7 +91,7 @@ export function CategoriasTable({
                     aria-label={row.activo ? 'Desactivar categoría' : 'Reactivar categoría'}
                     onClick={() => onToggleEstado(row)}
                   >
-                    <Icon name={row.activo ? 'visibility_off' : 'restart_alt'} size={18} />
+                    {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
@@ -115,7 +115,7 @@ export function CategoriasTable({
       emptyAction={
         canManage ? (
           <Button onClick={onNuevo}>
-            <Icon name="add" size={18} /> Nueva categoría
+            <Plus size={18} /> Nueva categoría
           </Button>
         ) : undefined
       }

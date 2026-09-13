@@ -1,26 +1,27 @@
 import { Link } from 'react-router'
-import { Icon } from '@/components/Icon'
+import { Zap, PlusCircle, CreditCard, PackagePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/useAuth'
 import type { RolUsuario } from '@/types/models'
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface QuickAction {
   label: string
-  icon: string
+  icon: LucideIcon
   to: string
 }
 
 const ACTIONS: Record<RolUsuario, QuickAction[]> = {
   administrador: [
-    { label: 'Nuevo pedido', icon: 'add_circle', to: '/pedidos/nuevo' },
-    { label: 'Registrar pago', icon: 'payments', to: '/finanzas?tab=pagos&nuevo=1' },
-    { label: 'Nueva variante', icon: 'library_add', to: '/inventario?tab=variantes' },
+    { label: 'Nuevo pedido', icon: PlusCircle, to: '/pedidos/nuevo' },
+    { label: 'Registrar pago', icon: CreditCard, to: '/finanzas?tab=pagos&nuevo=1' },
+    { label: 'Nueva variante', icon: PackagePlus, to: '/inventario?tab=variantes' },
   ],
   empleado: [
-    { label: 'Nuevo pedido', icon: 'add_circle', to: '/pedidos/nuevo' },
-    { label: 'Registrar pago', icon: 'payments', to: '/finanzas?tab=pagos&nuevo=1' },
-    { label: 'Nueva variante', icon: 'library_add', to: '/inventario?tab=variantes' },
+    { label: 'Nuevo pedido', icon: PlusCircle, to: '/pedidos/nuevo' },
+    { label: 'Registrar pago', icon: CreditCard, to: '/finanzas?tab=pagos&nuevo=1' },
+    { label: 'Nueva variante', icon: PackagePlus, to: '/inventario?tab=variantes' },
   ],
 }
 
@@ -35,7 +36,7 @@ export function QuickActions() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-container/20 text-primary">
-            <Icon name="bolt" size={20} filled />
+            <Zap size={20} />
           </div>
           <div>
             <h4 className="font-heading text-base font-bold text-on-surface leading-tight">
@@ -58,7 +59,7 @@ export function QuickActions() {
               )}
             >
               <Link to={action.to} className="flex items-center gap-1.5">
-                <Icon name={action.icon} size={16} />
+                <action.icon size={16} />
                 <span>{action.label}</span>
               </Link>
             </Button>

@@ -4,9 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import CodeMirror from '@uiw/react-codemirror'
 import { html } from '@codemirror/lang-html'
 import { css } from '@codemirror/lang-css'
+import { Code, Eye, FileText, Save } from 'lucide-react'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
-import { Icon } from '@/components/Icon'
 import { FieldError } from '@/components/forms/FieldError'
 import { SectionCard } from '@/components/forms/SectionCard'
 import { Button } from '@/components/ui/button'
@@ -147,7 +147,7 @@ export function PlantillaFormDialog({ open, onOpenChange, plantilla }: Plantilla
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-6">
-          <SectionCard icon="description" title="Información">
+          <SectionCard icon={FileText} title="Información">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="plantilla-nombre">Nombre</Label>
@@ -189,7 +189,7 @@ export function PlantillaFormDialog({ open, onOpenChange, plantilla }: Plantilla
           </SectionCard>
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <SectionCard icon="code" title="Contenido">
+            <SectionCard icon={Code} title="Contenido">
               <div className="space-y-4">
                 <FieldError message={errors.contenido_html?.message} />
                 <Controller
@@ -220,7 +220,7 @@ export function PlantillaFormDialog({ open, onOpenChange, plantilla }: Plantilla
               </div>
             </SectionCard>
 
-            <SectionCard icon="visibility" title="Vista previa">
+            <SectionCard icon={Eye} title="Vista previa">
               <div className="overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest">
                 {hayContenido ? (
                   <iframe
@@ -249,7 +249,7 @@ export function PlantillaFormDialog({ open, onOpenChange, plantilla }: Plantilla
               </Button>
             </DialogClose>
             <Button type="submit" loading={submitting}>
-              {!submitting && <Icon name="save" size={18} />}
+              {!submitting && <Save size={18} />}
               {esEdicion ? 'Guardar cambios' : 'Crear plantilla'}
             </Button>
           </DialogFooter>

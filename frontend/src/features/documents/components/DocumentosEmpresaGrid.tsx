@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Icon } from '@/components/Icon'
+import { CloudUpload, Download, Eye, EyeOff, Pencil, RotateCcw, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DataTable, type Column } from '@/components/data/DataTable'
@@ -16,6 +16,7 @@ import { formatBytes, getFileConfig, getCategoriaBadge } from './documentoEmpres
 import { estadoActivo } from '@/lib/constants/choices'
 import type { DocumentoEmpresa } from '@/types/models'
 import type { ActiveFilterItem } from '@/components/filters/ActiveFilterChips'
+import { FolderOpen } from 'lucide-react'
 
 interface DocumentosEmpresaGridProps {
   documentos: DocumentoEmpresa[]
@@ -123,12 +124,13 @@ export function DocumentosEmpresaGrid({
       header: 'Documento',
       cell: (doc) => {
         const fConfig = getFileConfig(doc.extension)
+        const FileIcon = fConfig.icon
         return (
           <div className="flex items-center gap-3 py-0.5">
             <div
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${fConfig.iconBg}`}
             >
-              <Icon name={fConfig.icon} size={20} />
+              <FileIcon size={20} />
             </div>
             <div>
               <p className="font-semibold text-on-surface line-clamp-1">{doc.nombre}</p>
@@ -189,7 +191,7 @@ export function DocumentosEmpresaGrid({
                     className="text-primary hover:bg-primary/10"
                     onClick={() => onGenerar(doc)}
                   >
-                    <Icon name="auto_fix_high" size={18} />
+                    <Wand2 size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Generar documento</TooltipContent>
@@ -205,7 +207,7 @@ export function DocumentosEmpresaGrid({
                     if (doc.archivo_url) window.open(doc.archivo_url, '_blank')
                   }}
                 >
-                  <Icon name="download" size={18} />
+                  <Download size={18} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Descargar original</TooltipContent>
@@ -215,7 +217,7 @@ export function DocumentosEmpresaGrid({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" onClick={() => onPrevisualizar(doc)}>
-                    <Icon name="visibility" size={18} />
+                    <Eye size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Vista previa</TooltipContent>
@@ -227,7 +229,7 @@ export function DocumentosEmpresaGrid({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" onClick={() => onEdit(doc)}>
-                      <Icon name="edit" size={18} />
+                      <Pencil size={18} />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Editar metadatos</TooltipContent>
@@ -245,7 +247,7 @@ export function DocumentosEmpresaGrid({
                       }
                       onClick={() => onToggleEstado(doc)}
                     >
-                      <Icon name={doc.activo ? 'visibility_off' : 'restart_alt'} size={18} />
+                      {doc.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>{doc.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
@@ -339,7 +341,7 @@ export function DocumentosEmpresaGrid({
         emptyAction={
           canEdit ? (
             <Button onClick={onNuevo} className="gap-2">
-              <Icon name="cloud_upload" size={18} /> Subir documento
+              <CloudUpload size={18} /> Subir documento
             </Button>
           ) : undefined
         }
@@ -387,11 +389,11 @@ export function DocumentosEmpresaGrid({
                 ? 'Prueba a ajustar o limpiar los filtros seleccionados.'
                 : 'No hay archivos subidos en esta sección de la compañía.'
             }
-            icon="folder_open"
+            icon={FolderOpen}
             action={
               canEdit && !hayFiltros ? (
                 <Button onClick={onNuevo} className="gap-2">
-                  <Icon name="cloud_upload" size={18} /> Subir primer documento
+                  <CloudUpload size={18} /> Subir primer documento
                 </Button>
               ) : undefined
             }
@@ -426,5 +428,3 @@ export function DocumentosEmpresaGrid({
     </div>
   )
 }
-
-

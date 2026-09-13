@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router'
 import dayjs from 'dayjs'
-import { Icon } from '@/components/Icon'
+import { ArrowRight } from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { Panel } from '@/components/data/Panel'
 import { ErrorState } from '@/components/data/ErrorState'
@@ -61,7 +61,7 @@ export default function DashboardPage() {
               to="/pedidos"
             >
               <span>Ver todos</span>
-              <Icon name="arrow_forward" size={14} />
+              <ArrowRight size={14} />
             </Link>
           }
         >
@@ -77,7 +77,7 @@ export default function DashboardPage() {
                 to="/finanzas"
               >
                 <span>Ver todos</span>
-                <Icon name="arrow_forward" size={14} />
+                <ArrowRight size={14} />
               </Link>
             }
           >

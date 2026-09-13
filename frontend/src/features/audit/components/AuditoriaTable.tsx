@@ -1,8 +1,8 @@
+import { Braces } from 'lucide-react'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
 import { Pagination } from '@/components/data/Pagination'
-import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -136,7 +136,7 @@ export function AuditoriaTable({
           onClick={() => onVerDetalle(row)}
           aria-label={`Ver detalle del registro ${row.id}`}
         >
-          <Icon name="data_object" size={18} />
+          <Braces size={18} />
         </Button>
       ),
     },

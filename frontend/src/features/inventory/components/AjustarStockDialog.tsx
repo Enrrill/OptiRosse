@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowUpDown, AlertCircle } from 'lucide-react'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
-import { Icon } from '@/components/Icon'
 import { FieldError } from '@/components/forms/FieldError'
 import { StockBadge } from '@/components/data/StockBadge'
 import { Button } from '@/components/ui/button'
@@ -140,7 +140,7 @@ export function AjustarStockDialog({ open, onOpenChange, variante }: AjustarStoc
             </div>
             {stockResultante != null && stockResultante < 0 && (
               <p className="mt-1 flex items-center gap-1 text-xs font-medium text-error">
-                <Icon name="error" size={14} />
+                <AlertCircle size={14} />
                 El stock no puede quedar en negativo.
               </p>
             )}
@@ -162,7 +162,7 @@ export function AjustarStockDialog({ open, onOpenChange, variante }: AjustarStoc
               Cancelar
             </Button>
             <Button type="submit" loading={submitting} disabled={bloqueado}>
-              {!submitting && <Icon name="swap_vert" size={18} />}
+              {!submitting && <ArrowUpDown size={18} />}
               Ajustar stock
             </Button>
           </DialogFooter>

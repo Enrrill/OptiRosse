@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
-import { Icon } from '@/components/Icon'
+import { Search } from 'lucide-react'
 import { CloseButton } from '@/components/ui/close-button'
 import { cn } from '@/lib/utils'
 
@@ -33,8 +33,7 @@ const CommandInput = React.forwardRef<
 
   return (
     <div className="relative border-b border-outline-variant">
-      <Icon
-        name="search"
+      <Search
         size={18}
         className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
       />

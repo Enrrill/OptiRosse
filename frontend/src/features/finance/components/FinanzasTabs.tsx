@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
+import { CreditCard, Landmark, Plus } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
 import { MetodosTab } from './MetodosTab'
 import { PagosTab } from './PagosTab'
 import { LibroMayorTab } from './LibroMayorTab'
 
 const TABS = {
-  pagos: { label: 'Pagos', icon: 'payments' },
-  metodos: { label: 'Métodos de pago', icon: 'credit_card' },
-  libro: { label: 'Libro mayor', icon: 'account_balance' },
+  pagos: { label: 'Pagos', icon: CreditCard },
+  metodos: { label: 'Métodos de pago', icon: CreditCard },
+  libro: { label: 'Libro mayor', icon: Landmark },
 } as const
 
 export type FinanzasTabKey = keyof typeof TABS
@@ -37,17 +37,20 @@ export function FinanzasTabs() {
     <Tabs value={active} onValueChange={onValueChange}>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <TabsList className="mb-0">
-          {(Object.keys(TABS) as FinanzasTabKey[]).map((key) => (
-            <TabsTrigger key={key} value={key}>
-              <Icon name={TABS[key].icon} size={16} />
-              {TABS[key].label}
-            </TabsTrigger>
-          ))}
+          {(Object.keys(TABS) as FinanzasTabKey[]).map((key) => {
+            const Icon = TABS[key].icon
+            return (
+              <TabsTrigger key={key} value={key}>
+                <Icon size={16} />
+                {TABS[key].label}
+              </TabsTrigger>
+            )
+          })}
         </TabsList>
 
         {active !== 'libro' && (
           <Button onClick={handleNuevoClick}>
-            <Icon name="add" size={18} />
+            <Plus size={18} />
             {active === 'pagos' ? 'Registrar pago' : 'Nuevo método'}
           </Button>
         )}

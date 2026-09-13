@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Save } from 'lucide-react'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
-import { Icon } from '@/components/Icon'
 import { FieldError } from '@/components/forms/FieldError'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -101,7 +101,7 @@ export function MarcaFormDialog({ open, onOpenChange, marca }: MarcaFormDialogPr
               Cancelar
             </Button>
             <Button type="submit" loading={submitting}>
-              {!submitting && <Icon name="save" size={18} />}
+              {!submitting && <Save size={18} />}
               {esEdicion ? 'Guardar cambios' : 'Crear marca'}
             </Button>
           </DialogFooter>

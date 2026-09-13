@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Save, UserCog, User } from 'lucide-react'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
-import { Icon } from '@/components/Icon'
 import { SectionCard } from '@/components/forms/SectionCard'
 import { FieldError } from '@/components/forms/FieldError'
 import { Button } from '@/components/ui/button'
@@ -81,7 +81,7 @@ export function UsuarioForm({ usuario, onSuccess, onCancel }: UsuarioFormProps) 
   return (
     <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <SectionCard icon="manage_accounts" title="Cuenta">
+        <SectionCard icon={UserCog} title="Cuenta">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="nombre_usuario">Nombre de usuario</Label>
@@ -147,7 +147,7 @@ export function UsuarioForm({ usuario, onSuccess, onCancel }: UsuarioFormProps) 
           </div>
         </SectionCard>
 
-        <SectionCard icon="badge" title="Datos personales">
+        <SectionCard icon={User} title="Datos personales">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="nombre">Nombre</Label>
@@ -175,7 +175,7 @@ export function UsuarioForm({ usuario, onSuccess, onCancel }: UsuarioFormProps) 
           </Button>
         )}
         <Button type="submit" loading={submitting}>
-          {!submitting && <Icon name="save" size={18} className="mr-1.5" />}
+          {!submitting && <Save size={18} className="mr-1.5" />}
           {esEdicion ? 'Guardar cambios' : 'Crear usuario'}
         </Button>
       </div>

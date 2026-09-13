@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Save, Package, SlidersHorizontal, ScanBarcode, Plus, Wand2 } from 'lucide-react'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
-import { Icon } from '@/components/Icon'
 import { SectionCard } from '@/components/forms/SectionCard'
 import { FieldError } from '@/components/forms/FieldError'
 import { Button } from '@/components/ui/button'
@@ -121,7 +121,7 @@ export function ProductoForm({ producto, onSuccess, onCancel }: ProductoFormProp
     <FormProvider {...methods}>
       <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          <SectionCard icon="inventory_2" title="Datos del producto">
+          <SectionCard icon={Package} title="Datos del producto">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="categoria">Categoría</Label>
@@ -159,7 +159,7 @@ export function ProductoForm({ producto, onSuccess, onCancel }: ProductoFormProp
                     className="h-5 px-1 text-xs text-primary hover:bg-transparent hover:underline"
                     onClick={() => setNuevaMarcaModalOpen(true)}
                   >
-                    <Icon name="add" size={14} className="mr-0.5" /> Nueva marca
+                    <Plus size={14} className="mr-0.5" /> Nueva marca
                   </Button>
                 </div>
                 <Controller
@@ -193,7 +193,7 @@ export function ProductoForm({ producto, onSuccess, onCancel }: ProductoFormProp
                     className="h-5 px-1 text-xs text-on-surface-variant hover:text-primary hover:bg-transparent"
                     onClick={handleSugerirCodigo}
                   >
-                    <Icon name="auto_fix_high" size={14} className="mr-0.5" /> Sugerir código
+                    <Wand2 size={14} className="mr-0.5" /> Sugerir código
                   </Button>
                 </div>
                 <Input id="codigo_modelo" placeholder="Ej: MT-2201" {...register('codigo_modelo')} />
@@ -215,7 +215,7 @@ export function ProductoForm({ producto, onSuccess, onCancel }: ProductoFormProp
           </SectionCard>
 
           {mostrarOpcionesTecnicas && (
-            <SectionCard icon="tune" title="Opciones técnicas">
+            <SectionCard icon={SlidersHorizontal} title="Opciones técnicas">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {esCristal && (
                   <div className="space-y-1.5">
@@ -330,7 +330,7 @@ export function ProductoForm({ producto, onSuccess, onCancel }: ProductoFormProp
             </SectionCard>
           )}
 
-          <SectionCard icon="barcode_scanner" title="Variantes del producto">
+          <SectionCard icon={ScanBarcode} title="Variantes del producto">
             <VariantesEditor tipoProducto={tipoProducto} />
             <p className="text-xs text-on-surface-variant/80 mt-2">
               Al guardar el producto, las variantes que elimines se desactivan automáticamente en la base de datos.
@@ -345,7 +345,7 @@ export function ProductoForm({ producto, onSuccess, onCancel }: ProductoFormProp
             </Button>
           )}
           <Button type="submit" loading={submitting}>
-            {!submitting && <Icon name="save" size={18} className="mr-1.5" />}
+            {!submitting && <Save size={18} className="mr-1.5" />}
             {esEdicion ? 'Guardar producto' : 'Crear producto'}
           </Button>
         </div>

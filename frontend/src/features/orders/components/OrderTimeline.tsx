@@ -1,13 +1,22 @@
 import { cn } from '@/lib/utils'
-import { Icon } from '@/components/Icon'
+import {
+  FileEdit,
+  CheckCircle2,
+  Microscope,
+  Package,
+  Truck,
+  Check,
+  Ban,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import type { EstadoPedido } from '@/types/models'
 
-const PASOS: { estado: EstadoPedido; label: string; icon: string }[] = [
-  { estado: 'borrador', label: 'Borrador', icon: 'draft' },
-  { estado: 'confirmado', label: 'Confirmado', icon: 'check_circle' },
-  { estado: 'en_laboratorio', label: 'En Laboratorio', icon: 'science' },
-  { estado: 'listo_para_entrega', label: 'Listo para Entrega', icon: 'inventory_2' },
-  { estado: 'entregado', label: 'Entregado', icon: 'local_shipping' },
+const PASOS: { estado: EstadoPedido; label: string; icon: LucideIcon }[] = [
+  { estado: 'borrador', label: 'Borrador', icon: FileEdit },
+  { estado: 'confirmado', label: 'Confirmado', icon: CheckCircle2 },
+  { estado: 'en_laboratorio', label: 'En Laboratorio', icon: Microscope },
+  { estado: 'listo_para_entrega', label: 'Listo para Entrega', icon: Package },
+  { estado: 'entregado', label: 'Entregado', icon: Truck },
 ]
 
 export function OrderTimeline({ estado }: { estado: EstadoPedido }) {
@@ -18,7 +27,7 @@ export function OrderTimeline({ estado }: { estado: EstadoPedido }) {
     <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-xs">
       {cancelado && (
         <div className="mb-5 flex items-center gap-3 rounded-xl border border-error-container bg-error-container/20 p-4">
-          <Icon name="block" className="shrink-0 text-error" size={22} />
+          <Ban className="shrink-0 text-error" size={22} />
           <div>
             <h4 className="text-sm font-semibold text-on-surface">Pedido cancelado</h4>
             <p className="text-sm text-on-surface-variant">
@@ -44,11 +53,7 @@ export function OrderTimeline({ estado }: { estado: EstadoPedido }) {
                         : 'border-outline-variant bg-surface-container-low text-outline',
                   )}
                 >
-                  <Icon
-                    name={completado ? 'check' : paso.icon}
-                    size={18}
-                    className="currentColor"
-                  />
+                  {completado ? <Check size={18} /> : <paso.icon size={18} />}
                 </div>
                 <span
                   className={cn(

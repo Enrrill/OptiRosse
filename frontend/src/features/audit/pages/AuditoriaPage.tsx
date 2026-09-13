@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
+import { History, X } from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
 import { usePagination } from '@/hooks/usePagination'
 import { choice, TABLA_AUDITORIA } from '@/lib/constants/choices'
 import type { RegistroAuditoria } from '@/types/models'
@@ -58,7 +58,7 @@ export default function AuditoriaPage() {
 
       {objetoFiltro != null && (
         <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary-container/10 px-4 py-3">
-          <Icon name="history" size={20} className="text-primary" />
+          <History size={20} className="text-primary" />
           <p className="text-sm text-on-surface">
             Historial del registro{' '}
             <span className="font-mono font-semibold">
@@ -75,7 +75,7 @@ export default function AuditoriaPage() {
               pagination.resetPage()
             }}
           >
-            <Icon name="close" size={16} /> Quitar filtro
+            <X size={16} /> Quitar filtro
           </Button>
         </div>
       )}
@@ -87,7 +87,7 @@ export default function AuditoriaPage() {
               Registros totales
             </span>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-container text-on-primary-container">
-              <Icon name="history" size={20} />
+              <History size={20} />
             </div>
           </div>
           <p className="mt-2 font-heading text-3xl font-bold text-on-surface">{count}</p>

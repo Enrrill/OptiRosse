@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Ban, FileText } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,6 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/data/StatusBadge'
-import { Icon } from '@/components/Icon'
 import { GenerarDocumentoDialog } from '@/components/forms/GenerarDocumentoDialog'
 import { useAuthStore } from '@/store/useAuth'
 import { choice, ESTADO_PAGO } from '@/lib/constants/choices'
@@ -70,7 +70,7 @@ export function PagoDetalleDialog({ open, onOpenChange, pago }: PagoDetalleDialo
           {pago.motivo_rechazo && (
             <div className="rounded-xl border border-error-container/60 bg-error-container/20 p-3">
               <p className="flex items-center gap-2 text-sm font-medium text-error">
-                <Icon name="block" size={18} /> Motivo de rechazo
+                <Ban size={18} /> Motivo de rechazo
               </p>
               <p className="mt-1 whitespace-pre-wrap text-sm text-on-surface">
                 {pago.motivo_rechazo}
@@ -94,7 +94,7 @@ export function PagoDetalleDialog({ open, onOpenChange, pago }: PagoDetalleDialo
         {puedeGenerarDocumentos(rol) && (
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setDocumentoOpen(true)}>
-              <Icon name="description" size={18} /> Recibo de pago
+              <FileText size={18} /> Recibo de pago
             </Button>
           </DialogFooter>
         )}

@@ -1,8 +1,8 @@
 import { useFieldArray, useFormContext } from 'react-hook-form'
+import { Plus, Trash2, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Icon } from '@/components/Icon'
 import { FieldError } from '@/components/forms/FieldError'
 import { MoneyInput } from '@/components/forms/MoneyInput'
 import type { TipoProducto } from '@/types/models'
@@ -108,7 +108,7 @@ function VarianteRow({ index, cols, onRemove }: VarianteRowProps) {
           className="text-error hover:bg-error-container/40 hover:text-error"
           onClick={onRemove}
         >
-          <Icon name="delete" size={18} />
+          <Trash2 size={18} />
         </Button>
       </td>
     </tr>
@@ -156,7 +156,7 @@ export function VariantesEditor({ tipoProducto }: VariantesEditorProps) {
           className="inline-flex items-center gap-1.5"
           onClick={() => append(DEFAULT_VARIANTE_ROW())}
         >
-          <Icon name="add" size={18} /> Agregar variante
+          <Plus size={18} /> Agregar variante
         </Button>
 
         <Button
@@ -167,7 +167,7 @@ export function VariantesEditor({ tipoProducto }: VariantesEditorProps) {
           onClick={handleAutoGenerarSKUs}
           title="Generar automáticamente un SKU formateado para cada fila según la marca, modelo y graduación/atributos"
         >
-          <Icon name="auto_fix_high" size={16} /> Auto-generar SKUs
+          <Wand2 size={16} /> Auto-generar SKUs
         </Button>
       </div>
 

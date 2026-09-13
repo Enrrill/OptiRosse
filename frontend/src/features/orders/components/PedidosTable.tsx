@@ -1,7 +1,7 @@
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
-import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
+import { Eye, Pencil, Trash2, Plus } from 'lucide-react'
 import { ESTADO_PEDIDO, choice } from '@/lib/constants/choices'
 import { formatDate, formatMoney } from '@/lib/format'
 import type { Cliente, Pedido } from '@/types/models'
@@ -134,7 +134,7 @@ export function PedidosTable({
                       onVer(row)
                     }}
                   >
-                    <Icon name="visibility" size={18} />
+                    <Eye size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Ver detalle</TooltipContent>
@@ -152,7 +152,7 @@ export function PedidosTable({
                           onEditar(row)
                         }}
                       >
-                        <Icon name="edit" size={18} />
+                        <Pencil size={18} />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Editar</TooltipContent>
@@ -169,7 +169,7 @@ export function PedidosTable({
                           onEliminar(row)
                         }}
                       >
-                        <Icon name="delete" size={18} />
+                        <Trash2 size={18} />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Eliminar</TooltipContent>
@@ -248,7 +248,7 @@ export function PedidosTable({
       emptyAction={
         canManage ? (
           <Button onClick={onNuevo}>
-            <Icon name="add" size={18} /> Nuevo pedido
+            <Plus size={18} /> Nuevo pedido
           </Button>
         ) : undefined
       }
@@ -315,7 +315,7 @@ export function PedidosTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

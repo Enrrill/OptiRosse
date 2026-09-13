@@ -1,8 +1,9 @@
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
+import { ArrowLeft, Ban, Eye } from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { ErrorState } from '@/components/data/ErrorState'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Icon } from '@/components/Icon'
 import { useApiQuery } from '@/hooks/useApi'
 import { useAuthStore } from '@/store/useAuth'
 import { CLIENTES, detalle } from '@/lib/api/endpoints'
@@ -73,7 +74,7 @@ export default function PedidoFormPage() {
       <div className="space-y-6">
         <div className="flex flex-col items-start gap-3 rounded-2xl border border-error-container bg-error-container/20 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
-            <Icon name="block" className="mt-0.5 text-error" size={22} />
+            <Ban className="mt-0.5 text-error" size={22} />
             <div>
               <h4 className="text-sm font-semibold text-on-surface">Edición no permitida</h4>
               <p className="text-sm text-on-surface-variant">
@@ -84,7 +85,7 @@ export default function PedidoFormPage() {
           </div>
           <Button asChild>
             <Link to={`/pedidos/${pedido!.id}`}>
-              <Icon name="visibility" size={18} /> Ver pedido
+              <Eye size={18} /> Ver pedido
             </Link>
           </Button>
         </div>
@@ -100,7 +101,7 @@ export default function PedidoFormPage() {
         to={volver}
         className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
       >
-        <Icon name="arrow_back" size={18} /> Volver a Pedidos
+        <ArrowLeft size={18} /> Volver a Pedidos
       </Link>
 
       <PageHeader

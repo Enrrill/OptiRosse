@@ -2,10 +2,10 @@ import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Pagination } from '@/components/data/Pagination'
+import { Plus, Pencil, EyeOff, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { choice, estadoActivo, TIPO_DOCUMENTO } from '@/lib/constants/choices'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { formatDate } from '@/lib/format'
@@ -97,7 +97,7 @@ export function PlantillasTable({
                     aria-label="Editar plantilla"
                     onClick={() => onEdit(row)}
                   >
-                    <Icon name="edit" size={18} />
+                    <Pencil size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Editar</TooltipContent>
@@ -110,7 +110,7 @@ export function PlantillasTable({
                     aria-label={row.activo ? 'Desactivar plantilla' : 'Reactivar plantilla'}
                     onClick={() => onToggleEstado(row)}
                   >
-                    <Icon name={row.activo ? 'visibility_off' : 'restart_alt'} size={18} />
+                    {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
@@ -157,7 +157,7 @@ export function PlantillasTable({
       emptyAction={
         canEdit ? (
           <Button onClick={onNuevo}>
-            <Icon name="add" size={18} /> Nueva plantilla
+            <Plus size={18} /> Nueva plantilla
           </Button>
         ) : undefined
       }

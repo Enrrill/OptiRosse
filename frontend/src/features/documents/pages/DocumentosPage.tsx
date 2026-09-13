@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
+import { Building2, CloudUpload, Lightbulb, Plus, Receipt } from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
-import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { usePagination } from '@/hooks/usePagination'
 import { usePlantillas } from '../hooks/usePlantillas'
@@ -36,7 +36,7 @@ type TabId = 'empresa' | 'sistema'
 interface TabConfig {
   id: TabId
   label: string
-  icon: string
+  icon: React.ComponentType<{ size?: number }>
   description: string
 }
 
@@ -44,13 +44,13 @@ const TABS: TabConfig[] = [
   {
     id: 'empresa',
     label: 'Archivos de la Empresa',
-    icon: 'business',
+    icon: Building2,
     description: 'RIF, constancias, contratos y plantillas Word/Excel de la compañía',
   },
   {
     id: 'sistema',
     label: 'Plantillas del Sistema',
-    icon: 'receipt_long',
+    icon: Receipt,
     description: 'Facturas, órdenes de trabajo, notas de entrega y recibos de pago',
   },
 ]
@@ -177,11 +177,11 @@ export default function DocumentosPage() {
           canEdit ? (
             activeTab === 'empresa' ? (
               <Button onClick={abrirNuevoEmpresa}>
-                <Icon name="cloud_upload" size={18} /> Subir Documento
+                <CloudUpload size={18} /> Subir Documento
               </Button>
             ) : (
               <Button onClick={abrirNuevoSistema}>
-                <Icon name="add" size={18} /> Nueva Plantilla
+                <Plus size={18} /> Nueva Plantilla
               </Button>
             )
           ) : undefined
@@ -191,31 +191,34 @@ export default function DocumentosPage() {
       {/* ── Sistema de Tabs ──────────────────────────────────────────────── */}
       <div className="mb-6 space-y-2">
         <div className="flex gap-1.5 rounded-2xl border border-outline-variant/40 bg-surface-container-low p-1.5 shadow-xs">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              id={`tab-${tab.id}`}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-surface-container-lowest text-primary shadow-xs border border-primary/20'
-                  : 'text-on-surface-variant hover:bg-surface-container-high/50 hover:text-on-surface'
-              }`}
-              aria-selected={activeTab === tab.id}
-              role="tab"
-            >
-              <Icon name={tab.icon} size={18} />
-              <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">
-                {tab.id === 'empresa' ? 'Empresa' : 'Sistema'}
-              </span>
-              {activeTab === tab.id && (
-                <span className="ml-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-mono font-medium text-primary">
-                  {tab.id === 'empresa' ? countEmpresa : countSistema}
+          {TABS.map((tab) => {
+            const TabIcon = tab.icon
+            return (
+              <button
+                key={tab.id}
+                id={`tab-${tab.id}`}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? 'bg-surface-container-lowest text-primary shadow-xs border border-primary/20'
+                    : 'text-on-surface-variant hover:bg-surface-container-high/50 hover:text-on-surface'
+                }`}
+                aria-selected={activeTab === tab.id}
+                role="tab"
+              >
+                <TabIcon size={18} />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">
+                  {tab.id === 'empresa' ? 'Empresa' : 'Sistema'}
                 </span>
-              )}
-            </button>
-          ))}
+                {activeTab === tab.id && (
+                  <span className="ml-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-mono font-medium text-primary">
+                    {tab.id === 'empresa' ? countEmpresa : countSistema}
+                  </span>
+                )}
+              </button>
+            )
+          })}
         </div>
         <p className="px-1 text-xs text-on-surface-variant/80">
           {TABS.find((t) => t.id === activeTab)?.description}
@@ -302,7 +305,7 @@ export default function DocumentosPage() {
 
           {puedeGenerarDocumentos(rol) && (
             <div className="mt-4 flex items-center gap-2 rounded-xl border border-secondary-container/40 bg-secondary-container/10 px-4 py-3 text-sm text-on-surface">
-              <Icon name="lightbulb" size={18} className="text-secondary" />
+              <Lightbulb size={18} className="text-secondary" />
               <span>
                 Genera documentos desde el detalle de un <b>pedido</b> (factura, orden de trabajo, nota
                 de entrega) o de un <b>pago</b> (recibo).

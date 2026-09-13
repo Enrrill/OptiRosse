@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
+import { Eye, Pencil, UserX, RotateCcw, Plus } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuth'
 import { estadoActivo } from '@/lib/constants/choices'
 import { formatDate, formatMoney, formatNumber, formatRIF, formatPhone, formatName, formatEmail } from '@/lib/format'
@@ -116,7 +116,7 @@ export function ClientesTable({
                     navigate(`/clientes/${row.id}`)
                   }}
                 >
-                  <Icon name="visibility" size={18} />
+                  <Eye size={18} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Ver cliente</TooltipContent>
@@ -135,7 +135,7 @@ export function ClientesTable({
                       onEdit(row)
                     }}
                   >
-                    <Icon name="edit" size={18} />
+                    <Pencil size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Editar</TooltipContent>
@@ -151,7 +151,7 @@ export function ClientesTable({
                       onToggleEstado(row)
                     }}
                   >
-                    <Icon name={row.activo ? 'person_off' : 'restart_alt'} size={18} />
+                    {row.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
@@ -176,7 +176,7 @@ export function ClientesTable({
       emptyAction={
         canManage ? (
           <Button onClick={onNuevo}>
-            <Icon name="add" size={18} /> Nuevo cliente
+            <Plus size={18} /> Nuevo cliente
           </Button>
         ) : undefined
       }
@@ -199,7 +199,7 @@ export function ClientesTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

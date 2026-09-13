@@ -1,3 +1,4 @@
+import { Pencil, EyeOff, RotateCcw, Plus } from 'lucide-react'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
@@ -5,7 +6,6 @@ import { Pagination } from '@/components/data/Pagination'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { estadoActivo } from '@/lib/constants/choices'
 import type { Marca } from '@/types/models'
 
@@ -68,7 +68,7 @@ export function MarcasTable({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" aria-label="Editar marca" onClick={() => onEdit(row)}>
-                    <Icon name="edit" size={18} />
+                    <Pencil size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Editar</TooltipContent>
@@ -81,7 +81,7 @@ export function MarcasTable({
                     aria-label={row.activo ? 'Desactivar marca' : 'Reactivar marca'}
                     onClick={() => onToggleEstado(row)}
                   >
-                    <Icon name={row.activo ? 'visibility_off' : 'restart_alt'} size={18} />
+                    {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
@@ -105,7 +105,7 @@ export function MarcasTable({
       emptyAction={
         canManage ? (
           <Button onClick={onNuevo}>
-            <Icon name="add" size={18} /> Nueva marca
+            <Plus size={18} /> Nueva marca
           </Button>
         ) : undefined
       }

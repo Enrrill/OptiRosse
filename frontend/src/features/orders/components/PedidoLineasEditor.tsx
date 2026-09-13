@@ -1,8 +1,8 @@
+import { Trash2, Plus } from 'lucide-react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Icon } from '@/components/Icon'
 import { FieldError } from '@/components/forms/FieldError'
 import { MoneyInput } from '@/components/forms/MoneyInput'
 import { SearchableSelect } from '@/components/forms/SearchableSelect'
@@ -97,7 +97,7 @@ function PedidoLineaRow({ index, onRemove }: PedidoLineaRowProps) {
           className="text-error hover:bg-error-container/40 hover:text-error"
           onClick={onRemove}
         >
-          <Icon name="delete" size={18} />
+          <Trash2 size={18} />
         </Button>
       </td>
     </tr>
@@ -145,14 +145,18 @@ export function PedidoLineasEditor() {
           </tbody>
         </table>
       </div>
-      <Button
-        type="button"
-        variant="outline"
-        className="mt-3"
-        onClick={() => append(DEFAULT_PEDIDO_LINEA())}
-      >
-        <Icon name="add" size={18} /> Agregar línea
-      </Button>
+      <div className="mt-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => append(DEFAULT_PEDIDO_LINEA)}
+          className="rounded-full"
+        >
+          <Plus size={16} className="mr-1" />
+          Agregar línea
+        </Button>
+      </div>
     </div>
   )
 }

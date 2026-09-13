@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CloudUpload, FileEdit, FileText, Plus, Save, Trash2, Upload, Wand2, X, Loader2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Icon } from '@/components/Icon'
 import { documentoEmpresaSchema, type DocumentoEmpresaFormValues } from './documentoEmpresaSchema'
 import { useCrearDocumentoEmpresa, useActualizarDocumentoEmpresa } from '../hooks/useDocumentoEmpresaMutations'
 import type { CategoriaDocumentoEmpresa, DocumentoEmpresa, VariableSchemaItem } from '@/types/models'
@@ -174,7 +174,7 @@ export function DocumentoEmpresaFormDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2.5 text-xl font-heading text-on-surface">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Icon name={isEditing ? 'edit_document' : 'cloud_upload'} size={22} />
+              {isEditing ? <FileEdit size={22} /> : <CloudUpload size={22} />}
             </div>
             {isEditing ? 'Editar Documento' : 'Subir Nuevo Documento'}
           </DialogTitle>
@@ -191,11 +191,12 @@ export function DocumentoEmpresaFormDialog({
               (() => {
                 const ext = selectedFile.name.split('.').pop() || ''
                 const config = getFileConfig(ext)
+                const ConfigIcon = config.icon
                 return (
                   <div className="flex items-center justify-between gap-4 rounded-xl border border-outline-variant/60 bg-surface-container-low/60 p-3.5 transition-all">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${config.iconBg}`}>
-                        <Icon name={config.icon} size={24} />
+                        <ConfigIcon size={24} />
                       </div>
                       <div className="min-w-0 text-left">
                         <div className="flex items-center gap-2">
@@ -218,7 +219,7 @@ export function DocumentoEmpresaFormDialog({
                       className="text-error hover:bg-error-container/20 hover:text-error shrink-0 gap-1 rounded-lg text-xs"
                       onClick={() => setSelectedFile(null)}
                     >
-                      <Icon name="close" size={16} />
+                      <X size={16} />
                       Cambiar
                     </Button>
                   </div>
@@ -245,7 +246,7 @@ export function DocumentoEmpresaFormDialog({
                 />
                 <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center w-full">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-2.5 shadow-xs group-hover:scale-105 group-hover:bg-primary group-hover:text-on-primary transition-all duration-200">
-                    <Icon name="cloud_upload" size={26} />
+                    <Upload size={26} />
                   </div>
                   <p className="text-sm font-semibold text-on-surface">
                     {isEditing ? 'Haz clic para reemplazar el archivo' : 'Arrastra un archivo aquí o haz clic para buscar'}
@@ -329,7 +330,7 @@ export function DocumentoEmpresaFormDialog({
                 />
                 <div className="space-y-0.5">
                   <span className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-                    <Icon name="description" size={16} className="text-primary" />
+                    <FileText size={16} className="text-primary" />
                     Es plantilla Word generable (.docx)
                   </span>
                   <p className="text-[11px] text-on-surface-variant leading-tight">
@@ -366,7 +367,7 @@ export function DocumentoEmpresaFormDialog({
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
-                    <Icon name="auto_fix_high" size={16} /> Variables Jinja2 de la Plantilla
+                    <Wand2 size={16} /> Variables Jinja2 de la Plantilla
                   </h4>
                   <p className="text-xs text-on-surface-variant mt-0.5">
                     Define los campos Jinja2 que el usuario rellenará (ej: <code className="rounded bg-primary/10 px-1 py-0.5 font-mono text-primary text-[10px]">{'{{ nombre }}'}</code>)
@@ -379,7 +380,7 @@ export function DocumentoEmpresaFormDialog({
                   onClick={agregarVariable}
                   className="gap-1.5 text-xs bg-surface-container-lowest shadow-xs border-primary/30 text-primary hover:bg-primary/10"
                 >
-                  <Icon name="add" size={16} /> Variable
+                  <Plus size={16} /> Variable
                 </Button>
               </div>
 
@@ -436,7 +437,7 @@ export function DocumentoEmpresaFormDialog({
                         onClick={() => eliminarVariable(idx)}
                         title="Eliminar variable"
                       >
-                        <Icon name="delete" size={16} />
+                        <Trash2 size={16} />
                       </Button>
                     </div>
                   ))}
@@ -452,12 +453,12 @@ export function DocumentoEmpresaFormDialog({
             <Button type="submit" disabled={isLoading} className="gap-2 min-w-[140px]">
               {isLoading ? (
                 <>
-                  <Icon name="progress_activity" size={18} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                   Guardando...
                 </>
               ) : (
                 <>
-                  <Icon name={isEditing ? 'save' : 'cloud_upload'} size={18} />
+                  {isEditing ? <Save size={18} /> : <CloudUpload size={18} />}
                   {isEditing ? 'Guardar Cambios' : 'Subir Documento'}
                 </>
               )}
@@ -468,5 +469,3 @@ export function DocumentoEmpresaFormDialog({
     </Dialog>
   )
 }
-
-

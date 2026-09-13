@@ -3,7 +3,7 @@ import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
-import { Icon } from '@/components/Icon'
+import { Save, BadgeCheck, Mail, CreditCard } from 'lucide-react'
 import { SectionCard } from '@/components/forms/SectionCard'
 import { FieldError } from '@/components/forms/FieldError'
 import { MoneyInput } from '@/components/forms/MoneyInput'
@@ -76,7 +76,7 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
   return (
     <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <SectionCard icon="badge" title="Identificación">
+        <SectionCard icon={BadgeCheck} title="Identificación">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="razon_social">Razón social</Label>
@@ -100,7 +100,7 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
           </div>
         </SectionCard>
 
-        <SectionCard icon="contact_mail" title="Contacto">
+        <SectionCard icon={Mail} title="Contacto">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="correo">Correo electrónico</Label>
@@ -134,7 +134,7 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
           </div>
         </SectionCard>
 
-        <SectionCard icon="credit_card" title="Crédito">
+        <SectionCard icon={CreditCard} title="Crédito">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="limite_credito">Límite de crédito</Label>
@@ -197,7 +197,7 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
           </Button>
         )}
         <Button type="submit" loading={submitting}>
-          {!submitting && <Icon name="save" size={18} className="mr-1.5" />}
+          {!submitting && <Save size={18} className="mr-1.5" />}
           Guardar cliente
         </Button>
       </div>

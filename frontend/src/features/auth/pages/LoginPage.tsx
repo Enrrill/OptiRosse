@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useLocation, useNavigate } from 'react-router'
+import { LogIn, Sun, Moon } from 'lucide-react'
 import { apiClient } from '@/lib/api/client'
 import { AUTH_ENDPOINTS } from '@/lib/api/endpoints'
 import { ApiError } from '@/lib/api/errors'
@@ -10,7 +11,6 @@ import { useAuthStore } from '@/store/useAuth'
 import { useToast } from '@/store/useToast'
 import type { ApiResponse } from '@/types/api'
 import type { Usuario } from '@/types/models'
-import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,6 +23,25 @@ const loginSchema = z.object({
 })
 
 type LoginForm = z.infer<typeof loginSchema>
+
+function LensBlurLogo({ size = 32 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      <path d="M2 12h20" />
+    </svg>
+  )
+}
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -70,13 +89,13 @@ export default function LoginPage() {
         aria-label="Cambiar tema"
         className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-surface/70 text-on-surface-variant backdrop-blur-md transition-colors hover:bg-surface hover:text-primary"
       >
-        <Icon name={theme === 'dark' ? 'light_mode' : 'dark_mode'} />
+        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
       </button>
 
       <div className="w-[95%] max-w-[420px] rounded-2xl border border-outline-variant bg-surface/95 p-8 shadow-lg backdrop-blur-md">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-on-primary shadow-md">
-            <Icon name="lens_blur" size={32} filled />
+            <LensBlurLogo size={32} />
           </div>
           <div>
             <h1 className="font-heading text-headline-lg font-bold text-primary">
@@ -113,7 +132,7 @@ export default function LoginPage() {
           </div>
 
           <Button type="submit" className="w-full" size="lg" loading={loading}>
-            {!loading && <Icon name="login" />}
+            {!loading && <LogIn />}
             Iniciar sesión
           </Button>
         </form>

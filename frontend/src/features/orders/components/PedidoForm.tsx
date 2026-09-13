@@ -1,14 +1,15 @@
+import { Loader2 } from 'lucide-react'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Icon } from '@/components/Icon'
 import { FieldError } from '@/components/forms/FieldError'
 import { SectionCard } from '@/components/forms/SectionCard'
 import { SearchableSelect } from '@/components/forms/SearchableSelect'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
+import { User, ListOrdered, StickyNote } from 'lucide-react'
 import type { Pedido } from '@/types/models'
 import { buscarClientes } from '@/lib/api/opciones'
 import { buscarRecetas } from '../hooks/useOpciones'
@@ -131,7 +132,7 @@ function FormCuerpo({
   return (
     <form onSubmit={onSubmit} noValidate>
       <div className="space-y-6">
-        <SectionCard icon="person" title="Cliente y receta">
+        <SectionCard icon={User} title="Cliente y receta">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="cliente">Cliente *</Label>
@@ -162,7 +163,7 @@ function FormCuerpo({
           </div>
         </SectionCard>
 
-        <SectionCard icon="list_alt" title="Líneas del pedido">
+        <SectionCard icon={ListOrdered} title="Líneas del pedido">
           <PedidoLineasEditor />
           {errorLineas && <FieldError message={errorLineas} />}
           <p className="text-xs text-on-surface-variant">
@@ -170,7 +171,7 @@ function FormCuerpo({
           </p>
         </SectionCard>
 
-        <SectionCard icon="notes" title="Notas">
+        <SectionCard icon={StickyNote} title="Notas">
           <Textarea
             {...register('notas')}
             placeholder="Notas internas del pedido..."
@@ -193,7 +194,7 @@ function FormCuerpo({
             Cancelar
           </Button>
           <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending && <Icon name="progress_activity" className="mr-2 animate-spin" />}
+            {mutation.isPending && <Loader2 className="mr-2 animate-spin" size={16} />}
             {pedido ? 'Guardar cambios' : 'Crear pedido'}
           </Button>
         </div>

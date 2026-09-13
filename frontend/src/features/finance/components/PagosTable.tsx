@@ -1,3 +1,4 @@
+import { Eye, CheckCircle, XCircle, Plus } from 'lucide-react'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
@@ -12,7 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { choice, ESTADO_PAGO } from '@/lib/constants/choices'
 import { formatDateTime, formatMoney } from '@/lib/format'
 import type { Cliente, MetodoPago, Pago } from '@/types/models'
@@ -155,7 +155,7 @@ export function PagosTable({
                     onVer(row)
                   }}
                 >
-                  <Icon name="visibility" size={18} />
+                  <Eye size={18} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Ver detalle</TooltipContent>
@@ -174,7 +174,7 @@ export function PagosTable({
                         onAprobar(row)
                       }}
                     >
-                      <Icon name="check_circle" size={18} />
+                      <CheckCircle size={18} />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Aprobar</TooltipContent>
@@ -191,7 +191,7 @@ export function PagosTable({
                         onRechazar(row)
                       }}
                     >
-                      <Icon name="cancel" size={18} />
+                      <XCircle size={18} />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Rechazar</TooltipContent>
@@ -278,7 +278,7 @@ export function PagosTable({
       emptyDescription="Registra el primer pago de un cliente para comenzar."
       emptyAction={
         <Button onClick={onNuevo}>
-          <Icon name="add" size={18} /> Registrar pago
+          <Plus size={18} /> Registrar pago
         </Button>
       }
       toolbar={

@@ -1,3 +1,6 @@
+import type { LucideIcon } from 'lucide-react'
+import { FileText, Table2, FileImage, Image, File } from 'lucide-react'
+
 /** Formatea bytes a unidad legible (B, KB, MB, GB). */
 export function formatBytes(bytes: number): string {
   if (!bytes || bytes === 0) return '0 B'
@@ -9,7 +12,7 @@ export function formatBytes(bytes: number): string {
 
 export interface FileConfig {
   label: string
-  icon: string
+  icon: LucideIcon
   badgeBg: string
   iconBg: string
 }
@@ -19,7 +22,7 @@ export function getFileConfig(extension: string): FileConfig {
   if (['docx', 'doc'].includes(ext)) {
     return {
       label: 'Word',
-      icon: 'description',
+      icon: FileText,
       badgeBg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
       iconBg: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
     }
@@ -27,7 +30,7 @@ export function getFileConfig(extension: string): FileConfig {
   if (['xlsx', 'xls', 'csv'].includes(ext)) {
     return {
       label: 'Excel',
-      icon: 'table_chart',
+      icon: Table2,
       badgeBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
       iconBg: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
     }
@@ -35,7 +38,7 @@ export function getFileConfig(extension: string): FileConfig {
   if (ext === 'pdf') {
     return {
       label: 'PDF',
-      icon: 'picture_as_pdf',
+      icon: FileImage,
       badgeBg: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
       iconBg: 'bg-rose-500/15 text-rose-600 dark:text-rose-400',
     }
@@ -43,14 +46,14 @@ export function getFileConfig(extension: string): FileConfig {
   if (['png', 'jpg', 'jpeg', 'webp'].includes(ext)) {
     return {
       label: 'Imagen',
-      icon: 'image',
+      icon: Image,
       badgeBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
       iconBg: 'bg-purple-500/15 text-purple-600 dark:text-purple-400',
     }
   }
   return {
     label: ext ? ext.toUpperCase() : 'Archivo',
-    icon: 'insert_drive_file',
+    icon: File,
     badgeBg: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
     iconBg: 'bg-slate-500/15 text-slate-600 dark:text-slate-400',
   }

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
+import { Wallet } from 'lucide-react'
 import { usePagination } from '@/hooks/usePagination'
 import { useSaldoCliente } from '@/hooks/useSaldoCliente'
-import { Icon } from '@/components/Icon'
 import { formatMoney } from '@/lib/format'
 import { useLibroMayor, type LibroMayorParams } from '../hooks/useLibroMayor'
 import { useClientesOpciones } from '../hooks/useClientesOpciones'
@@ -33,7 +33,7 @@ export function LibroMayorTab() {
       <div className="flex flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-container/40 text-primary">
-            <Icon name="account_balance_wallet" size={20} />
+            <Wallet size={20} />
           </div>
           <div>
             <p className="text-sm text-on-surface-variant">

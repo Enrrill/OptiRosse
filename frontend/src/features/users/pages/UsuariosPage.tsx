@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
+import { Plus, ShieldCheck, UserCog, UserX, Users } from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { useToast } from '@/store/useToast'
 import { usePagination } from '@/hooks/usePagination'
@@ -71,7 +71,7 @@ export default function UsuariosPage() {
         description="Gestiona las cuentas del personal y sus roles de acceso."
         actions={
           <Button onClick={abrirNuevo}>
-            <Icon name="add" size={18} /> Nuevo usuario
+            <Plus size={18} /> Nuevo usuario
           </Button>
         }
       />
@@ -83,7 +83,7 @@ export default function UsuariosPage() {
               Total Usuarios
             </span>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-container text-on-primary-container">
-              <Icon name="manage_accounts" size={20} />
+              <UserCog size={20} />
             </div>
           </div>
           <p className="mt-2 font-heading text-3xl font-bold text-on-surface">{count}</p>
@@ -96,7 +96,7 @@ export default function UsuariosPage() {
               Estado del filtro
             </span>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container">
-              <Icon name={showInactivos ? 'person_off' : 'verified_user'} size={20} />
+              {showInactivos ? <UserX size={20} /> : <ShieldCheck size={20} />}
             </div>
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-on-surface">
@@ -113,7 +113,7 @@ export default function UsuariosPage() {
               En Pantalla
             </span>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-tertiary-container text-on-tertiary-container">
-              <Icon name="group" size={20} />
+              <Users size={20} />
             </div>
           </div>
           <p className="mt-2 font-heading text-3xl font-bold text-on-surface">{usuarios.length}</p>

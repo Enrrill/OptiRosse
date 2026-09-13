@@ -1,12 +1,24 @@
 import type { KpiCardProps } from '@/components/data/KpiCard'
 import { formatMoney, formatNumber } from '@/lib/format'
 import type { DashboardKpis } from '@/types/models'
+import {
+  Package,
+  Microscope,
+  ShoppingCart,
+  CheckCircle2,
+  DollarSign,
+  Users,
+  AlertTriangle,
+  Wallet,
+  CreditCard,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const ESTADOS_ORDEN = [
-  { key: 'confirmado', label: 'Confirmados', icon: 'inventory', variant: 'primary' },
-  { key: 'en_laboratorio', label: 'En laboratorio', icon: 'science', variant: 'secondary' },
-  { key: 'listo_para_entrega', label: 'Listos para entrega', icon: 'inventory_2', variant: 'amber' },
-  { key: 'entregado', label: 'Entregados', icon: 'check_circle', variant: 'green' },
+  { key: 'confirmado', label: 'Confirmados', icon: Package, variant: 'primary' },
+  { key: 'en_laboratorio', label: 'En laboratorio', icon: Microscope, variant: 'secondary' },
+  { key: 'listo_para_entrega', label: 'Listos para entrega', icon: ShoppingCart, variant: 'amber' },
+  { key: 'entregado', label: 'Entregados', icon: CheckCircle2, variant: 'green' },
 ] as const
 
 export function buildKpiCards(kpis: DashboardKpis): KpiCardProps[] {
@@ -17,7 +29,7 @@ export function buildKpiCards(kpis: DashboardKpis): KpiCardProps[] {
     for (const { key, label, icon, variant } of ESTADOS_ORDEN) {
       const value = estados[key]
       if (typeof value === 'number') {
-        cards.push({ label, icon, variant, value: formatNumber(value) })
+        cards.push({ label, icon: icon as LucideIcon, variant, value: formatNumber(value) })
       }
     }
   }
@@ -25,7 +37,7 @@ export function buildKpiCards(kpis: DashboardKpis): KpiCardProps[] {
   if (kpis.total_vendido_mes != null) {
     cards.push({
       label: 'Vendido del mes',
-      icon: 'sell',
+      icon: DollarSign,
       variant: 'primary',
       value: formatMoney(kpis.total_vendido_mes),
     })
@@ -34,7 +46,7 @@ export function buildKpiCards(kpis: DashboardKpis): KpiCardProps[] {
   if (kpis.clientes != null) {
     cards.push({
       label: 'Clientes activos',
-      icon: 'groups',
+      icon: Users,
       variant: 'secondary',
       value: formatNumber(kpis.clientes),
     })
@@ -43,7 +55,7 @@ export function buildKpiCards(kpis: DashboardKpis): KpiCardProps[] {
   if (kpis.stock_bajo != null) {
     cards.push({
       label: 'Stock bajo',
-      icon: 'warning',
+      icon: AlertTriangle,
       variant: 'amber',
       value: formatNumber(kpis.stock_bajo),
       sub: 'items',
@@ -55,7 +67,7 @@ export function buildKpiCards(kpis: DashboardKpis): KpiCardProps[] {
     const { cantidad, monto } = kpis.pagos_pendientes
     cards.push({
       label: 'Pagos pendientes',
-      icon: 'account_balance_wallet',
+      icon: Wallet,
       variant: 'green',
       value: formatMoney(monto),
       sub: `${formatNumber(cantidad)} pagos`,
@@ -65,7 +77,7 @@ export function buildKpiCards(kpis: DashboardKpis): KpiCardProps[] {
   if (kpis.saldo_por_cobrar != null) {
     cards.push({
       label: 'Saldo por cobrar',
-      icon: 'payments',
+      icon: CreditCard,
       variant: kpis.saldo_por_cobrar < 0 ? 'error' : 'default',
       value: formatMoney(kpis.saldo_por_cobrar),
     })

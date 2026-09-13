@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
+import { Plus } from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { usePagination } from '@/hooks/usePagination'
 import type { PaginationParams } from '@/types/api'
@@ -62,7 +62,7 @@ export default function RecetasPage() {
         actions={
           canEdit ? (
             <Button onClick={abrirNuevo}>
-              <Icon name="add" size={18} /> Nueva receta
+              <Plus size={18} /> Nueva receta
             </Button>
           ) : undefined
         }

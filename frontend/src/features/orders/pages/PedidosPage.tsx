@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
+import { Plus } from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { ConfirmDialog } from '@/components/forms/ConfirmDialog'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { useToast } from '@/store/useToast'
 import { ApiError } from '@/lib/api/errors'
@@ -76,7 +76,7 @@ export default function PedidosPage() {
         actions={
           canManage ? (
             <Button onClick={() => navigate('/pedidos/nuevo')}>
-              <Icon name="add" size={18} /> Nuevo pedido
+              <Plus size={18} /> Nuevo pedido
             </Button>
           ) : undefined
         }

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
+import { Calendar, Eye, EyeOff, Key, LogOut, LockReset, Mail, Phone, Shield, User } from 'lucide-react'
 import { apiClient } from '@/lib/api/client'
 import { AUTH_ENDPOINTS } from '@/lib/api/endpoints'
 import { ApiError } from '@/lib/api/errors'
@@ -10,7 +11,6 @@ import { useAuthStore } from '@/store/useAuth'
 import { useUIStore } from '@/store/useUI'
 import { useToast } from '@/store/useToast'
 import { ROLES, choice } from '@/lib/constants/choices'
-import { Icon } from '@/components/Icon'
 import { PageHeader } from '@/components/data/PageHeader'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
@@ -92,7 +92,7 @@ function PasswordForm() {
             className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-on-surface"
             tabIndex={-1}
           >
-            <Icon name={showCurrent ? 'visibility_off' : 'visibility'} size={18} />
+            {showCurrent ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
         <FieldError message={errors.contrasena_actual?.message} />
@@ -115,7 +115,7 @@ function PasswordForm() {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-on-surface"
               tabIndex={-1}
             >
-              <Icon name={showNew ? 'visibility_off' : 'visibility'} size={18} />
+              {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
           <FieldError message={errors.contrasena_nueva?.message} />
@@ -136,7 +136,7 @@ function PasswordForm() {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-on-surface"
               tabIndex={-1}
             >
-              <Icon name={showConfirm ? 'visibility_off' : 'visibility'} size={18} />
+              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
           <FieldError message={errors.confirmacion?.message} />
@@ -148,7 +148,7 @@ function PasswordForm() {
           La contraseña debe contener al menos 8 caracteres.
         </p>
         <Button type="submit" loading={loading} className="rounded-xl px-5">
-          {!loading && <Icon name="lock_reset" size={18} />}
+          {!loading && <LockReset size={18} />}
           <span>Cambiar contraseña</span>
         </Button>
       </div>
@@ -218,7 +218,7 @@ export default function PerfilPage() {
           onClick={openLogoutModal}
           className="rounded-full px-4 text-xs font-semibold border-error-container/60 text-error hover:bg-error-container/20 hover:border-error-container self-center sm:self-auto"
         >
-          <Icon name="logout" size={16} />
+          <LogOut size={16} />
           <span>Cerrar sesión</span>
         </Button>
       </div>
@@ -227,7 +227,7 @@ export default function PerfilPage() {
         {/* Account Info Panel */}
         <div className="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-6 shadow-xs space-y-4">
           <div className="flex items-center gap-2 text-primary pb-2 border-b border-outline-variant/30">
-            <Icon name="person" size={20} />
+            <User size={20} />
             <h3 className="font-heading text-base font-bold text-on-surface">Información de la cuenta</h3>
           </div>
 
@@ -241,28 +241,28 @@ export default function PerfilPage() {
             <div className="divide-y divide-outline-variant/30 text-sm">
               <div className="flex items-center justify-between py-3">
                 <span className="flex items-center gap-2 text-on-surface-variant font-medium">
-                  <Icon name="mail" size={18} className="text-outline" />
+                  <Mail size={18} className="text-outline" />
                   Correo electrónico
                 </span>
                 <span className="font-semibold text-on-surface">{user.correo}</span>
               </div>
               <div className="flex items-center justify-between py-3">
                 <span className="flex items-center gap-2 text-on-surface-variant font-medium">
-                  <Icon name="call" size={18} className="text-outline" />
+                  <Phone size={18} className="text-outline" />
                   Teléfono
                 </span>
                 <span className="font-semibold text-on-surface">{user.telefono || '—'}</span>
               </div>
               <div className="flex items-center justify-between py-3">
                 <span className="flex items-center gap-2 text-on-surface-variant font-medium">
-                  <Icon name="shield" size={18} className="text-outline" />
+                  <Shield size={18} className="text-outline" />
                   Rol asignado
                 </span>
                 <StatusBadge display={rol} />
               </div>
               <div className="flex items-center justify-between py-3">
                 <span className="flex items-center gap-2 text-on-surface-variant font-medium">
-                  <Icon name="calendar_month" size={18} className="text-outline" />
+                  <Calendar size={18} className="text-outline" />
                   Miembro desde
                 </span>
                 <span className="font-medium text-on-surface">
@@ -280,7 +280,7 @@ export default function PerfilPage() {
         {/* Change Password Panel */}
         <div className="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-6 shadow-xs space-y-4">
           <div className="flex items-center gap-2 text-primary pb-2 border-b border-outline-variant/30">
-            <Icon name="key" size={20} />
+            <Key size={20} />
             <h3 className="font-heading text-base font-bold text-on-surface">Seguridad y contraseña</h3>
           </div>
 

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { User, Eye, Copy, Ruler, Save } from 'lucide-react'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
-import { Icon } from '@/components/Icon'
 import { SectionCard } from '@/components/forms/SectionCard'
 import { FieldError } from '@/components/forms/FieldError'
 import { SearchableSelect } from '@/components/forms/SearchableSelect'
@@ -142,7 +142,7 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
     <FormProvider {...form}>
       <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          <SectionCard icon="person" title="Paciente">
+          <SectionCard icon={User} title="Paciente">
             <div className="space-y-4">
               {/* Paciente selector */}
               <div className="space-y-1.5">
@@ -190,7 +190,7 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
                 <span className="px-2 py-0.5 rounded-md bg-primary-container text-on-primary-container text-xs font-mono font-bold tracking-wider">
                   OD
                 </span>
-                <Icon name="visibility" size={20} />
+                <Eye size={20} />
                 <h4 className="font-semibold text-sm">Ojo Derecho (OD)</h4>
               </div>
               <OjoFields lado="od" />
@@ -203,7 +203,7 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
                   <span className="px-2 py-0.5 rounded-md bg-secondary-container text-on-secondary-container text-xs font-mono font-bold tracking-wider">
                     OI
                   </span>
-                  <Icon name="visibility" size={20} />
+                  <Eye size={20} />
                   <h4 className="font-semibold text-sm">Ojo Izquierdo (OI)</h4>
                 </div>
                 <Button
@@ -213,14 +213,14 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
                   onClick={copiarOdAOi}
                   className="h-7 text-xs px-2.5 border-secondary/30 text-secondary hover:bg-secondary/10"
                 >
-                  <Icon name="content_copy" size={14} className="mr-1" /> Copiar OD
+                  <Copy size={14} className="mr-1" /> Copiar OD
                 </Button>
               </div>
               <OjoFields lado="oi" />
             </div>
           </div>
 
-          <SectionCard icon="straighten" title="Medidas y notas">
+          <SectionCard icon={Ruler} title="Medidas y notas">
             <div className="grid gap-4 sm:grid-cols-1">
               <div className="space-y-1.5">
                 <Label htmlFor="distancia_pupilar">Distancia pupilar (mm)</Label>
@@ -259,7 +259,7 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
             </Button>
           )}
           <Button type="submit" loading={submitting}>
-            {!submitting && <Icon name="save" size={18} className="mr-1.5" />}
+            {!submitting && <Save size={18} className="mr-1.5" />}
             Guardar receta
           </Button>
         </div>

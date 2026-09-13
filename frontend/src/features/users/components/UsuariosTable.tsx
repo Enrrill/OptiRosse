@@ -2,6 +2,7 @@ import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { Pagination } from '@/components/data/Pagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
+import { Plus, Pencil, RotateCcw, UserX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
 import {
@@ -12,7 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { choice, estadoActivo, ROLES } from '@/lib/constants/choices'
 import { formatDate, formatEmail, formatName } from '@/lib/format'
 import type { RolUsuario, Usuario } from '@/types/models'
@@ -114,7 +114,7 @@ export function UsuariosTable({
                       onEdit(row)
                     }}
                   >
-                    <Icon name="edit" size={18} />
+                    <Pencil size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Editar</TooltipContent>
@@ -132,7 +132,7 @@ export function UsuariosTable({
                         onToggleEstado(row)
                       }}
                     >
-                      <Icon name={row.activo ? 'person_off' : 'restart_alt'} size={18} />
+                      {row.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
                     </Button>
                   </span>
                 </TooltipTrigger>
@@ -180,7 +180,7 @@ export function UsuariosTable({
       emptyDescription="Crea la primera cuenta para que tu equipo pueda acceder a la plataforma."
       emptyAction={
         <Button onClick={onNuevo}>
-          <Icon name="add" size={18} /> Nuevo usuario
+          <Plus size={18} /> Nuevo usuario
         </Button>
       }
       toolbar={

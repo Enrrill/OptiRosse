@@ -1,4 +1,4 @@
-import { Icon } from '@/components/Icon'
+import { Calendar } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -20,7 +20,7 @@ export function DateRangePicker({
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-outline-variant/60 bg-surface-container-low/40 p-3">
       <span className="flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant">
-        <Icon name="calendar_today" size={14} className="text-primary" /> Rango de fechas
+        <Calendar size={14} className="text-primary" /> Rango de fechas
       </span>
       <div className="grid grid-cols-2 gap-2.5">
         <div className="space-y-1">

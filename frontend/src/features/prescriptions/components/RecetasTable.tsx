@@ -1,11 +1,11 @@
+import { Pencil, UserX, RotateCcw, Plus } from 'lucide-react'
 import { DataTable, type Column } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Icon } from '@/components/Icon'
 import { estadoActivo } from '@/lib/constants/choices'
 import { formatGradienteCompleto } from '@/lib/format'
 import type { RecetaOptica } from '@/types/models'
@@ -117,7 +117,7 @@ export function RecetasTable({
                       onEdit(row)
                     }}
                   >
-                    <Icon name="edit" size={18} />
+                    <Pencil size={18} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Editar</TooltipContent>
@@ -133,7 +133,7 @@ export function RecetasTable({
                       onToggleEstado(row)
                     }}
                   >
-                    <Icon name={row.activo ? 'person_off' : 'restart_alt'} size={18} />
+                    {row.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
@@ -158,7 +158,7 @@ export function RecetasTable({
       emptyAction={
         canEdit ? (
           <Button onClick={onNuevo}>
-            <Icon name="add" size={18} /> Nueva receta
+            <Plus size={18} /> Nueva receta
           </Button>
         ) : undefined
       }
@@ -178,7 +178,7 @@ export function RecetasTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

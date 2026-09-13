@@ -1,9 +1,9 @@
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CreditCard, Loader2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Icon } from '@/components/Icon'
 import { FieldError } from '@/components/forms/FieldError'
 import { MoneyInput } from '@/components/forms/MoneyInput'
 import { SectionCard } from '@/components/forms/SectionCard'
@@ -125,7 +125,7 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <SectionCard icon="person" title="Cliente y pedido">
+        <SectionCard icon={User} title="Cliente y pedido">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="pago-cliente">Cliente *</Label>
@@ -197,7 +197,7 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
           </div>
         </SectionCard>
 
-        <SectionCard icon="payments" title="Datos del pago">
+        <SectionCard icon={CreditCard} title="Datos del pago">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="pago-metodo">Método de pago *</Label>
@@ -283,7 +283,7 @@ function FormCuerpo({ onSuccess, onCancel }: Omit<RegistrarPagoFormProps, 'prese
           Cancelar
         </Button>
         <Button type="submit" disabled={crear.isPending}>
-          {crear.isPending && <Icon name="progress_activity" className="mr-2 animate-spin" />}
+          {crear.isPending && <Loader2 className="mr-2 animate-spin" />}
           Registrar pago
         </Button>
       </div>

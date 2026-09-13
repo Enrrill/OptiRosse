@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
+import { Tag, Package, ScanBarcode, Plus } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
 import { useAuthStore } from '@/store/useAuth'
 import { CategoriasTab } from './CategoriasTab'
 import { MarcasTab } from './MarcasTab'
@@ -10,10 +10,10 @@ import { ProductosTab } from './ProductosTab'
 import { VariantesTab } from './VariantesTab'
 
 const TABS = {
-  categorias: { label: 'Categorías', icon: 'category' },
-  marcas: { label: 'Marcas', icon: 'loyalty' },
-  productos: { label: 'Productos', icon: 'inventory_2' },
-  variantes: { label: 'Variantes', icon: 'barcode_scanner' },
+  categorias: { label: 'Categorías', icon: Tag },
+  marcas: { label: 'Marcas', icon: Tag },
+  productos: { label: 'Productos', icon: Package },
+  variantes: { label: 'Variantes', icon: ScanBarcode },
 } as const
 
 export type InventarioTabKey = keyof typeof TABS
@@ -44,17 +44,20 @@ export function InventarioTabs() {
     <Tabs value={active} onValueChange={onValueChange}>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <TabsList className="mb-0">
-          {(Object.keys(TABS) as InventarioTabKey[]).map((key) => (
-            <TabsTrigger key={key} value={key}>
-              <Icon name={TABS[key].icon} size={16} />
-              {TABS[key].label}
-            </TabsTrigger>
-          ))}
+          {(Object.keys(TABS) as InventarioTabKey[]).map((key) => {
+            const IconComp = TABS[key].icon
+            return (
+              <TabsTrigger key={key} value={key}>
+                <IconComp size={16} />
+                {TABS[key].label}
+              </TabsTrigger>
+            )
+          })}
         </TabsList>
 
         {canManage && active !== 'variantes' && (
           <Button onClick={handleNuevoClick}>
-            <Icon name="add" size={18} />
+            <Plus size={18} />
             {active === 'categorias'
               ? 'Nueva categoría'
               : active === 'marcas'
