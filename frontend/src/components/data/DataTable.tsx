@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import {
-  useReactTable,
-  getCoreRowModel,
+  useTable,
+  stockFeatures,
   flexRender,
   type ColumnDef,
   type SortingState,
@@ -13,8 +13,16 @@ import { SkeletonRows } from './SkeletonRows'
 import { ErrorState } from './ErrorState'
 import { EmptyState } from './EmptyState'
 
+type AppFeatures = typeof stockFeatures
+
+export type AppColumnDef<TData, TValue = unknown> = ColumnDef<
+  AppFeatures,
+  TData,
+  TValue
+>
+
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
+  columns: AppColumnDef<TData, TValue>[]
   data: TData[]
   isLoading?: boolean
   error?: string | null
@@ -56,10 +64,10 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
-  const table = useReactTable({
+  const table = useTable({
+    features: stockFeatures,
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: enableSorting ? setSorting : undefined,
     onColumnVisibilityChange: enableColumnVisibility ? setColumnVisibility : undefined,
     onRowSelectionChange: enableRowSelection ? setRowSelection : undefined,

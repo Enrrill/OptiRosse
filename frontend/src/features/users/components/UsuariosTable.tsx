@@ -1,5 +1,5 @@
 import { DataTable } from '@/components/data/DataTable'
-import type { ColumnDef } from '@tanstack/react-table'
+import type { AppColumnDef as ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'

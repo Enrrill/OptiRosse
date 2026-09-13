@@ -3,7 +3,7 @@ import type { Column } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 
 interface SortableHeaderProps<TData, TValue> {
-  column: Column<TData, TValue>
+  column: Column<Record<string, unknown>, TData, TValue>
   title: string
   className?: string
 }

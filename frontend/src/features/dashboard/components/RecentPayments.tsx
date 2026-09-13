@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router'
-import { DataTable, type ColumnDef } from '@/components/data/DataTable'
+import { DataTable, type AppColumnDef as ColumnDef } from '@/components/data/DataTable'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { choice, ESTADO_PAGO } from '@/lib/constants/choices'
 import { formatDate, formatMoney } from '@/lib/format'

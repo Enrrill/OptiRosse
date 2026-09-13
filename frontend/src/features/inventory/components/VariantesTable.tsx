@@ -1,5 +1,5 @@
 import { ArrowUpDown } from 'lucide-react'
-import { DataTable, type ColumnDef } from '@/components/data/DataTable'
+import { DataTable, type AppColumnDef as ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StockBadge } from '@/components/data/StockBadge'

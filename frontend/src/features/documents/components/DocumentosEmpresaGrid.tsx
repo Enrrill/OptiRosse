@@ -3,7 +3,7 @@ import { CloudUpload, Download, Eye, EyeOff, Pencil, RotateCcw, Wand2 } from 'lu
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DataTable } from '@/components/data/DataTable'
-import type { ColumnDef } from '@tanstack/react-table'
+import type { AppColumnDef as ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { EmptyState } from '@/components/data/EmptyState'
 import { ErrorState } from '@/components/data/ErrorState'

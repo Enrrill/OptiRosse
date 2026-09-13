@@ -1,5 +1,5 @@
 import { Eye, CheckCircle, XCircle, Plus } from 'lucide-react'
-import { DataTable, type ColumnDef } from '@/components/data/DataTable'
+import { DataTable, type AppColumnDef as ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
 import { DataTablePagination } from '@/components/data/DataTablePagination'
