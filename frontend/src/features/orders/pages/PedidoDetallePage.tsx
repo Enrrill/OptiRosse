@@ -9,6 +9,8 @@ import {
   Ban,
   FileText,
   History,
+  User,
+  Heart,
 } from 'lucide-react'
 import { PageHeader } from '@/components/data/PageHeader'
 import { Panel } from '@/components/data/Panel'
@@ -269,18 +271,24 @@ export default function PedidoDetallePage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
                 <span className="text-sm text-on-surface-variant">Destinatario</span>
-                {pedido.cliente_detalle ? (
-                  <Link
-                    to={`/clientes/${pedido.cliente}`}
-                    className="text-sm font-medium text-primary hover:underline"
-                  >
-                    {pedido.cliente_detalle.nombre_comercial}
-                  </Link>
-                ) : (
-                  <span className="text-sm font-medium">
-                    {pedido.paciente_detalle?.nombre_completo ?? '—'}
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${pedido.cliente_detalle ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'}`}>
+                    {pedido.cliente_detalle ? <User size={10} /> : <Heart size={10} />}
+                    {pedido.cliente_detalle ? 'Cliente' : 'Paciente'}
                   </span>
-                )}
+                  {pedido.cliente_detalle ? (
+                    <Link
+                      to={`/clientes/${pedido.cliente}`}
+                      className="text-sm font-medium text-primary hover:underline"
+                    >
+                      {pedido.cliente_detalle.nombre_comercial}
+                    </Link>
+                  ) : (
+                    <span className="text-sm font-medium">
+                      {pedido.paciente_detalle?.nombre_completo ?? '—'}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
                 <span className="text-sm text-on-surface-variant">Receta óptica</span>

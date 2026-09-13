@@ -4,13 +4,11 @@ import { PageHeader } from '@/components/data/PageHeader'
 import { ErrorState } from '@/components/data/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useApiQuery } from '@/hooks/useApi'
 import { useAuthStore } from '@/store/useAuth'
-import { CLIENTES, detalle } from '@/lib/api/endpoints'
-import type { Cliente, Pedido } from '@/types/models'
 import { usePedido } from '../hooks/usePedido'
 import { puedeGestionarPedidos } from '../permissions'
 import { PedidoForm } from '../components/PedidoForm'
+import type { DestinatarioSeleccion } from '../components/pedidoSchema'
 
 function FormSkeleton() {
   return (
@@ -34,17 +32,18 @@ export default function PedidoFormPage() {
   const id = idParam && /^\d+$/.test(idParam) ? Number(idParam) : null
 
   const clienteParam = searchParams.get('cliente')
-  const clientePreselectId =
-    clienteParam && /^\d+$/.test(clienteParam) ? Number(clienteParam) : null
+  const pacienteParam = searchParams.get('paciente')
+
+  let preselectDestinatario: DestinatarioSeleccion | null = null
+  if (!esEdicion && clienteParam && /^\d+$/.test(clienteParam)) {
+    preselectDestinatario = { tipo: 'cliente', id: Number(clienteParam), nombre: '' }
+  } else if (!esEdicion && pacienteParam && /^\d+$/.test(pacienteParam)) {
+    preselectDestinatario = { tipo: 'paciente', id: Number(pacienteParam), nombre: '' }
+  }
 
   const { pedido, isLoading, isError, error } = usePedido(id)
 
-  const preselectCliente = useApiQuery<Cliente>(
-    ['cliente', 'preselect', clientePreselectId],
-    !esEdicion && clientePreselectId != null ? detalle(CLIENTES, clientePreselectId) : null,
-  )
-
-  const volver = esEdicion ? '/pedidos' : '/pedidos'
+  const volver = '/pedidos'
 
   if (!canManage) {
     return (
@@ -93,7 +92,7 @@ export default function PedidoFormPage() {
     )
   }
 
-  const manejarExito = (p: Pedido) => navigate(`/pedidos/${p.id}`)
+  const manejarExito = (p: { id: number }) => navigate(`/pedidos/${p.id}`)
 
   return (
     <div className="space-y-6">
@@ -113,16 +112,12 @@ export default function PedidoFormPage() {
         }
       />
 
-      {clienteParam && preselectCliente.isLoading ? (
-        <FormSkeleton />
-      ) : (
-        <PedidoForm
-          pedido={pedido ?? null}
-          preselectCliente={preselectCliente.data?.data ?? null}
-          onSuccess={manejarExito}
-          onCancel={() => navigate('/pedidos')}
-        />
-      )}
+      <PedidoForm
+        pedido={pedido ?? null}
+        preselectDestinatario={preselectDestinatario}
+        onSuccess={manejarExito}
+        onCancel={() => navigate('/pedidos')}
+      />
     </div>
   )
 }

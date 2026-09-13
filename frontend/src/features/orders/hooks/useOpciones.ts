@@ -1,8 +1,8 @@
 import { apiClient } from '@/lib/api/client'
-import { RECETAS, VARIANTES } from '@/lib/api/endpoints'
+import { PACIENTES, RECETAS, VARIANTES } from '@/lib/api/endpoints'
 import { formatGradienteCompleto } from '@/lib/format'
 import type { SearchableOption } from '@/components/forms/SearchableSelect'
-import type { RecetaOptica, VarianteProducto } from '@/types/models'
+import type { Paciente, RecetaOptica, VarianteProducto } from '@/types/models'
 import type { ApiResponse } from '@/types/api'
 
 const PAGE_SIZE = 20
@@ -18,6 +18,20 @@ export async function buscarRecetas(
     label: r.paciente_detalle?.nombre_completo ?? `Receta #${r.id}`,
     description: formatGradienteCompleto(r.od_esfera, r.od_cilindro, r.od_eje),
     data: { id: r.id, nombre_completo: r.paciente_detalle?.nombre_completo ?? `Receta #${r.id}` },
+  }))
+}
+
+export async function buscarPacientes(
+  query: string,
+): Promise<SearchableOption<Paciente>[]> {
+  const res = await apiClient.get<ApiResponse<Paciente[]>>(PACIENTES, {
+    params: { search: query || undefined, activo: true, page_size: PAGE_SIZE },
+  })
+  return (res.data.data ?? []).map((p) => ({
+    value: String(p.id),
+    label: p.nombre_completo,
+    description: p.cedula ? `C.I. ${p.cedula}` : p.telefono || '',
+    data: p,
   }))
 }
 

@@ -11,38 +11,38 @@ import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
 import { User, ListOrdered, StickyNote } from 'lucide-react'
 import type { Pedido } from '@/types/models'
-import { buscarClientes } from '@/lib/api/opciones'
 import { buscarRecetas } from '../hooks/useOpciones'
 import { useActualizarPedido, useCrearPedido } from '../hooks/usePedidoMutations'
 import { calcularTotalesLineas } from '../lib/pedidoTotales'
 import { PedidoLineasEditor } from './PedidoLineasEditor'
 import { PedidoTotalesPanel } from './PedidoTotalesPanel'
+import { DestinatarioSelector } from './DestinatarioSelector'
 import {
   PEDIDO_DEFAULT_VALUES,
   pedidoFormSchema,
   toPedidoFormValues,
   toPedidoPayload,
-  type ClienteSeleccion,
+  type DestinatarioSeleccion,
   type PedidoFormValues,
   type RecetaSeleccion,
 } from './pedidoSchema'
 
 interface PedidoFormProps {
   pedido?: Pedido | null
-  preselectCliente?: ClienteSeleccion | null
+  preselectDestinatario?: DestinatarioSeleccion | null
   onSuccess: (pedido: Pedido) => void
   onCancel: () => void
 }
 
-const CAMPOS_SERVIDOR = ['cliente', 'receta', 'detalles']
+const CAMPOS_SERVIDOR = ['destinatario', 'cliente', 'paciente', 'receta', 'detalles']
 
-export function PedidoForm({ pedido, preselectCliente, onSuccess, onCancel }: PedidoFormProps) {
+export function PedidoForm({ pedido, preselectDestinatario, onSuccess, onCancel }: PedidoFormProps) {
   const form = useForm<PedidoFormValues>({
     resolver: zodResolver(pedidoFormSchema),
     defaultValues: pedido
       ? toPedidoFormValues(pedido)
-      : preselectCliente
-        ? { ...PEDIDO_DEFAULT_VALUES, cliente: preselectCliente }
+      : preselectDestinatario
+        ? { ...PEDIDO_DEFAULT_VALUES, destinatario: preselectDestinatario }
         : PEDIDO_DEFAULT_VALUES,
     mode: 'onTouched',
   })
@@ -58,7 +58,7 @@ function FormCuerpo({
   pedido,
   onSuccess,
   onCancel,
-}: Omit<PedidoFormProps, 'preselectCliente'>) {
+}: Omit<PedidoFormProps, 'preselectDestinatario'>) {
   const {
     register,
     handleSubmit,
@@ -68,7 +68,7 @@ function FormCuerpo({
     formState,
   } = useFormContext<PedidoFormValues>()
   const errors = formState.errors
-  const cliente = watch('cliente')
+  const destinatario = watch('destinatario')
   const receta = watch('receta')
   const detalles = watch('detalles')
   const totales = calcularTotalesLineas(detalles)
@@ -86,7 +86,10 @@ function FormCuerpo({
     }
 
     if (errores.cliente) {
-      setError('cliente', { type: 'server', message: errores.cliente[0] })
+      setError('destinatario', { type: 'server', message: errores.cliente[0] })
+    }
+    if (errores.paciente) {
+      setError('destinatario', { type: 'server', message: errores.paciente[0] })
     }
     if (errores.receta) {
       setError('receta', { type: 'server', message: errores.receta[0] })
@@ -132,22 +135,15 @@ function FormCuerpo({
   return (
     <form onSubmit={onSubmit} noValidate>
       <div className="space-y-6">
-        <SectionCard icon={User} title="Cliente y receta">
+        <SectionCard icon={User} title="Destinatario y receta">
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="cliente">Cliente *</Label>
-              <SearchableSelect<ClienteSeleccion>
-                keyId="cliente"
-                value={cliente}
-                onChange={(value) =>
-                  setValue('cliente', value, { shouldDirty: true, shouldValidate: true })
-                }
-                searchOptions={buscarClientes}
-                formatSelected={(c) => c.nombre_comercial}
-                placeholder="Buscar cliente por nombre o RIF..."
-              />
-              <FieldError message={errors.cliente?.message} />
-            </div>
+            <DestinatarioSelector
+              value={destinatario}
+              onChange={(value) =>
+                setValue('destinatario', value ?? { tipo: 'cliente', id: 0, nombre: '' }, { shouldDirty: true, shouldValidate: true })
+              }
+              error={errors.destinatario?.message}
+            />
             <div className="space-y-2">
               <Label>Receta óptica (opcional)</Label>
               <SearchableSelect<RecetaSeleccion>

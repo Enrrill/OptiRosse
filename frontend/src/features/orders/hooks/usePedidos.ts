@@ -6,6 +6,7 @@ import type { Pedido } from '@/types/models'
 export interface PedidoParams extends PaginationParams {
   estado?: string
   cliente?: number
+  tipo_destinatario?: 'cliente' | 'paciente'
   numero_pedido?: string
   fecha_creado_after?: string
   fecha_creado_before?: string
@@ -13,7 +14,7 @@ export interface PedidoParams extends PaginationParams {
 
 export function usePedidos(params: PedidoParams) {
   const clean: Record<string, unknown> = { ...params }
-  for (const key of ['search', 'estado', 'cliente', 'numero_pedido', 'fecha_creado_after', 'fecha_creado_before']) {
+  for (const key of ['search', 'estado', 'cliente', 'tipo_destinatario', 'numero_pedido', 'fecha_creado_after', 'fecha_creado_before']) {
     if (!clean[key]) delete clean[key]
   }
 

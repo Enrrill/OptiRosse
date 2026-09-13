@@ -1,3 +1,4 @@
+import { User, Heart } from 'lucide-react'
 import { DataTable } from '@/components/data/DataTable'
 import type { AppColumnDef as ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
@@ -33,6 +34,8 @@ interface PedidosTableProps {
   onSearchChange: (value: string) => void
   estadoFiltro: string
   onEstadoChange: (value: string) => void
+  tipoDestinatarioFiltro: string
+  onTipoDestinatarioChange: (value: string) => void
   clientes: Cliente[]
   clienteFiltro: number | null
   onClienteChange: (value: number | null) => void
@@ -62,6 +65,8 @@ export function PedidosTable({
   onSearchChange,
   estadoFiltro,
   onEstadoChange,
+  tipoDestinatarioFiltro,
+  onTipoDestinatarioChange,
   clientes,
   clienteFiltro,
   onClienteChange,
@@ -84,15 +89,23 @@ export function PedidosTable({
       ),
     },
     {
-      accessorKey: 'cliente',
+      accessorKey: 'destinatario',
       header: 'Destinatario',
-      cell: ({row}) => (
-        <span className="font-medium text-on-surface">
-          {row.original.cliente_detalle?.nombre_comercial
-            ?? row.original.paciente_detalle?.nombre_completo
-            ?? '—'}
-        </span>
-      ),
+      cell: ({row}) => {
+        const esCliente = !!row.original.cliente_detalle
+        const nombre = esCliente
+          ? row.original.cliente_detalle?.nombre_comercial
+          : row.original.paciente_detalle?.nombre_completo
+        return (
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${esCliente ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'}`}>
+              {esCliente ? <User size={10} /> : <Heart size={10} />}
+              {esCliente ? 'Cliente' : 'Paciente'}
+            </span>
+            <span className="font-medium text-on-surface">{nombre ?? '—'}</span>
+          </div>
+        )
+      },
     },
     {
       accessorKey: 'usuario',
@@ -186,6 +199,7 @@ export function PedidosTable({
 
   const activeCount = [
     estadoFiltro !== '',
+    tipoDestinatarioFiltro !== '',
     clienteFiltro !== null,
     fechaDesde !== '',
     fechaHasta !== '',
@@ -198,6 +212,14 @@ export function PedidosTable({
           label: 'Estado',
           valueDisplay: choice(ESTADO_PEDIDO, estadoFiltro)?.label ?? '',
           onRemove: () => onEstadoChange(''),
+        }
+      : null,
+    tipoDestinatarioFiltro
+      ? {
+          id: 'tipoDestinatario',
+          label: 'Tipo',
+          valueDisplay: tipoDestinatarioFiltro === 'cliente' ? 'Cliente' : 'Paciente',
+          onRemove: () => onTipoDestinatarioChange(''),
         }
       : null,
     clienteFiltro !== null
@@ -228,6 +250,7 @@ export function PedidosTable({
 
   const handleClearFilters = () => {
     onEstadoChange('')
+    onTipoDestinatarioChange('')
     onClienteChange(null)
     onFechaDesdeChange('')
     onFechaHastaChange('')
@@ -256,7 +279,7 @@ export function PedidosTable({
         <DataTableToolbar
           search={search}
           onSearchChange={onSearchChange}
-          searchPlaceholder="Buscar por N.º o cliente..."
+          searchPlaceholder="Buscar por N.º o destinatario..."
           searchId="search-pedidos"
           activeFilterCount={activeCount}
           activeFilters={activeFiltersList}
@@ -279,6 +302,23 @@ export function PedidosTable({
                         {item.label}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-on-surface-variant">Tipo destinatario</label>
+                <Select
+                  value={tipoDestinatarioFiltro || 'todos'}
+                  onValueChange={(value) => onTipoDestinatarioChange(value === 'todos' ? '' : value)}
+                >
+                  <SelectTrigger className="w-full h-8.5 text-xs bg-surface-container-lowest border-outline-variant/80">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="cliente">Clientes</SelectItem>
+                    <SelectItem value="paciente">Pacientes</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

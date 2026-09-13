@@ -7,9 +7,19 @@ export const clienteSeleccion = z.object({
   razon_social: z.string(),
 })
 
+export const pacienteSeleccion = z.object({
+  id: z.number(),
+  nombre_completo: z.string(),
+})
+
+export const destinatarioSeleccion = z.discriminatedUnion('tipo', [
+  z.object({ tipo: z.literal('cliente'), id: z.number(), nombre: z.string() }),
+  z.object({ tipo: z.literal('paciente'), id: z.number(), nombre: z.string() }),
+])
+
 export const recetaSeleccion = z.object({
   id: z.number(),
-  nombre_completo: z.string(), // nombre_completo del paciente vinculado
+  nombre_completo: z.string(),
 })
 
 export const varianteSeleccion = z.object({
@@ -22,6 +32,8 @@ export const varianteSeleccion = z.object({
 })
 
 export type ClienteSeleccion = z.infer<typeof clienteSeleccion>
+export type PacienteSeleccion = z.infer<typeof pacienteSeleccion>
+export type DestinatarioSeleccion = z.infer<typeof destinatarioSeleccion>
 export type RecetaSeleccion = z.infer<typeof recetaSeleccion>
 export type VarianteSeleccion = z.infer<typeof varianteSeleccion>
 
@@ -42,9 +54,10 @@ export const pedidoLineaSchema = z.object({
 
 export const pedidoFormSchema = z
   .object({
-    cliente: clienteSeleccion
-      .nullable()
-      .refine((v): boolean => v !== null, { message: 'Selecciona un cliente' }),
+    destinatario: destinatarioSeleccion.refine(
+      (v): boolean => v !== null && v.id > 0,
+      { message: 'Selecciona un cliente o paciente' },
+    ),
     receta: recetaSeleccion.nullable(),
     notas: z.string().trim(),
     detalles: z.array(pedidoLineaSchema).min(1, 'Agrega al menos una línea'),
@@ -64,7 +77,7 @@ export type PedidoLineaFormValue = z.infer<typeof pedidoLineaSchema>
 export type PedidoFormValues = z.infer<typeof pedidoFormSchema>
 
 export const PEDIDO_DEFAULT_VALUES: PedidoFormValues = {
-  cliente: null,
+  destinatario: { tipo: 'cliente', id: 0, nombre: '' },
   receta: null,
   notas: '',
   detalles: [DEFAULT_PEDIDO_LINEA()],
@@ -79,8 +92,25 @@ export function DEFAULT_PEDIDO_LINEA(): PedidoLineaFormValue {
 }
 
 export function toPedidoFormValues(pedido: Pedido): PedidoFormValues {
+  let destinatario: DestinatarioSeleccion
+  if (pedido.cliente && pedido.cliente_detalle) {
+    destinatario = {
+      tipo: 'cliente',
+      id: pedido.cliente,
+      nombre: pedido.cliente_detalle.nombre_comercial,
+    }
+  } else if (pedido.paciente && pedido.paciente_detalle) {
+    destinatario = {
+      tipo: 'paciente',
+      id: pedido.paciente,
+      nombre: pedido.paciente_detalle.nombre_completo,
+    }
+  } else {
+    destinatario = { tipo: 'cliente', id: 0, nombre: '' }
+  }
+
   return {
-    cliente: pedido.cliente_detalle,
+    destinatario,
     receta: pedido.receta_detalle
       ? {
           id: pedido.receta_detalle.id,
@@ -110,10 +140,19 @@ export function toPedidoPayload(values: PedidoFormValues): PedidoPayload {
     precio_unitario: d.precio_unitario,
   }))
 
-  return {
-    cliente: values.cliente ? values.cliente.id : undefined,
+  const payload: PedidoPayload = {
     receta: values.receta?.id ?? null,
     notas: values.notas,
     detalles,
   }
+
+  if (values.destinatario?.tipo === 'cliente') {
+    payload.cliente = values.destinatario.id
+    payload.paciente = null
+  } else if (values.destinatario?.tipo === 'paciente') {
+    payload.paciente = values.destinatario.id
+    payload.cliente = null
+  }
+
+  return payload
 }

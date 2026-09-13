@@ -16,6 +16,7 @@ import { PedidosTable } from '../components/PedidosTable'
 import type { Pedido } from '@/types/models'
 
 const ESTADOS = ['borrador', 'confirmado', 'en_laboratorio', 'listo_para_entrega', 'entregado', 'cancelado']
+const TIPOS_DESTINATARIO = ['cliente', 'paciente']
 
 export default function PedidosPage() {
   const navigate = useNavigate()
@@ -28,6 +29,10 @@ export default function PedidosPage() {
   const [estadoFiltro, setEstadoFiltro] = useState(() => {
     const desdeUrl = searchParams.get('estado')
     return desdeUrl && ESTADOS.includes(desdeUrl) ? desdeUrl : ''
+  })
+  const [tipoDestinatarioFiltro, setTipoDestinatarioFiltro] = useState(() => {
+    const desdeUrl = searchParams.get('tipo_destinatario')
+    return desdeUrl && TIPOS_DESTINATARIO.includes(desdeUrl) ? desdeUrl : ''
   })
   const [clienteFiltro, setClienteFiltro] = useState<number | null>(() => {
     const desdeUrl = searchParams.get('cliente')
@@ -42,11 +47,12 @@ export default function PedidosPage() {
   const params = useMemo<PedidoParams>(() => {
     const p: PedidoParams = { ...pagination.params }
     if (estadoFiltro) p.estado = estadoFiltro
+    if (tipoDestinatarioFiltro) p.tipo_destinatario = tipoDestinatarioFiltro as 'cliente' | 'paciente'
     if (clienteFiltro != null) p.cliente = clienteFiltro
     if (fechaDesde) p.fecha_creado_after = fechaDesde
     if (fechaHasta) p.fecha_creado_before = fechaHasta
     return p
-  }, [pagination.params, estadoFiltro, clienteFiltro, fechaDesde, fechaHasta])
+  }, [pagination.params, estadoFiltro, tipoDestinatarioFiltro, clienteFiltro, fechaDesde, fechaHasta])
 
   const { pedidos, count, isLoading, isError, error, refetch } = usePedidos(params)
   const eliminar = useEliminarPedido(eliminarTarget?.id ?? null)
@@ -56,6 +62,12 @@ export default function PedidosPage() {
     setEstadoFiltro(value)
     pagination.resetPage()
     setSearchParams(value ? { estado: value } : {}, { replace: true })
+  }
+
+  const actualizarTipoDestinatarioFiltro = (value: string) => {
+    setTipoDestinatarioFiltro(value)
+    pagination.resetPage()
+    setSearchParams(value ? { tipo_destinatario: value } : {}, { replace: true })
   }
 
   const confirmarEliminacion = async () => {
@@ -100,6 +112,8 @@ export default function PedidosPage() {
         }}
         estadoFiltro={estadoFiltro}
         onEstadoChange={actualizarEstadoFiltro}
+        tipoDestinatarioFiltro={tipoDestinatarioFiltro}
+        onTipoDestinatarioChange={actualizarTipoDestinatarioFiltro}
         clientes={clientes}
         clienteFiltro={clienteFiltro}
         onClienteChange={(value) => {
