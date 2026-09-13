@@ -18,7 +18,7 @@ export function AppShell() {
         >
           <Header />
           <main
-            className="flex-1 overflow-y-auto p-4 pt-[calc(var(--header-height)+16px)] md:px-8 md:pb-8"
+            className="flex-1 overflow-y-auto p-4 pt-[calc(var(--header-height)+8px)] md:px-8 md:pb-8"
           >
             <div className="mx-auto w-full max-w-[1600px]">
               <Outlet />

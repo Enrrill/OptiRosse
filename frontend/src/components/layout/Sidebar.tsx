@@ -258,7 +258,7 @@ export function Sidebar() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 hidden h-screen flex-col border-r border-outline-variant bg-surface px-2 pb-4 transition-all duration-300 lg:flex',
+          'fixed inset-y-0 left-0 z-40 hidden h-screen flex-col border-r border-outline-variant bg-surface px-2 pt-2 pb-4 transition-all duration-300 lg:flex',
           collapsed ? 'w-[--sidebar-collapsed-width]' : 'w-[--sidebar-width]',
         )}
       >
