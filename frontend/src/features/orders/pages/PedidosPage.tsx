@@ -15,7 +15,7 @@ import { puedeGestionarPedidos } from '../permissions'
 import { PedidosTable } from '../components/PedidosTable'
 import type { Pedido } from '@/types/models'
 
-const ESTADOS = ['borrador', 'confirmado', 'en_taller', 'listo_para_despacho', 'enviado', 'cancelado']
+const ESTADOS = ['borrador', 'confirmado', 'en_laboratorio', 'listo_para_entrega', 'entregado', 'cancelado']
 
 export default function PedidosPage() {
   const navigate = useNavigate()
@@ -72,7 +72,7 @@ export default function PedidosPage() {
     <div>
       <PageHeader
         title="Pedidos"
-        description="Gestiona el ciclo de vida de los pedidos: borrador a enviado."
+        description="Gestiona el ciclo de vida de los pedidos: borrador a entregado."
         actions={
           canManage ? (
             <Button onClick={() => navigate('/pedidos/nuevo')}>

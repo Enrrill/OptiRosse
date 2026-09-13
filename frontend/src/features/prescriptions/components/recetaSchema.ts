@@ -29,11 +29,11 @@ const distanciaPupilar = opticoNullable.refine((v) => v === null || (v >= 40 && 
 
 export const recetaSchema = z
   .object({
-    nombre_paciente: z
-      .string()
-      .trim()
-      .min(2, 'El nombre del paciente es obligatorio (mínimo 2 caracteres)')
-      .max(100, 'Máximo 100 caracteres'),
+    paciente: z
+      .number({ required_error: 'El paciente es obligatorio' })
+      .int()
+      .positive('Selecciona un paciente'),
+    medico_prescriptor: z.string().trim().max(150, 'Máximo 150 caracteres'),
     od_esfera: esferaOCilindro,
     od_cilindro: esferaOCilindro,
     od_eje: eje,
@@ -101,11 +101,12 @@ export const recetaSchema = z
 
 export type RecetaFormValues = z.infer<typeof recetaSchema>
 
-/** Payload enviado al backend: los campos de graduación van como número o null. */
+/** Payload enviado al backend. */
 export type RecetaPayload = RecetaFormValues
 
 export const RECETA_DEFAULT_VALUES: RecetaFormValues = {
-  nombre_paciente: '',
+  paciente: undefined as unknown as number,
+  medico_prescriptor: '',
   od_esfera: null,
   od_cilindro: null,
   od_eje: null,
@@ -125,7 +126,8 @@ function numeroOpcional(valor?: string | null): number | null {
 
 export function toRecetaFormValues(receta: RecetaOptica): RecetaFormValues {
   return {
-    nombre_paciente: receta.nombre_paciente,
+    paciente: receta.paciente,
+    medico_prescriptor: receta.medico_prescriptor ?? '',
     od_esfera: numeroOpcional(receta.od_esfera),
     od_cilindro: numeroOpcional(receta.od_cilindro),
     od_eje: numeroOpcional(receta.od_eje !== null ? String(receta.od_eje) : null),
@@ -141,7 +143,8 @@ export function toRecetaFormValues(receta: RecetaOptica): RecetaFormValues {
 
 export function toRecetaPayload(values: RecetaFormValues): RecetaPayload {
   return {
-    nombre_paciente: values.nombre_paciente,
+    paciente: values.paciente,
+    medico_prescriptor: values.medico_prescriptor,
     od_esfera: values.od_esfera,
     od_cilindro: values.od_cilindro,
     od_eje: values.od_eje,

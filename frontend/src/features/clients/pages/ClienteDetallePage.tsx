@@ -17,8 +17,8 @@ import { useDesactivarCliente, useReactivarCliente } from '../hooks/useClienteMu
 import { ClienteFormDrawer } from '../components/ClienteFormDrawer'
 import type { RolUsuario } from '@/types/models'
 
-const PEDIDOS_ROLES = new Set<RolUsuario>(['administrador', 'contabilidad', 'vendedor_b2b'])
-const PAGOS_ROLES = new Set<RolUsuario>(['administrador', 'contabilidad'])
+const PEDIDOS_ROLES = new Set<RolUsuario>(['administrador', 'empleado'])
+const PAGOS_ROLES = new Set<RolUsuario>(['administrador', 'empleado'])
 
 function DetalleSkeleton() {
   return (
@@ -193,7 +193,7 @@ export default function ClienteDetallePage() {
             )}
           </div>
           <p className="mt-1 text-xs text-on-surface-variant">
-            {puedeVerSaldo ? 'Deuda actual pendiente' : 'Solo administración / contabilidad'}
+            {puedeVerSaldo ? 'Deuda actual pendiente' : 'Solo administración'}
           </p>
         </div>
       </div>

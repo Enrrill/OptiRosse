@@ -3,10 +3,7 @@ import type { Usuario } from '@/types/models'
 
 export const ROLES_ARRAY = [
   'administrador',
-  'vendedor_b2b',
-  'almacen',
-  'tecnico_taller',
-  'contabilidad',
+  'empleado',
 ] as const
 
 export type RolFormValue = (typeof ROLES_ARRAY)[number]
@@ -63,7 +60,7 @@ export const USUARIO_DEFAULT_VALUES: UsuarioFormValues = {
   nombre: '',
   apellido: '',
   telefono: '',
-  rol: 'vendedor_b2b',
+  rol: 'empleado',
   password: '',
 }
 

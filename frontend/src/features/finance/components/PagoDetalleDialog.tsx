@@ -43,7 +43,9 @@ export function PagoDetalleDialog({ open, onOpenChange, pago }: PagoDetalleDialo
         <DialogHeader>
           <DialogTitle>Pago #{pago.id}</DialogTitle>
           <DialogDescription>
-            {pago.cliente_detalle.nombre_comercial} · {formatDateTime(pago.fecha_pago)}
+            {pago.cliente_detalle?.nombre_comercial
+              ?? pago.paciente_detalle?.nombre_completo
+              ?? '—'} · {formatDateTime(pago.fecha_pago)}
           </DialogDescription>
         </DialogHeader>
 
@@ -52,7 +54,11 @@ export function PagoDetalleDialog({ open, onOpenChange, pago }: PagoDetalleDialo
             <span className="text-sm text-on-surface-variant">Estado</span>
             <StatusBadge display={choice(ESTADO_PAGO, pago.estado)} />
           </div>
-          <Fila label="Cliente">{pago.cliente_detalle.nombre_comercial}</Fila>
+          <Fila label="Destinatario">
+            {pago.cliente_detalle?.nombre_comercial
+              ?? pago.paciente_detalle?.nombre_completo
+              ?? '—'}
+          </Fila>
           <Fila label="Pedido">{pago.pedido_numero ?? '—'}</Fila>
           <Fila label="Método de pago">{pago.metodo_pago_detalle}</Fila>
           <Fila label="Monto">{formatMoney(pago.monto)}</Fila>

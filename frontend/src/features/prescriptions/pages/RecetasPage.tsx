@@ -52,7 +52,7 @@ export default function RecetasPage() {
   }
 
   const esInactivo = estadoTarget != null && !estadoTarget.activo
-  const nombrePaciente = estadoTarget?.nombre_paciente || 'el paciente'
+  const nombrePaciente = estadoTarget?.paciente_detalle?.nombre_completo || 'el paciente'
 
   return (
     <div>

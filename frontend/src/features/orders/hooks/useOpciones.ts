@@ -15,9 +15,9 @@ export async function buscarRecetas(
   })
   return (res.data.data ?? []).map((r) => ({
     value: String(r.id),
-    label: r.nombre_paciente || `Receta #${r.id}`,
+    label: r.paciente_detalle?.nombre_completo ?? `Receta #${r.id}`,
     description: formatGradienteCompleto(r.od_esfera, r.od_cilindro, r.od_eje),
-    data: r,
+    data: { id: r.id, nombre_completo: r.paciente_detalle?.nombre_completo ?? `Receta #${r.id}` },
   }))
 }
 

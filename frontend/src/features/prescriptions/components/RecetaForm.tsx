@@ -1,17 +1,19 @@
 import { useState } from 'react'
-import { FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ApiError } from '@/lib/api/errors'
 import { useToast } from '@/store/useToast'
 import { Icon } from '@/components/Icon'
 import { SectionCard } from '@/components/forms/SectionCard'
 import { FieldError } from '@/components/forms/FieldError'
+import { SearchableSelect } from '@/components/forms/SearchableSelect'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { useCrearReceta, useActualizarReceta } from '../hooks/useRecetaMutations'
+import { buscarPacientes } from '../hooks/usePacientes'
 import {
   recetaSchema,
   RECETA_DEFAULT_VALUES,
@@ -19,7 +21,7 @@ import {
   toRecetaPayload,
   type RecetaFormValues,
 } from './recetaSchema'
-import type { RecetaOptica } from '@/types/models'
+import type { PacienteResumen, RecetaOptica } from '@/types/models'
 
 interface RecetaFormProps {
   receta?: RecetaOptica | null
@@ -91,6 +93,9 @@ function OjoFields({ lado }: { lado: Lado }) {
 export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
   const toast = useToast()
   const [submitting, setSubmitting] = useState(false)
+  const [pacienteSeleccionado, setPacienteSeleccionado] = useState<PacienteResumen | null>(
+    receta?.paciente_detalle ?? null,
+  )
   const crear = useCrearReceta()
   const actualizar = useActualizarReceta(receta?.id ?? null)
 
@@ -138,16 +143,43 @@ export function RecetaForm({ receta, onSuccess, onCancel }: RecetaFormProps) {
       <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <SectionCard icon="person" title="Paciente">
-            <div className="space-y-1.5">
-              <Label htmlFor="nombre_paciente">
-                Nombre del paciente <span className="text-error">*</span>
-              </Label>
-              <Input
-                id="nombre_paciente"
-                placeholder="Nombre completo del paciente"
-                {...form.register('nombre_paciente')}
-              />
-              <FieldError message={form.formState.errors.nombre_paciente?.message} />
+            <div className="space-y-4">
+              {/* Paciente selector */}
+              <div className="space-y-1.5">
+                <Label htmlFor="paciente-select">
+                  Paciente <span className="text-error">*</span>
+                </Label>
+                <Controller
+                  name="paciente"
+                  control={form.control}
+                  render={({ field }) => (
+                    <SearchableSelect<PacienteResumen>
+                      keyId="paciente-select"
+                      value={pacienteSeleccionado}
+                      onChange={(p) => {
+                        setPacienteSeleccionado(p)
+                        field.onChange(p?.id ?? undefined)
+                      }}
+                      searchOptions={buscarPacientes}
+                      formatSelected={(p) => p.nombre_completo}
+                      placeholder="Buscar paciente..."
+                      emptyText="No se encontraron pacientes"
+                    />
+                  )}
+                />
+                <FieldError message={form.formState.errors.paciente?.message} />
+              </div>
+
+              {/* Médico prescriptor */}
+              <div className="space-y-1.5">
+                <Label htmlFor="medico_prescriptor">Médico prescriptor</Label>
+                <Input
+                  id="medico_prescriptor"
+                  placeholder="Dr. Nombre Apellido"
+                  {...form.register('medico_prescriptor')}
+                />
+                <FieldError message={form.formState.errors.medico_prescriptor?.message} />
+              </div>
             </div>
           </SectionCard>
 

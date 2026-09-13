@@ -9,7 +9,7 @@ export const clienteSeleccion = z.object({
 
 export const recetaSeleccion = z.object({
   id: z.number(),
-  nombre_paciente: z.string(),
+  nombre_completo: z.string(), // nombre_completo del paciente vinculado
 })
 
 export const varianteSeleccion = z.object({
@@ -82,7 +82,10 @@ export function toPedidoFormValues(pedido: Pedido): PedidoFormValues {
   return {
     cliente: pedido.cliente_detalle,
     receta: pedido.receta_detalle
-      ? { id: pedido.receta_detalle.id, nombre_paciente: pedido.receta_detalle.nombre_paciente }
+      ? {
+          id: pedido.receta_detalle.id,
+          nombre_completo: pedido.receta_detalle.paciente_detalle?.nombre_completo ?? `Receta #${pedido.receta_detalle.id}`,
+        }
       : null,
     notas: pedido.notas,
     detalles: pedido.detalles.map((d) => ({
@@ -108,7 +111,7 @@ export function toPedidoPayload(values: PedidoFormValues): PedidoPayload {
   }))
 
   return {
-    cliente: values.cliente!.id,
+    cliente: values.cliente ? values.cliente.id : undefined,
     receta: values.receta?.id ?? null,
     notas: values.notas,
     detalles,

@@ -65,10 +65,12 @@ export function RecetasTable({
       cell: (row) => <span className="font-mono text-sm font-medium text-on-surface">#{row.id}</span>,
     },
     {
-      key: 'nombre_paciente',
+      key: 'paciente',
       header: 'Paciente',
       cell: (row) => (
-        <span className="font-medium text-on-surface">{row.nombre_paciente || 'Sin paciente'}</span>
+        <span className="font-medium text-on-surface">
+          {row.paciente_detalle?.nombre_completo || 'Sin paciente'}
+        </span>
       ),
     },
     {

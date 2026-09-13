@@ -8,21 +8,9 @@ export const ROLES: Record<string, ChoiceDisplay> = {
     label: 'Administrador',
     badge: 'bg-primary-container/20 text-primary',
   },
-  vendedor_b2b: {
-    label: 'Vendedor B2B',
+  empleado: {
+    label: 'Empleado',
     badge: 'bg-secondary-container/25 text-secondary',
-  },
-  almacen: {
-    label: 'Almacén',
-    badge: 'bg-surface-variant/40 text-on-surface-variant',
-  },
-  tecnico_taller: {
-    label: 'Técnico de Taller',
-    badge: 'bg-tertiary-container/20 text-tertiary',
-  },
-  contabilidad: {
-    label: 'Contabilidad',
-    badge: 'bg-green-500/15 text-green-700 dark:text-green-300',
   },
 }
 
@@ -35,21 +23,32 @@ export const ESTADO_PEDIDO: Record<string, ChoiceDisplay> = {
     label: 'Confirmado',
     badge: 'bg-primary-container/20 text-primary',
   },
-  en_taller: {
-    label: 'En Taller',
+  en_laboratorio: {
+    label: 'En Laboratorio',
     badge: 'bg-secondary-container/25 text-secondary',
   },
-  listo_para_despacho: {
-    label: 'Listo para Despacho',
+  listo_para_entrega: {
+    label: 'Listo para Entrega',
     badge: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
   },
-  enviado: {
-    label: 'Enviado',
+  entregado: {
+    label: 'Entregado',
     badge: 'bg-green-500/15 text-green-700 dark:text-green-300',
   },
   cancelado: {
     label: 'Cancelado',
     badge: 'bg-error-container/50 text-error',
+  },
+}
+
+export const TIPO_PEDIDO: Record<string, ChoiceDisplay> = {
+  laboratorio: {
+    label: 'Laboratorio',
+    badge: 'bg-secondary-container/25 text-secondary',
+  },
+  mostrador: {
+    label: 'Mostrador',
+    badge: 'bg-tertiary-container/20 text-tertiary',
   },
 }
 

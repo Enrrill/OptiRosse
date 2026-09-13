@@ -4,7 +4,7 @@ import { LIBRO_MAYOR } from '@/lib/api/endpoints'
 import { useAuthStore } from '@/store/useAuth'
 import type { LibroMayorAsiento } from '@/types/models'
 
-const ROLES_SALDO = new Set(['administrador', 'contabilidad'])
+const ROLES_SALDO = new Set(['administrador', 'empleado'])
 
 export function useSaldoCliente(id: number | null) {
   const rol = useAuthStore((s) => s.user?.rol)

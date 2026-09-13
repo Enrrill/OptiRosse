@@ -27,7 +27,7 @@ export function CategoriasTab({ triggerNuevo }: CategoriasTabProps) {
   }
 
   const rol = useAuthStore((s) => s.user?.rol)
-  const canManage = !rol || rol === 'administrador' || rol === 'almacen'
+  const canManage = !rol || rol === 'administrador' || rol === 'empleado'
 
   const params = useMemo<CategoriaParams>(() => {
     const p: CategoriaParams = { ...pagination.params }

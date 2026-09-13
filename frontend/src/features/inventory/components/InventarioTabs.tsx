@@ -25,7 +25,7 @@ export function InventarioTabs() {
   const [triggerNuevo, setTriggerNuevo] = useState(0)
 
   const rol = useAuthStore((s) => s.user?.rol)
-  const canManage = rol === 'administrador' || rol === 'almacen'
+  const canManage = rol === 'administrador' || rol === 'empleado'
 
   const raw = searchParams.get('tab')
   const active: InventarioTabKey =

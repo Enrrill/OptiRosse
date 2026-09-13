@@ -4,9 +4,9 @@ import type { DashboardKpis } from '@/types/models'
 
 const ESTADOS_ORDEN = [
   { key: 'confirmado', label: 'Confirmados', icon: 'inventory', variant: 'primary' },
-  { key: 'en_taller', label: 'En taller', icon: 'build', variant: 'secondary' },
-  { key: 'listo_para_despacho', label: 'Listos para despacho', icon: 'local_shipping', variant: 'amber' },
-  { key: 'enviado', label: 'Enviados', icon: 'check_circle', variant: 'green' },
+  { key: 'en_laboratorio', label: 'En laboratorio', icon: 'science', variant: 'secondary' },
+  { key: 'listo_para_entrega', label: 'Listos para entrega', icon: 'inventory_2', variant: 'amber' },
+  { key: 'entregado', label: 'Entregados', icon: 'check_circle', variant: 'green' },
 ] as const
 
 export function buildKpiCards(kpis: DashboardKpis): KpiCardProps[] {

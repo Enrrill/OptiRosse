@@ -17,7 +17,7 @@ interface RecetaFormDrawerProps {
 }
 
 export function RecetaFormDrawer({ open, onOpenChange, receta }: RecetaFormDrawerProps) {
-  const paciente = receta?.nombre_paciente || 'Sin paciente'
+  const paciente = receta?.paciente_detalle?.nombre_completo || 'Sin paciente'
   const title = receta ? 'Editar receta' : 'Nueva receta'
   const description = receta
     ? `Actualiza la graduación de ${paciente}.`

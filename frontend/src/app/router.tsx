@@ -29,13 +29,7 @@ const withSuspense = (element: React.ReactNode) => (
 )
 
 const adminOnly: RolUsuario[] = ['administrador']
-const adminAlmacen: RolUsuario[] = ['administrador', 'almacen']
-const adminContabilidad: RolUsuario[] = ['administrador', 'contabilidad']
-const adminContabilidadVendedor: RolUsuario[] = [
-  'administrador',
-  'contabilidad',
-  'vendedor_b2b',
-]
+const adminEmpleado: RolUsuario[] = ['administrador', 'empleado']
 
 const dashboard = withSuspense(<Dashboard />)
 
@@ -57,14 +51,14 @@ export const router = createBrowserRouter([
           { path: '/clientes/:id', element: withSuspense(<ClienteDetalle />) },
           { path: '/usuarios', element: <RoleRoute roles={adminOnly} />, children: [{ index: true, element: withSuspense(<Usuarios />) }] },
           { path: '/auditoria', element: <RoleRoute roles={adminOnly} />, children: [{ index: true, element: withSuspense(<Auditoria />) }] },
-          { path: '/inventario', element: <RoleRoute roles={adminAlmacen} />, children: [{ index: true, element: withSuspense(<Inventario />) }] },
+          { path: '/inventario', element: <RoleRoute roles={adminEmpleado} />, children: [{ index: true, element: withSuspense(<Inventario />) }] },
           { path: '/recetas', element: withSuspense(<Recetas />) },
           { path: '/pedidos', element: withSuspense(<Pedidos />) },
           { path: '/pedidos/nuevo', element: withSuspense(<PedidoNuevo />) },
           { path: '/pedidos/:id', element: withSuspense(<PedidoDetalle />) },
           { path: '/pedidos/:id/editar', element: withSuspense(<PedidoEditar />) },
-          { path: '/finanzas', element: <RoleRoute roles={adminContabilidad} />, children: [{ index: true, element: withSuspense(<Finanzas />) }] },
-          { path: '/documentos', element: <RoleRoute roles={adminContabilidadVendedor} />, children: [{ index: true, element: withSuspense(<Documentos />) }] },
+          { path: '/finanzas', element: <RoleRoute roles={adminEmpleado} />, children: [{ index: true, element: withSuspense(<Finanzas />) }] },
+          { path: '/documentos', element: <RoleRoute roles={adminEmpleado} />, children: [{ index: true, element: withSuspense(<Documentos />) }] },
           { path: '/403', element: withSuspense(<Forbidden />) },
         ],
       },

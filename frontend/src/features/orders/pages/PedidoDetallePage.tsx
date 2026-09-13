@@ -35,9 +35,9 @@ import { PedidoTotalesPanel } from '../components/PedidoTotalesPanel'
 const ESTADO_LABEL: Record<EstadoPedido, string> = {
   borrador: 'Borrador',
   confirmado: 'Confirmado',
-  en_taller: 'En Taller',
-  listo_para_despacho: 'Listo para Despacho',
-  enviado: 'Enviado',
+  en_laboratorio: 'En Laboratorio',
+  listo_para_entrega: 'Listo para Entrega',
+  entregado: 'Entregado',
   cancelado: 'Cancelado',
 }
 
@@ -259,18 +259,24 @@ export default function PedidoDetallePage() {
           <Panel title="Resumen">
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
-                <span className="text-sm text-on-surface-variant">Cliente</span>
-                <Link
-                  to={`/clientes/${pedido.cliente}`}
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  {pedido.cliente_detalle.nombre_comercial}
-                </Link>
+                <span className="text-sm text-on-surface-variant">Destinatario</span>
+                {pedido.cliente_detalle ? (
+                  <Link
+                    to={`/clientes/${pedido.cliente}`}
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    {pedido.cliente_detalle.nombre_comercial}
+                  </Link>
+                ) : (
+                  <span className="text-sm font-medium">
+                    {pedido.paciente_detalle?.nombre_completo ?? '—'}
+                  </span>
+                )}
               </div>
               <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
                 <span className="text-sm text-on-surface-variant">Receta óptica</span>
                 <span className="text-sm font-medium">
-                  {pedido.receta_detalle?.nombre_paciente ?? '—'}
+                  {pedido.receta_detalle?.paciente_detalle?.nombre_completo ?? '—'}
                 </span>
               </div>
               <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
@@ -316,8 +322,8 @@ export default function PedidoDetallePage() {
         onOpenChange={setSiguienteOpen}
         title={`¿Marcar como ${siguiente ? ESTADO_LABEL[siguiente].toLowerCase() : 'siguiente estado'}?`}
         description={
-          siguiente === 'enviado'
-            ? 'El pedido se marcará como enviado y completará su ciclo de vida.'
+          siguiente === 'entregado'
+            ? 'El pedido se marcará como entregado y completará su ciclo de vida.'
             : `El pedido avanzará al estado ${siguiente ? ESTADO_LABEL[siguiente] : ''}.`
         }
         confirmLabel={siguiente ? `Marcar como ${ESTADO_LABEL[siguiente]}` : undefined}

@@ -5,9 +5,9 @@ import type { EstadoPedido } from '@/types/models'
 const PASOS: { estado: EstadoPedido; label: string; icon: string }[] = [
   { estado: 'borrador', label: 'Borrador', icon: 'draft' },
   { estado: 'confirmado', label: 'Confirmado', icon: 'check_circle' },
-  { estado: 'en_taller', label: 'En Taller', icon: 'build' },
-  { estado: 'listo_para_despacho', label: 'Listo para Despacho', icon: 'inventory_2' },
-  { estado: 'enviado', label: 'Enviado', icon: 'local_shipping' },
+  { estado: 'en_laboratorio', label: 'En Laboratorio', icon: 'science' },
+  { estado: 'listo_para_entrega', label: 'Listo para Entrega', icon: 'inventory_2' },
+  { estado: 'entregado', label: 'Entregado', icon: 'local_shipping' },
 ]
 
 export function OrderTimeline({ estado }: { estado: EstadoPedido }) {

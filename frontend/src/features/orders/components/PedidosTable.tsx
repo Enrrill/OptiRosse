@@ -84,9 +84,13 @@ export function PedidosTable({
     },
     {
       key: 'cliente',
-      header: 'Cliente',
+      header: 'Destinatario',
       cell: (row) => (
-        <span className="font-medium text-on-surface">{row.cliente_detalle.nombre_comercial}</span>
+        <span className="font-medium text-on-surface">
+          {row.cliente_detalle?.nombre_comercial
+            ?? row.paciente_detalle?.nombre_completo
+            ?? '—'}
+        </span>
       ),
     },
     {

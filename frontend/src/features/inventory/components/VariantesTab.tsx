@@ -15,7 +15,7 @@ export function VariantesTab() {
   const [ajusteTarget, setAjusteTarget] = useState<VarianteProducto | null>(null)
 
   const rol = useAuthStore((s) => s.user?.rol)
-  const canManage = rol === 'administrador' || rol === 'almacen'
+  const canManage = rol === 'administrador' || rol === 'empleado'
 
   const params = useMemo<PaginationParams>(() => {
     const p: PaginationParams = { ...pagination.params }

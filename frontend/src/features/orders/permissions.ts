@@ -1,6 +1,6 @@
 import type { EstadoPedido, RolUsuario } from '@/types/models'
 
-const ROLES_ESCRITURA = new Set<RolUsuario>(['administrador', 'vendedor_b2b'])
+const ROLES_ESCRITURA = new Set<RolUsuario>(['administrador', 'empleado'])
 
 export function puedeGestionarPedidos(rol?: RolUsuario | null): boolean {
   return !!rol && ROLES_ESCRITURA.has(rol)
@@ -14,32 +14,31 @@ type Transicion = Partial<Record<EstadoPedido, RolUsuario[]>>
 
 const TRANSICIONES: Record<EstadoPedido, Transicion> = {
   borrador: {
-    // La confirmación no es una transición de cambiar-estado: el botón
-    // "Confirmar pedido" (puedeConfirmarPedido) va por el endpoint dedicado.
-    cancelado: ['administrador', 'vendedor_b2b'],
+    cancelado: ['administrador', 'empleado'],
   },
   confirmado: {
-    en_taller: ['administrador', 'tecnico_taller'],
-    cancelado: ['administrador', 'vendedor_b2b'],
+    en_laboratorio: ['administrador', 'empleado'],
+    entregado: ['administrador', 'empleado'], // mostrador: saltar al final
+    cancelado: ['administrador', 'empleado'],
   },
-  en_taller: {
-    listo_para_despacho: ['administrador', 'tecnico_taller'],
-    cancelado: ['administrador', 'vendedor_b2b', 'tecnico_taller'],
+  en_laboratorio: {
+    listo_para_entrega: ['administrador', 'empleado'],
+    cancelado: ['administrador', 'empleado'],
   },
-  listo_para_despacho: {
-    enviado: ['administrador', 'almacen'],
-    cancelado: ['administrador', 'vendedor_b2b', 'tecnico_taller'],
+  listo_para_entrega: {
+    entregado: ['administrador', 'empleado'],
+    cancelado: ['administrador', 'empleado'],
   },
-  enviado: {},
+  entregado: {},
   cancelado: {},
 }
 
 const FLUJO: EstadoPedido[] = [
   'borrador',
   'confirmado',
-  'en_taller',
-  'listo_para_despacho',
-  'enviado',
+  'en_laboratorio',
+  'listo_para_entrega',
+  'entregado',
 ]
 
 export function puedeTransicionar(

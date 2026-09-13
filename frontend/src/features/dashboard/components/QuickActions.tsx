@@ -17,18 +17,10 @@ const ACTIONS: Record<RolUsuario, QuickAction[]> = {
     { label: 'Registrar pago', icon: 'payments', to: '/finanzas?tab=pagos&nuevo=1' },
     { label: 'Nueva variante', icon: 'library_add', to: '/inventario?tab=variantes' },
   ],
-  vendedor_b2b: [
+  empleado: [
     { label: 'Nuevo pedido', icon: 'add_circle', to: '/pedidos/nuevo' },
-    { label: 'Nueva variante', icon: 'library_add', to: '/inventario?tab=variantes' },
-  ],
-  almacen: [
-    { label: 'Ajustar stock', icon: 'shelf_position', to: '/inventario?tab=variantes' },
-    { label: 'Pedidos por despachar', icon: 'local_shipping', to: '/pedidos' },
-  ],
-  tecnico_taller: [{ label: 'Pedidos en taller', icon: 'build', to: '/pedidos' }],
-  contabilidad: [
     { label: 'Registrar pago', icon: 'payments', to: '/finanzas?tab=pagos&nuevo=1' },
-    { label: 'Aprobar pagos', icon: 'fact_check', to: '/finanzas?tab=pagos' },
+    { label: 'Nueva variante', icon: 'library_add', to: '/inventario?tab=variantes' },
   ],
 }
 

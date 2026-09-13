@@ -1,9 +1,4 @@
-export type RolUsuario =
-  | 'administrador'
-  | 'vendedor_b2b'
-  | 'almacen'
-  | 'tecnico_taller'
-  | 'contabilidad'
+export type RolUsuario = 'administrador' | 'empleado'
 
 export interface Usuario {
   id: number
@@ -26,12 +21,37 @@ export interface TokenResponse {
 export type EstadoPedido =
   | 'borrador'
   | 'confirmado'
-  | 'en_taller'
-  | 'listo_para_despacho'
-  | 'enviado'
+  | 'en_laboratorio'
+  | 'listo_para_entrega'
+  | 'entregado'
   | 'cancelado'
 
+export type TipoPedido = 'laboratorio' | 'mostrador'
+
 export type EstadoPago = 'pendiente' | 'aprobado' | 'rechazado'
+
+export interface Paciente {
+  id: number
+  nombre: string
+  apellido: string
+  nombre_completo: string
+  cedula: string | null
+  fecha_nacimiento: string | null
+  telefono: string | null
+  correo: string | null
+  activo: boolean
+  creado_en: string
+  actualizado_en: string
+}
+
+export interface PacienteResumen {
+  id: number
+  nombre: string
+  apellido: string
+  nombre_completo: string
+  cedula: string | null
+  telefono: string | null
+}
 
 export interface Cliente {
   id: number
@@ -119,7 +139,9 @@ export interface Producto {
 
 export interface RecetaOptica {
   id: number
-  nombre_paciente: string
+  paciente: number
+  paciente_detalle: PacienteResumen | null
+  medico_prescriptor: string
   od_esfera: string | null
   od_cilindro: string | null
   od_eje: number | null
@@ -131,6 +153,8 @@ export interface RecetaOptica {
   distancia_pupilar: string | null
   notas: string
   activo: boolean
+  creado_en: string
+  actualizado_en: string
 }
 
 export interface VarianteResumen {
@@ -158,12 +182,16 @@ export interface DetallePedido {
 export interface Pedido {
   id: number
   numero_pedido: string
-  cliente: number
-  cliente_detalle: ClienteResumen
+  cliente: number | null
+  cliente_detalle: ClienteResumen | null
+  paciente: number | null
+  paciente_detalle: PacienteResumen | null
   usuario: number
   usuario_nombre: string
+  tipo_pedido: TipoPedido
   receta: number | null
   receta_detalle: RecetaOptica | null
+  receta_snapshot: Record<string, unknown> | null
   estado: EstadoPedido
   subtotal: string
   impuesto: string
@@ -182,7 +210,9 @@ export interface DetallePedidoPayload {
 }
 
 export interface PedidoPayload {
-  cliente: number
+  cliente?: number | null
+  paciente?: number | null
+  tipo_pedido?: TipoPedido
   receta?: number | null
   notas?: string
   detalles: DetallePedidoPayload[]
@@ -211,8 +241,10 @@ export interface MetodoPagoPayload {
 
 export interface Pago {
   id: number
-  cliente: number
-  cliente_detalle: ClienteResumen
+  cliente: number | null
+  cliente_detalle: ClienteResumen | null
+  paciente: number | null
+  paciente_detalle: PacienteResumen | null
   pedido: number | null
   pedido_numero: string | null
   metodo_pago: number
@@ -242,8 +274,10 @@ export interface PagoPayload {
 
 export interface LibroMayorAsiento {
   id: number
-  cliente: number
-  cliente_detalle: ClienteResumen
+  cliente: number | null
+  cliente_detalle: ClienteResumen | null
+  paciente: number | null
+  paciente_detalle: PacienteResumen | null
   pedido: number | null
   pedido_numero: string | null
   pago: number | null

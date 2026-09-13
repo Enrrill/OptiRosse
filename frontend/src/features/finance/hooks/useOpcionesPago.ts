@@ -17,7 +17,7 @@ export async function buscarPedidos(
   return (res.data.data ?? []).map((p) => ({
     value: String(p.id),
     label: p.numero_pedido,
-    description: `${p.cliente_detalle.nombre_comercial} · ${formatMoney(p.total)}`,
+    description: `${p.cliente_detalle?.nombre_comercial ?? p.paciente_detalle?.nombre_completo ?? '—'} · ${formatMoney(p.total)}`,
     data: p,
   }))
 }

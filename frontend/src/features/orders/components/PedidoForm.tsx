@@ -154,7 +154,7 @@ function FormCuerpo({
                 value={receta}
                 onChange={(value) => setValue('receta', value, { shouldDirty: true })}
                 searchOptions={buscarRecetas}
-                formatSelected={(r) => r.nombre_paciente}
+                formatSelected={(r) => r.nombre_completo}
                 placeholder="Buscar receta por paciente..."
               />
               <FieldError message={errors.receta?.message} />
