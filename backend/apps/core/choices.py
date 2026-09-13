@@ -3,10 +3,7 @@ from django.db import models
 
 class RolUsuario(models.TextChoices):
     ADMINISTRADOR = 'administrador', 'Administrador'
-    VENDEDOR_B2B = 'vendedor_b2b', 'Vendedor B2B'
-    ALMACEN = 'almacen', 'Almacén'
-    TECNICO_TALLER = 'tecnico_taller', 'Técnico de Taller'
-    CONTABILIDAD = 'contabilidad', 'Contabilidad'
+    VENDEDORA = 'vendedora', 'Vendedora'
 
 
 class TipoProducto(models.TextChoices):
@@ -19,10 +16,15 @@ class TipoProducto(models.TextChoices):
 class EstadoPedido(models.TextChoices):
     BORRADOR = 'borrador', 'Borrador'
     CONFIRMADO = 'confirmado', 'Confirmado'
-    EN_TALLER = 'en_taller', 'En Taller'
-    LISTO_PARA_DESPACHO = 'listo_para_despacho', 'Listo para Despacho'
-    ENVIADO = 'enviado', 'Enviado'
+    EN_LABORATORIO = 'en_laboratorio', 'En Laboratorio'
+    LISTO_PARA_ENTREGA = 'listo_para_entrega', 'Listo para Entrega'
+    ENTREGADO = 'entregado', 'Entregado'
     CANCELADO = 'cancelado', 'Cancelado'
+
+
+class TipoPedido(models.TextChoices):
+    LABORATORIO = 'laboratorio', 'Con Laboratorio'
+    MOSTRADOR = 'mostrador', 'Venta de Mostrador'
 
 
 class EstadoPago(models.TextChoices):
@@ -70,6 +72,7 @@ class AccionAuditoria(models.TextChoices):
 class TablaAfectada(models.TextChoices):
     USUARIOS = 'usuarios', 'Usuarios'
     CLIENTES = 'clientes_optica', 'Clientes'
+    PACIENTES = 'pacientes', 'Pacientes'
     CATEGORIAS = 'categorias', 'Categorías'
     PRODUCTOS = 'productos', 'Productos'
     VARIANTES = 'variantes_producto', 'Variantes'

@@ -5,6 +5,8 @@ from rest_framework import serializers
 from backend.apps.finance.models import Pago
 from backend.apps.finance.services import PagoService
 from backend.apps.orders.serializers.pedido import ClienteResumenSerializer
+from backend.apps.orders.serializers.receta import PacienteResumenSerializer
+from backend.common.utils import SanitizedSerializerMixin
 
 
 class PagoResumenSerializer(serializers.ModelSerializer):
@@ -13,8 +15,9 @@ class PagoResumenSerializer(serializers.ModelSerializer):
         fields = ('id', 'monto', 'estado', 'numero_referencia')
 
 
-class PagoSerializer(serializers.ModelSerializer):
+class PagoSerializer(SanitizedSerializerMixin, serializers.ModelSerializer):
     cliente_detalle = ClienteResumenSerializer(source='cliente', read_only=True)
+    paciente_detalle = PacienteResumenSerializer(source='paciente', read_only=True)
     pedido_numero = serializers.CharField(source='pedido.numero_pedido', read_only=True, allow_null=True)
     metodo_pago_detalle = serializers.CharField(source='metodo_pago.nombre', read_only=True)
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
@@ -26,6 +29,8 @@ class PagoSerializer(serializers.ModelSerializer):
             'id',
             'cliente',
             'cliente_detalle',
+            'paciente',
+            'paciente_detalle',
             'pedido',
             'pedido_numero',
             'metodo_pago',
@@ -67,14 +72,31 @@ class PagoSerializer(serializers.ModelSerializer):
             )
 
         pedido = attrs.get('pedido')
+        cliente = attrs.get('cliente')
+        paciente = attrs.get('paciente')
+
         if pedido is not None:
-            cliente = attrs.get('cliente')
-            if cliente is None:
-                attrs['cliente'] = pedido.cliente
-            elif cliente.pk != pedido.cliente_id:
-                raise serializers.ValidationError(
-                    {'cliente': 'El cliente del pago no coincide con el cliente del pedido'}
-                )
+            if cliente is None and paciente is None:
+                if pedido.cliente:
+                    attrs['cliente'] = pedido.cliente
+                    cliente = pedido.cliente
+                elif pedido.paciente:
+                    attrs['paciente'] = pedido.paciente
+                    paciente = pedido.paciente
+            else:
+                if cliente and cliente.pk != pedido.cliente_id:
+                    raise serializers.ValidationError(
+                        {'cliente': 'El cliente del pago no coincide con el cliente del pedido'}
+                    )
+                if paciente and paciente.pk != pedido.paciente_id:
+                    raise serializers.ValidationError(
+                        {'paciente': 'El paciente del pago no coincide con el paciente del pedido'}
+                    )
+
+        if bool(cliente) == bool(paciente):
+            raise serializers.ValidationError(
+                'Debe especificar exactamente un destinatario: cliente óptica o paciente.'
+            )
 
         return attrs
 

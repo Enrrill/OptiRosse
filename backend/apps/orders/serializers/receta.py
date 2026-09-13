@@ -1,14 +1,33 @@
 from rest_framework import serializers
 
 from backend.apps.orders.models import RecetaOptica
+from backend.apps.pacientes.models import Paciente
+from backend.common.utils import SanitizedSerializerMixin
 
 
-class RecetaOpticaSerializer(serializers.ModelSerializer):
+class PacienteResumenSerializer(serializers.ModelSerializer):
+    nombre_completo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Paciente
+        fields = ('id', 'nombre', 'apellido', 'nombre_completo', 'cedula', 'telefono')
+
+    def get_nombre_completo(self, obj):
+        if obj.apellido:
+            return f'{obj.nombre} {obj.apellido}'
+        return obj.nombre
+
+
+class RecetaOpticaSerializer(SanitizedSerializerMixin, serializers.ModelSerializer):
+    paciente_detalle = PacienteResumenSerializer(source='paciente', read_only=True)
+
     class Meta:
         model = RecetaOptica
         fields = (
             'id',
-            'nombre_paciente',
+            'paciente',
+            'paciente_detalle',
+            'medico_prescriptor',
             'od_esfera',
             'od_cilindro',
             'od_eje',
@@ -20,8 +39,10 @@ class RecetaOpticaSerializer(serializers.ModelSerializer):
             'distancia_pupilar',
             'notas',
             'activo',
+            'creado_en',
+            'actualizado_en',
         )
-        read_only_fields = ('id',)
+        read_only_fields = ('id', 'creado_en', 'actualizado_en')
 
     def validate(self, attrs):
         def get_val(field_name):
@@ -31,14 +52,7 @@ class RecetaOpticaSerializer(serializers.ModelSerializer):
                 return getattr(self.instance, field_name, None)
             return None
 
-        # 1. Nombre del paciente
-        nombre = get_val('nombre_paciente')
-        if not nombre or not str(nombre).strip() or len(str(nombre).strip()) < 2:
-            raise serializers.ValidationError({
-                'nombre_paciente': 'El nombre del paciente es obligatorio (mínimo 2 caracteres)'
-            })
-
-        # 2. Rangos de campos individuales
+        # 1. Validar rangos de campos individuales
         for campo in ('od_esfera', 'oi_esfera', 'od_cilindro', 'oi_cilindro'):
             valor = get_val(campo)
             if valor is not None and not (-30 <= valor <= 30):
@@ -60,7 +74,7 @@ class RecetaOpticaSerializer(serializers.ModelSerializer):
                 'distancia_pupilar': 'La distancia pupilar debe estar entre 40 y 80 mm'
             })
 
-        # 3. Dependencia Cilindro vs Eje para cada ojo
+        # 2. Dependencia Cilindro vs Eje para cada ojo
         for lado in ('od', 'oi'):
             cilindro = get_val(f'{lado}_cilindro')
             eje = get_val(f'{lado}_eje')
@@ -75,7 +89,7 @@ class RecetaOpticaSerializer(serializers.ModelSerializer):
                     f'{lado}_cilindro': 'Debe indicar un cilindro válido para el eje especificado'
                 })
 
-        # 4. Al menos algún dato de graduación u óptico presente
+        # 3. Al menos algún dato de graduación u óptico presente
         valores_opticos = [
             get_val('od_esfera'),
             get_val('od_cilindro'),
@@ -92,4 +106,3 @@ class RecetaOpticaSerializer(serializers.ModelSerializer):
             })
 
         return attrs
-

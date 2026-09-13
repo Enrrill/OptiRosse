@@ -3,10 +3,12 @@ from rest_framework import serializers
 from backend.apps.finance.models import LibroMayor
 from backend.apps.finance.serializers.pago import PagoResumenSerializer
 from backend.apps.orders.serializers.pedido import ClienteResumenSerializer
+from backend.apps.orders.serializers.receta import PacienteResumenSerializer
 
 
 class LibroMayorSerializer(serializers.ModelSerializer):
     cliente_detalle = ClienteResumenSerializer(source='cliente', read_only=True)
+    paciente_detalle = PacienteResumenSerializer(source='paciente', read_only=True)
     pedido_numero = serializers.CharField(source='pedido.numero_pedido', read_only=True, allow_null=True)
     pago_detalle = PagoResumenSerializer(source='pago', read_only=True)
     tipo_asiento_display = serializers.CharField(source='get_tipo_asiento_display', read_only=True)
@@ -18,6 +20,8 @@ class LibroMayorSerializer(serializers.ModelSerializer):
             'id',
             'cliente',
             'cliente_detalle',
+            'paciente',
+            'paciente_detalle',
             'pedido',
             'pedido_numero',
             'pago',

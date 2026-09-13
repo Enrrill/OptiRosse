@@ -10,13 +10,13 @@ class MetodoPagoAdmin(admin.ModelAdmin):
 
 @admin.register(Pago)
 class PagoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'cliente', 'monto', 'estado', 'fecha_pago', 'motivo_rechazo', 'creado_en')
+    list_display = ('id', 'cliente', 'paciente', 'monto', 'estado', 'fecha_pago', 'motivo_rechazo', 'creado_en')
     list_filter = ('estado', 'metodo_pago')
-    search_fields = ('cliente__nombre_comercial', 'numero_referencia')
+    search_fields = ('cliente__nombre_comercial', 'paciente__nombre', 'paciente__apellido', 'numero_referencia')
 
 
 @admin.register(LibroMayor)
 class LibroMayorAdmin(admin.ModelAdmin):
-    list_display = ('cliente', 'tipo_asiento', 'monto', 'saldo_posterior', 'creado_en')
+    list_display = ('id', 'cliente', 'paciente', 'tipo_asiento', 'monto', 'saldo_posterior', 'creado_en')
     list_filter = ('tipo_asiento',)
-    search_fields = ('cliente__nombre_comercial', 'descripcion')
+    search_fields = ('cliente__nombre_comercial', 'paciente__nombre', 'paciente__apellido', 'descripcion')

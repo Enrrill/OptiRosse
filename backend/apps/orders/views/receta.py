@@ -7,15 +7,15 @@ from backend.common.api.viewsets import BaseModelViewSet
 
 
 class RecetaOpticaViewSet(BaseModelViewSet):
-    queryset = RecetaOptica.objects.all()
+    queryset = RecetaOptica.objects.select_related('paciente').all()
     serializer_class = RecetaOpticaSerializer
     permission_classes = [EscrituraRecetaOLectura]
     filterset_class = RecetaOpticaFilter
-    search_fields = ('nombre_paciente',)
-    ordering = ('-id',)
+    search_fields = ('paciente__nombre', 'paciente__apellido', 'paciente__cedula', 'medico_prescriptor')
+    ordering = ('-creado_en',)
 
     def get_queryset(self):
-        queryset = RecetaOptica.objects.all()
+        queryset = RecetaOptica.objects.select_related('paciente').all()
         if self.action == 'list' and 'activo' not in self.request.query_params:
             queryset = queryset.filter(activo=True)
         return queryset
@@ -24,5 +24,5 @@ class RecetaOpticaViewSet(BaseModelViewSet):
         instancia = self.get_object()
         self._registrar_auditoria('desactivar', instancia)
         instancia.activo = False
-        instancia.save(update_fields=['activo'])
+        instancia.save(update_fields=['activo', 'actualizado_en'])
         return api_response(message='Receta desactivada correctamente')

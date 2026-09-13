@@ -10,15 +10,16 @@ class DetallePedidoInline(admin.TabularInline):
 
 @admin.register(RecetaOptica)
 class RecetaOpticaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nombre_paciente')
-    search_fields = ('nombre_paciente',)
+    list_display = ('id', 'paciente', 'medico_prescriptor', 'activo', 'creado_en')
+    list_filter = ('activo',)
+    search_fields = ('paciente__nombre', 'paciente__apellido', 'paciente__cedula', 'medico_prescriptor')
 
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-    list_display = ('numero_pedido', 'cliente', 'estado', 'total', 'creado_en')
-    list_filter = ('estado',)
-    search_fields = ('numero_pedido', 'cliente__nombre_comercial')
+    list_display = ('numero_pedido', 'cliente', 'paciente', 'tipo_pedido', 'estado', 'total', 'creado_en')
+    list_filter = ('estado', 'tipo_pedido')
+    search_fields = ('numero_pedido', 'cliente__nombre_comercial', 'paciente__nombre', 'paciente__apellido')
     inlines = [DetallePedidoInline]
 
 

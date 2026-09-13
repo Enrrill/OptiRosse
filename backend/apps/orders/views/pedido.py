@@ -15,13 +15,20 @@ from backend.common.api.viewsets import BaseModelViewSet
 
 class PedidoViewSet(BaseModelViewSet):
     queryset = (
-        Pedido.objects.select_related('cliente', 'usuario', 'receta')
+        Pedido.objects.select_related('cliente', 'paciente', 'usuario', 'receta')
         .prefetch_related('detalles__variante__producto__categoria')
         .all()
     )
     serializer_class = PedidoSerializer
     filterset_class = PedidoFilter
-    search_fields = ('numero_pedido', 'cliente__nombre_comercial', 'cliente__razon_social')
+    search_fields = (
+        'numero_pedido',
+        'cliente__nombre_comercial',
+        'cliente__razon_social',
+        'paciente__nombre',
+        'paciente__apellido',
+        'paciente__cedula',
+    )
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -55,7 +62,7 @@ class ConfirmarPedidoView(APIView):
         serializer.is_valid(raise_exception=True)
 
         pedido = get_object_or_404(
-            Pedido.objects.select_related('cliente', 'usuario', 'receta')
+            Pedido.objects.select_related('cliente', 'paciente', 'usuario', 'receta')
             .prefetch_related('detalles__variante__producto__categoria'),
             pk=pk,
         )
@@ -80,7 +87,7 @@ class CambiarEstadoPedidoView(APIView):
         serializer.is_valid(raise_exception=True)
 
         pedido = get_object_or_404(
-            Pedido.objects.select_related('cliente', 'usuario', 'receta')
+            Pedido.objects.select_related('cliente', 'paciente', 'usuario', 'receta')
             .prefetch_related('detalles__variante__producto__categoria'),
             pk=pk,
         )

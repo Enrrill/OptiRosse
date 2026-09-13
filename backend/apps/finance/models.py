@@ -4,6 +4,7 @@ from backend.apps.clients.models import ClienteOptica
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
 from backend.apps.core.choices import EstadoPago, TipoAsiento
 from backend.apps.orders.models import Pedido
+from backend.apps.pacientes.models import Paciente
 from backend.common.utils import SanitizedModelMixin
 
 
@@ -22,7 +23,20 @@ class MetodoPago(SanitizedModelMixin, ActivoMixin):
 
 
 class Pago(SanitizedModelMixin, TimeStampedModel):
-    cliente = models.ForeignKey(ClienteOptica, on_delete=models.RESTRICT, verbose_name='cliente')
+    cliente = models.ForeignKey(
+        ClienteOptica,
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        verbose_name='cliente',
+    )
+    paciente = models.ForeignKey(
+        Paciente,
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        verbose_name='paciente',
+    )
     pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='pedido')
     metodo_pago = models.ForeignKey(MetodoPago, on_delete=models.RESTRICT, verbose_name='método de pago')
 
@@ -45,14 +59,35 @@ class Pago(SanitizedModelMixin, TimeStampedModel):
         constraints = [
             models.CheckConstraint(condition=models.Q(monto__gt=0), name='pago_monto_positivo'),
             models.CheckConstraint(condition=models.Q(tasa_cambio__gt=0), name='pago_tasa_cambio_positiva'),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(cliente__isnull=False, paciente__isnull=True) |
+                    models.Q(cliente__isnull=True, paciente__isnull=False)
+                ),
+                name='pago_exactamente_un_destinatario',
+            ),
         ]
 
     def __str__(self):
-        return f'Pago #{self.id} - {self.cliente.nombre_comercial} ({self.get_estado_display()})'
+        destinatario = self.cliente.nombre_comercial if self.cliente else str(self.paciente)
+        return f'Pago #{self.id} - {destinatario} ({self.get_estado_display()})'
 
 
 class LibroMayor(SanitizedModelMixin, TimeStampedModel):
-    cliente = models.ForeignKey(ClienteOptica, on_delete=models.RESTRICT, verbose_name='cliente')
+    cliente = models.ForeignKey(
+        ClienteOptica,
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        verbose_name='cliente',
+    )
+    paciente = models.ForeignKey(
+        Paciente,
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        verbose_name='paciente',
+    )
     pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='pedido')
     pago = models.ForeignKey(Pago, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='pago')
 
@@ -70,7 +105,18 @@ class LibroMayor(SanitizedModelMixin, TimeStampedModel):
         db_table = 'libro_mayor'
         indexes = [
             models.Index(fields=['cliente', 'creado_en'], name='libro_mayor_idx_cliente_creado'),
+            models.Index(fields=['paciente', 'creado_en'], name='lm_idx_paciente_creado'),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(cliente__isnull=False, paciente__isnull=True) |
+                    models.Q(cliente__isnull=True, paciente__isnull=False)
+                ),
+                name='libro_mayor_exactamente_un_destinatario',
+            )
         ]
 
     def __str__(self):
-        return f'{self.get_tipo_asiento_display()} {self.monto} - {self.cliente.nombre_comercial}'
+        destinatario = self.cliente.nombre_comercial if self.cliente else str(self.paciente)
+        return f'{self.get_tipo_asiento_display()} {self.monto} - {destinatario}'

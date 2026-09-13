@@ -5,7 +5,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from backend.apps.core.choices import EstadoPedido, RolUsuario, TipoAsiento
+from backend.apps.core.choices import EstadoPedido, RolUsuario, TipoAsiento, TipoPedido
 from backend.apps.core.services import AuditoriaService
 from backend.apps.finance.models import LibroMayor
 from backend.apps.finance.services import LibroMayorService
@@ -15,43 +15,54 @@ from backend.common.api.exceptions import ApiError
 
 
 class TransicionesPedido:
-    TRANSICIONES = {
+    # Flujo completo: pedidos con laboratorio externo
+    PIPELINE_LABORATORIO = {
         EstadoPedido.BORRADOR: {
-            # La confirmación no está en el mapa: solo se alcanza mediante
-            # PedidoService.confirmar (descuenta stock y registra el asiento).
-            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDOR_B2B),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
         },
         EstadoPedido.CONFIRMADO: {
-            EstadoPedido.EN_TALLER: (RolUsuario.ADMINISTRADOR, RolUsuario.TECNICO_TALLER),
-            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDOR_B2B),
+            EstadoPedido.EN_LABORATORIO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
         },
-        EstadoPedido.EN_TALLER: {
-            EstadoPedido.LISTO_PARA_DESPACHO: (RolUsuario.ADMINISTRADOR, RolUsuario.TECNICO_TALLER),
-            EstadoPedido.CANCELADO: (
-                RolUsuario.ADMINISTRADOR,
-                RolUsuario.VENDEDOR_B2B,
-                RolUsuario.TECNICO_TALLER,
-            ),
+        EstadoPedido.EN_LABORATORIO: {
+            EstadoPedido.LISTO_PARA_ENTREGA: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
         },
-        EstadoPedido.LISTO_PARA_DESPACHO: {
-            EstadoPedido.ENVIADO: (RolUsuario.ADMINISTRADOR, RolUsuario.ALMACEN),
-            EstadoPedido.CANCELADO: (
-                RolUsuario.ADMINISTRADOR,
-                RolUsuario.VENDEDOR_B2B,
-                RolUsuario.TECNICO_TALLER,
-            ),
+        EstadoPedido.LISTO_PARA_ENTREGA: {
+            EstadoPedido.ENTREGADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
         },
     }
 
-    ESTADOS_TERMINALES = (EstadoPedido.ENVIADO, EstadoPedido.CANCELADO)
+    # Flujo corto: venta de mostrador
+    PIPELINE_MOSTRADOR = {
+        EstadoPedido.BORRADOR: {
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+        },
+        EstadoPedido.CONFIRMADO: {
+            EstadoPedido.ENTREGADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+            EstadoPedido.CANCELADO: (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA),
+        },
+    }
+
+    ESTADOS_TERMINALES = (EstadoPedido.ENTREGADO, EstadoPedido.CANCELADO)
 
     @classmethod
-    def es_transicion_valida(cls, origen, destino):
-        return destino in cls.TRANSICIONES.get(origen, {})
+    def _pipeline(cls, pedido_o_tipo):
+        tipo = getattr(pedido_o_tipo, 'tipo_pedido', pedido_o_tipo)
+        if tipo == TipoPedido.MOSTRADOR:
+            return cls.PIPELINE_MOSTRADOR
+        return cls.PIPELINE_LABORATORIO
 
     @classmethod
-    def roles_permitidos(cls, origen, destino):
-        return cls.TRANSICIONES.get(origen, {}).get(destino, ())
+    def es_transicion_valida(cls, pedido, destino):
+        estado_origen = getattr(pedido, 'estado', pedido)
+        return destino in cls._pipeline(pedido).get(estado_origen, {})
+
+    @classmethod
+    def roles_permitidos(cls, pedido, destino):
+        estado_origen = getattr(pedido, 'estado', pedido)
+        return cls._pipeline(pedido).get(estado_origen, {}).get(destino, ())
 
 
 class PedidoService:
@@ -96,8 +107,37 @@ class PedidoService:
             direccion_ip=ip,
         )
 
+    @staticmethod
+    def _snapshot_receta(receta):
+        if not receta:
+            return None
+        return {
+            'receta_id': receta.pk,
+            'paciente': str(receta.paciente),
+            'od_esfera': str(receta.od_esfera) if receta.od_esfera is not None else None,
+            'od_cilindro': str(receta.od_cilindro) if receta.od_cilindro is not None else None,
+            'od_eje': receta.od_eje,
+            'od_adicion': str(receta.od_adicion) if receta.od_adicion is not None else None,
+            'oi_esfera': str(receta.oi_esfera) if receta.oi_esfera is not None else None,
+            'oi_cilindro': str(receta.oi_cilindro) if receta.oi_cilindro is not None else None,
+            'oi_eje': receta.oi_eje,
+            'oi_adicion': str(receta.oi_adicion) if receta.oi_adicion is not None else None,
+            'distancia_pupilar': str(receta.distancia_pupilar) if receta.distancia_pupilar is not None else None,
+            'medico_prescriptor': receta.medico_prescriptor,
+            'receta_creada_en': receta.creado_en.isoformat() if hasattr(receta, 'creado_en') and receta.creado_en else None,
+        }
+
     @classmethod
     def crear(cls, datos, usuario, direccion_ip=''):
+        cliente = datos.get('cliente')
+        paciente = datos.get('paciente')
+        if bool(cliente) == bool(paciente):
+            raise ApiError(
+                'Debe especificar exactamente un destinatario: cliente óptica o paciente.',
+                status_code=400,
+                code='destinatario_invalido',
+            )
+
         detalles_data = datos.pop('detalles', [])
         with transaction.atomic():
             datos['numero_pedido'] = cls._siguiente_numero()
@@ -115,6 +155,15 @@ class PedidoService:
                 'Solo se puede editar un pedido en estado borrador',
                 status_code=409,
                 code='pedido_no_editable',
+            )
+
+        cliente = datos.get('cliente', pedido.cliente)
+        paciente = datos.get('paciente', pedido.paciente)
+        if bool(cliente) == bool(paciente):
+            raise ApiError(
+                'Debe especificar exactamente un destinatario: cliente óptica o paciente.',
+                status_code=400,
+                code='destinatario_invalido',
             )
 
         detalles_data = datos.pop('detalles', None)
@@ -189,7 +238,13 @@ class PedidoService:
 
             estado_anterior = pedido.estado
             pedido.estado = EstadoPedido.CONFIRMADO
-            pedido.save(update_fields=['estado', 'actualizado_en'])
+            update_fields = ['estado', 'actualizado_en']
+
+            if pedido.receta:
+                pedido.receta_snapshot = cls._snapshot_receta(pedido.receta)
+                update_fields.append('receta_snapshot')
+
+            pedido.save(update_fields=update_fields)
             cls._registrar(
                 pedido,
                 usuario,
@@ -199,6 +254,7 @@ class PedidoService:
             )
             LibroMayorService.crear_asiento(
                 cliente=pedido.cliente,
+                paciente=pedido.paciente,
                 tipo_asiento=TipoAsiento.DEBITO,
                 monto=pedido.total,
                 descripcion=f'Pedido {pedido.numero_pedido}',
@@ -218,13 +274,13 @@ class PedidoService:
         with transaction.atomic():
             pedido = Pedido.objects.select_for_update().get(pk=pedido.pk)
 
-            if not TransicionesPedido.es_transicion_valida(pedido.estado, nuevo_estado):
+            if not TransicionesPedido.es_transicion_valida(pedido, nuevo_estado):
                 raise ApiError(
                     'La transición de estado no es válida',
                     status_code=409,
                     code='transicion_invalida',
                 )
-            if rol not in TransicionesPedido.roles_permitidos(pedido.estado, nuevo_estado):
+            if rol not in TransicionesPedido.roles_permitidos(pedido, nuevo_estado):
                 raise ApiError(
                     'Su rol no tiene permisos para realizar esta transición',
                     status_code=403,
@@ -254,13 +310,13 @@ class PedidoService:
         with transaction.atomic():
             pedido = Pedido.objects.select_for_update().get(pk=pedido.pk)
 
-            if not TransicionesPedido.es_transicion_valida(pedido.estado, EstadoPedido.CANCELADO):
+            if not TransicionesPedido.es_transicion_valida(pedido, EstadoPedido.CANCELADO):
                 raise ApiError(
                     'El pedido no se puede cancelar en su estado actual',
                     status_code=409,
                     code='transicion_invalida',
                 )
-            if rol not in TransicionesPedido.roles_permitidos(pedido.estado, EstadoPedido.CANCELADO):
+            if rol not in TransicionesPedido.roles_permitidos(pedido, EstadoPedido.CANCELADO):
                 raise ApiError(
                     'Su rol no tiene permisos para realizar esta transición',
                     status_code=403,

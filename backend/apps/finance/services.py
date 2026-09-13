@@ -10,13 +10,19 @@ from backend.apps.core.services import AuditoriaService
 from backend.apps.finance.models import LibroMayor, Pago
 from backend.apps.inventory.models import VarianteProducto
 from backend.apps.orders.models import Pedido
+from backend.apps.pacientes.models import Paciente
 from backend.common.api.exceptions import ApiError
 
 
 class LibroMayorService:
     @staticmethod
-    def _saldo_previo(cliente):
-        ultimo = LibroMayor.objects.filter(cliente=cliente).order_by('-id').first()
+    def _saldo_previo(cliente=None, paciente=None):
+        if cliente:
+            ultimo = LibroMayor.objects.filter(cliente=cliente).order_by('-id').first()
+        elif paciente:
+            ultimo = LibroMayor.objects.filter(paciente=paciente).order_by('-id').first()
+        else:
+            return Decimal('0.00')
         return ultimo.saldo_posterior if ultimo else Decimal('0.00')
 
     @staticmethod
@@ -28,19 +34,33 @@ class LibroMayorService:
     @classmethod
     def crear_asiento(
         cls,
-        cliente,
         tipo_asiento,
         monto,
         descripcion,
+        cliente=None,
+        paciente=None,
         pedido=None,
         pago=None,
         asiento_origen=None,
         usuario=None,
         direccion_ip='',
     ):
+        if bool(cliente) == bool(paciente):
+            raise ApiError(
+                'Debe especificar exactamente un destinatario: cliente óptica o paciente.',
+                status_code=400,
+                code='destinatario_invalido',
+            )
+
         with transaction.atomic():
-            cliente_bloqueado = ClienteOptica.objects.select_for_update().get(pk=cliente.pk)
-            saldo_previo = cls._saldo_previo(cliente_bloqueado)
+            if cliente:
+                cliente_bloqueado = ClienteOptica.objects.select_for_update().get(pk=cliente.pk)
+                paciente_bloqueado = None
+                saldo_previo = cls._saldo_previo(cliente=cliente_bloqueado)
+            else:
+                paciente_bloqueado = Paciente.objects.select_for_update().get(pk=paciente.pk)
+                cliente_bloqueado = None
+                saldo_previo = cls._saldo_previo(paciente=paciente_bloqueado)
 
             if tipo_asiento == TipoAsiento.DEBITO:
                 saldo_posterior = saldo_previo + monto
@@ -49,6 +69,7 @@ class LibroMayorService:
 
             asiento = LibroMayor.objects.create(
                 cliente=cliente_bloqueado,
+                paciente=paciente_bloqueado,
                 pedido=pedido,
                 pago=pago,
                 tipo_asiento=tipo_asiento,
@@ -83,6 +104,7 @@ class LibroMayorService:
             )
         return cls.crear_asiento(
             cliente=asiento_origen.cliente,
+            paciente=asiento_origen.paciente,
             tipo_asiento=cls._tipo_inverso(asiento_origen.tipo_asiento),
             monto=asiento_origen.monto,
             descripcion=f'Reverso del asiento #{asiento_origen.pk}',
@@ -108,6 +130,14 @@ class PagoService:
 
     @staticmethod
     def crear(datos, usuario=None, direccion_ip=''):
+        cliente = datos.get('cliente')
+        paciente = datos.get('paciente')
+        if bool(cliente) == bool(paciente):
+            raise ApiError(
+                'Debe especificar exactamente un destinatario: cliente óptica o paciente.',
+                status_code=400,
+                code='destinatario_invalido',
+            )
         return Pago.objects.create(**datos)
 
     @classmethod
@@ -147,6 +177,7 @@ class PagoService:
 
             asiento = LibroMayorService.crear_asiento(
                 cliente=pago.cliente,
+                paciente=pago.paciente,
                 tipo_asiento=TipoAsiento.CREDITO,
                 monto=pago.monto,
                 descripcion=f'Pago #{pago.pk} - {pago.metodo_pago.nombre}',
@@ -199,9 +230,9 @@ class PagoService:
 
 ESTADOS_VENTA = (
     EstadoPedido.CONFIRMADO,
-    EstadoPedido.EN_TALLER,
-    EstadoPedido.LISTO_PARA_DESPACHO,
-    EstadoPedido.ENVIADO,
+    EstadoPedido.EN_LABORATORIO,
+    EstadoPedido.LISTO_PARA_ENTREGA,
+    EstadoPedido.ENTREGADO,
 )
 
 
@@ -240,21 +271,28 @@ class DashboardService:
 
     @staticmethod
     def _saldo_por_cobrar():
-        saldos = (
-            LibroMayor.objects.order_by('cliente_id', '-id')
+        saldos_clientes = (
+            LibroMayor.objects.filter(cliente__isnull=False)
+            .order_by('cliente_id', '-id')
             .distinct('cliente_id')
             .values_list('saldo_posterior', flat=True)
         )
-        return float(sum(saldos))
+        saldos_pacientes = (
+            LibroMayor.objects.filter(paciente__isnull=False)
+            .order_by('paciente_id', '-id')
+            .distinct('paciente_id')
+            .values_list('saldo_posterior', flat=True)
+        )
+        return float(sum(saldos_clientes) + sum(saldos_pacientes))
 
     @staticmethod
     def _recientes_pedidos(limite=5):
-        pedidos = Pedido.objects.select_related('cliente').order_by('-creado_en')[:limite]
+        pedidos = Pedido.objects.select_related('cliente', 'paciente').order_by('-creado_en')[:limite]
         return [
             {
                 'id': p.pk,
                 'numero_pedido': p.numero_pedido,
-                'cliente_nombre': p.cliente.nombre_comercial,
+                'cliente_nombre': p.cliente.nombre_comercial if p.cliente else str(p.paciente),
                 'estado': p.estado,
                 'total': float(p.total),
                 'creado_en': p.creado_en,
@@ -265,13 +303,13 @@ class DashboardService:
     @staticmethod
     def _recientes_pagos(limite=5):
         pagos = (
-            Pago.objects.select_related('cliente', 'metodo_pago')
+            Pago.objects.select_related('cliente', 'paciente', 'metodo_pago')
             .order_by('-creado_en')[:limite]
         )
         return [
             {
                 'id': p.pk,
-                'cliente_nombre': p.cliente.nombre_comercial,
+                'cliente_nombre': p.cliente.nombre_comercial if p.cliente else str(p.paciente),
                 'metodo_pago_nombre': p.metodo_pago.nombre,
                 'monto': float(p.monto),
                 'estado': p.estado,
@@ -289,33 +327,20 @@ class DashboardService:
         kpis = {}
         recientes = {}
 
-        if rol in (
-            RolUsuario.ADMINISTRADOR,
-            RolUsuario.VENDEDOR_B2B,
-            RolUsuario.ALMACEN,
-            RolUsuario.TECNICO_TALLER,
-        ):
+        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDORA):
             kpis['pedidos_por_estado'] = cls._pedidos_por_estado()
-
-        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDOR_B2B, RolUsuario.CONTABILIDAD):
             kpis['total_vendido_mes'] = cls._total_vendido_mes(desde, fecha)
-
-        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.VENDEDOR_B2B):
             kpis['clientes'] = ClienteOptica.objects.filter(activo=True).count()
-
-        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.ALMACEN):
+            kpis['pacientes'] = Paciente.objects.filter(activo=True).count()
             kpis['stock_bajo'] = VarianteProducto.objects.filter(
                 activo=True,
                 stock__lte=F('alerta_stock_minimo'),
             ).count()
-
-        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.CONTABILIDAD):
             kpis['pagos_pendientes'] = cls._pagos_pendientes()
             kpis['saldo_por_cobrar'] = cls._saldo_por_cobrar()
 
         recientes['pedidos'] = cls._recientes_pedidos()
-        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.CONTABILIDAD):
-            recientes['pagos'] = cls._recientes_pagos()
+        recientes['pagos'] = cls._recientes_pagos()
 
         return {
             'fecha': fecha.isoformat(),

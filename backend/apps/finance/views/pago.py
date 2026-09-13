@@ -14,11 +14,18 @@ from backend.common.api.viewsets import BaseModelViewSet
 
 
 class PagoViewSet(BaseModelViewSet):
-    queryset = Pago.objects.select_related('cliente', 'pedido', 'metodo_pago').all()
+    queryset = Pago.objects.select_related('cliente', 'paciente', 'pedido', 'metodo_pago').all()
     serializer_class = PagoSerializer
     permission_classes = [GestionPago]
     filterset_class = PagoFilter
-    search_fields = ('numero_referencia', 'cliente__nombre_comercial', 'cliente__razon_social')
+    search_fields = (
+        'numero_referencia',
+        'cliente__nombre_comercial',
+        'cliente__razon_social',
+        'paciente__nombre',
+        'paciente__apellido',
+        'paciente__cedula',
+    )
 
     def update(self, request, *args, **kwargs):
         raise ApiError(
@@ -54,7 +61,7 @@ class AprobarPagoView(APIView):
         serializer.is_valid(raise_exception=True)
 
         pago = get_object_or_404(
-            Pago.objects.select_related('cliente', 'pedido', 'metodo_pago'),
+            Pago.objects.select_related('cliente', 'paciente', 'pedido', 'metodo_pago'),
             pk=pk,
         )
         pago = PagoService.aprobar(
@@ -78,7 +85,7 @@ class RechazarPagoView(APIView):
         serializer.is_valid(raise_exception=True)
 
         pago = get_object_or_404(
-            Pago.objects.select_related('cliente', 'pedido', 'metodo_pago'),
+            Pago.objects.select_related('cliente', 'paciente', 'pedido', 'metodo_pago'),
             pk=pk,
         )
         pago = PagoService.rechazar(

@@ -6,9 +6,15 @@ from backend.common.api.viewsets import BaseReadOnlyModelViewSet
 
 
 class LibroMayorViewSet(BaseReadOnlyModelViewSet):
-    queryset = LibroMayor.objects.select_related('cliente', 'pedido', 'pago').all()
+    queryset = LibroMayor.objects.select_related('cliente', 'paciente', 'pedido', 'pago').all()
     serializer_class = LibroMayorSerializer
     permission_classes = [LecturaLibroMayor]
     filterset_class = LibroMayorFilter
-    search_fields = ('cliente__razon_social', 'cliente__nombre_comercial', 'descripcion')
+    search_fields = (
+        'cliente__razon_social',
+        'cliente__nombre_comercial',
+        'paciente__nombre',
+        'paciente__apellido',
+        'descripcion',
+    )
     ordering = ('-id',)

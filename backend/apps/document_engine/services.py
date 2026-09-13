@@ -40,6 +40,8 @@ class DocumentoService:
 
     @staticmethod
     def _cliente_a_primitivas(cliente):
+        if not cliente:
+            return None
         return {
             'razon_social': cliente.razon_social,
             'nombre_comercial': cliente.nombre_comercial,
@@ -47,6 +49,19 @@ class DocumentoService:
             'correo': cliente.correo,
             'telefono': cliente.telefono,
             'direccion': cliente.direccion,
+        }
+
+    @staticmethod
+    def _paciente_a_primitivas(paciente):
+        if not paciente:
+            return None
+        return {
+            'nombre': paciente.nombre,
+            'apellido': paciente.apellido,
+            'nombre_completo': f'{paciente.nombre} {paciente.apellido}'.strip(),
+            'cedula': paciente.cedula or '',
+            'correo': paciente.correo or '',
+            'telefono': paciente.telefono or '',
         }
 
     @staticmethod
@@ -67,8 +82,11 @@ class DocumentoService:
 
     @staticmethod
     def _receta_a_primitivas(receta):
+        if not receta:
+            return None
         return {
-            'nombre_paciente': receta.nombre_paciente,
+            'nombre_paciente': str(receta.paciente) if receta.paciente else '',
+            'medico_prescriptor': receta.medico_prescriptor,
             'od_esfera': receta.od_esfera,
             'od_cilindro': receta.od_cilindro,
             'od_eje': receta.od_eje,
@@ -86,6 +104,8 @@ class DocumentoService:
         return {
             'pedido': {
                 'numero_pedido': pedido.numero_pedido,
+                'tipo_pedido': pedido.tipo_pedido,
+                'tipo_pedido_display': pedido.get_tipo_pedido_display(),
                 'estado': pedido.estado,
                 'estado_display': pedido.get_estado_display(),
                 'subtotal': pedido.subtotal,
@@ -95,7 +115,8 @@ class DocumentoService:
                 'creado_en': pedido.creado_en,
                 'impuesto_rate': settings.IMPUESTO_RATE,
             },
-            'cliente': cls._cliente_a_primitivas(pedido.cliente),
+            'cliente': cls._cliente_a_primitivas(pedido.cliente) if pedido.cliente else None,
+            'paciente': cls._paciente_a_primitivas(pedido.paciente) if pedido.paciente else None,
             'detalles': [cls._detalle_a_primitivas(d) for d in pedido.detalles.all()],
             'receta': cls._receta_a_primitivas(pedido.receta) if pedido.receta_id else None,
         }
@@ -116,7 +137,8 @@ class DocumentoService:
                 'nombre': pago.metodo_pago.nombre,
                 'moneda': pago.metodo_pago.moneda,
             },
-            'cliente': cls._cliente_a_primitivas(pago.cliente),
+            'cliente': cls._cliente_a_primitivas(pago.cliente) if pago.cliente else None,
+            'paciente': cls._paciente_a_primitivas(pago.paciente) if pago.paciente else None,
             'pedido': None,
         }
         if pago.pedido_id:

@@ -3,14 +3,20 @@ from django.db import models
 
 from backend.apps.clients.models import ClienteOptica
 from backend.apps.core.base_models import ActivoMixin, TimeStampedModel
-from backend.apps.core.choices import EstadoPedido
+from backend.apps.core.choices import EstadoPedido, TipoPedido
 from backend.apps.core.models import Usuario
 from backend.apps.inventory.models import VarianteProducto
+from backend.apps.pacientes.models import Paciente
 from backend.common.utils import SanitizedModelMixin
 
 
-class RecetaOptica(SanitizedModelMixin, ActivoMixin):
-    nombre_paciente = models.CharField('nombre del paciente', max_length=100, blank=True, default='')
+class RecetaOptica(SanitizedModelMixin, TimeStampedModel, ActivoMixin):
+    paciente = models.ForeignKey(
+        Paciente,
+        on_delete=models.RESTRICT,
+        related_name='recetas',
+        verbose_name='paciente',
+    )
 
     od_esfera = models.DecimalField('OD esfera', max_digits=4, decimal_places=2, blank=True, null=True)
     od_cilindro = models.DecimalField('OD cilindro', max_digits=4, decimal_places=2, blank=True, null=True)
@@ -23,6 +29,7 @@ class RecetaOptica(SanitizedModelMixin, ActivoMixin):
     oi_adicion = models.DecimalField('OI adición', max_digits=4, decimal_places=2, blank=True, null=True)
 
     distancia_pupilar = models.DecimalField('distancia pupilar', max_digits=4, decimal_places=1, blank=True, null=True)
+    medico_prescriptor = models.CharField('médico prescriptor', max_length=150, blank=True, default='')
     notas = models.TextField('notas', blank=True, default='')
 
     class Meta:
@@ -33,9 +40,6 @@ class RecetaOptica(SanitizedModelMixin, ActivoMixin):
     def clean(self):
         super().clean()
         errors = {}
-
-        if not self.nombre_paciente or not self.nombre_paciente.strip() or len(self.nombre_paciente.strip()) < 2:
-            errors['nombre_paciente'] = 'El nombre del paciente es obligatorio (mínimo 2 caracteres).'
 
         for lado in ('od', 'oi'):
             cilindro = getattr(self, f'{lado}_cilindro')
@@ -58,15 +62,43 @@ class RecetaOptica(SanitizedModelMixin, ActivoMixin):
             raise ValidationError(errors)
 
     def __str__(self):
-        return f'Receta #{self.id} - {self.nombre_paciente or "Sin paciente"}'
-
+        return f'Receta #{self.id} - {self.paciente}'
 
 
 class Pedido(SanitizedModelMixin, TimeStampedModel):
     numero_pedido = models.CharField('número de pedido', max_length=20, unique=True)
-    cliente = models.ForeignKey(ClienteOptica, on_delete=models.RESTRICT, verbose_name='cliente')
+    cliente = models.ForeignKey(
+        ClienteOptica,
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        related_name='pedidos',
+        verbose_name='cliente óptica',
+    )
+    paciente = models.ForeignKey(
+        Paciente,
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        related_name='pedidos',
+        verbose_name='paciente',
+    )
     usuario = models.ForeignKey(Usuario, on_delete=models.RESTRICT, verbose_name='usuario')
-    receta = models.OneToOneField(RecetaOptica, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='receta')
+    tipo_pedido = models.CharField(
+        'tipo de pedido',
+        max_length=20,
+        choices=TipoPedido.choices,
+        default=TipoPedido.LABORATORIO,
+    )
+    receta = models.ForeignKey(
+        RecetaOptica,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pedidos',
+        verbose_name='receta óptica',
+    )
+    receta_snapshot = models.JSONField('snapshot de receta', null=True, blank=True)
 
     estado = models.CharField('estado', max_length=20, choices=EstadoPedido.choices, default=EstadoPedido.BORRADOR)
     subtotal = models.DecimalField('subtotal', max_digits=12, decimal_places=2, default=0.00)
@@ -82,9 +114,19 @@ class Pedido(SanitizedModelMixin, TimeStampedModel):
         indexes = [
             models.Index(fields=['estado'], name='pedidos_idx_estado'),
         ]
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(cliente__isnull=False, paciente__isnull=True) |
+                    models.Q(cliente__isnull=True, paciente__isnull=False)
+                ),
+                name='pedido_exactamente_un_destinatario',
+            )
+        ]
 
     def __str__(self):
-        return f'Pedido #{self.numero_pedido} - {self.cliente.nombre_comercial}'
+        destinatario = self.cliente.nombre_comercial if self.cliente else str(self.paciente)
+        return f'Pedido #{self.numero_pedido} - {destinatario}'
 
 
 class DetallePedido(models.Model):
