@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
-import { Check, ChevronDown, X } from 'lucide-react'
+import { Check, ChevronDown, Loader2, X } from 'lucide-react'
 import {
   Command,
   CommandEmpty,
@@ -117,7 +117,7 @@ export function SearchableSelect<T>({
           <CommandList>
             {isFetching && options.length === 0 && (
               <div className="flex items-center gap-2 px-3 py-6 text-sm text-on-surface-variant">
-                <Icon name="progress_activity" size={16} className="animate-spin" />
+                <Loader2 size={16} className="animate-spin" />
                 Buscando...
               </div>
             )}
