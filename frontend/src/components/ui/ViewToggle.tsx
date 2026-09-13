@@ -1,4 +1,4 @@
-import { Icon } from '@/components/Icon'
+import { LayoutList, LayoutGrid } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
@@ -7,7 +7,7 @@ export type ViewMode = 'grid' | 'table'
 interface ViewOption {
   value: ViewMode
   label: string
-  icon: string
+  icon: typeof LayoutList
   tooltip: string
 }
 
@@ -15,13 +15,13 @@ const DEFAULT_OPTIONS: ViewOption[] = [
   {
     value: 'grid',
     label: 'Cuadrícula',
-    icon: 'grid_view',
+    icon: LayoutGrid,
     tooltip: 'Vista en cuadrícula',
   },
   {
     value: 'table',
     label: 'Lista',
-    icon: 'format_list_bulleted',
+    icon: LayoutList,
     tooltip: 'Vista en lista/tabla',
   },
 ]
@@ -54,6 +54,7 @@ export function ViewToggle({
       >
         {options.map((opt) => {
           const isActive = viewMode === opt.value
+          const IconComp = opt.icon
           return (
             <Tooltip key={opt.value}>
               <TooltipTrigger asChild>
@@ -70,7 +71,7 @@ export function ViewToggle({
                       : 'text-on-surface-variant/70 hover:text-on-surface hover:bg-surface-container-high/60',
                   )}
                 >
-                  <Icon name={opt.icon} size={16} className="shrink-0" />
+                  <IconComp size={16} className="shrink-0" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="top">

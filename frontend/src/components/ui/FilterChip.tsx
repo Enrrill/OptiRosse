@@ -1,4 +1,4 @@
-import { Icon } from '@/components/Icon'
+import { Eye, EyeOff } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +22,7 @@ export function FilterChip({
   id,
 }: FilterChipProps) {
   const currentLabel = checked ? activeLabel : label
+  const IconComp = checked ? EyeOff : Eye
 
   return (
     <Tooltip>
@@ -41,8 +42,7 @@ export function FilterChip({
             className,
           )}
         >
-          <Icon
-            name={checked ? 'visibility_off' : 'visibility'}
+          <IconComp
             size={14}
             className={cn('shrink-0', checked ? 'text-primary' : 'text-on-surface-variant')}
           />

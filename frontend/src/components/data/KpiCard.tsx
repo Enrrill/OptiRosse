@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import { Link } from 'react-router'
-import { Icon } from '@/components/Icon'
 import { cn } from '@/lib/utils'
 
 export type KpiVariant = 'primary' | 'secondary' | 'amber' | 'green' | 'error' | 'default'
@@ -9,7 +9,7 @@ export interface KpiCardProps {
   label: string
   value: ReactNode
   sub?: ReactNode
-  icon: string
+  icon: LucideIcon
   variant?: KpiVariant
   link?: { to: string; label: string }
 }
@@ -62,34 +62,23 @@ const VARIANT_CLASSES: Record<
   },
 }
 
-export function KpiCard({ label, value, sub, icon, variant = 'default', link }: KpiCardProps) {
+export function KpiCard({ label, value, sub, icon: IconComp, variant = 'default', link }: KpiCardProps) {
   const styles = VARIANT_CLASSES[variant]
-
   return (
-    <div
-      className={cn(
-        'flex min-h-[9.25rem] flex-col justify-between rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1',
-        styles.card,
-      )}
-    >
+    <div className={cn('flex min-h-[9.25rem] flex-col justify-between rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1', styles.card)}>
       <div className="flex items-start justify-between gap-2">
         <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105', styles.chip)}>
-          <Icon name={icon} size={20} filled={variant !== 'default'} />
+          <IconComp size={20} />
         </span>
         {link && (
-          <Link
-            to={link.to}
-            className={cn('text-xs font-medium underline-offset-4 transition-colors', styles.link)}
-          >
+          <Link to={link.to} className={cn('text-xs font-medium underline-offset-4 transition-colors', styles.link)}>
             {link.label}
           </Link>
         )}
       </div>
       <div className="mt-3">
         <p className={cn('uppercase', styles.label)}>{label}</p>
-        <p className={cn('font-heading text-2xl font-bold leading-tight mt-1 tracking-tight', styles.value)}>
-          {value}
-        </p>
+        <p className={cn('font-heading text-2xl font-bold leading-tight mt-1 tracking-tight', styles.value)}>{value}</p>
         {sub && <p className={cn('mt-0.5 text-xs opacity-80', styles.label)}>{sub}</p>}
       </div>
     </div>

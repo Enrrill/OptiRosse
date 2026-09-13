@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { EmptyState } from '@/components/data/EmptyState'
-import { Icon } from '@/components/Icon'
+import { Loader2, Download, FileText } from 'lucide-react'
 import { useApiQuery } from '@/hooks/useApi'
 import { useToast } from '@/store/useToast'
 import { ApiError } from '@/lib/api/errors'
@@ -83,12 +83,12 @@ export function GenerarDocumentoDialog({
 
         {isLoading ? (
           <div className="flex items-center justify-center gap-2 py-10 text-on-surface-variant">
-            <Icon name="progress_activity" size={20} className="animate-spin" />
+            <Loader2 size={20} className="animate-spin" />
             Cargando plantillas...
           </div>
         ) : plantillas.length === 0 ? (
           <EmptyState
-            icon="description"
+            icon={FileText}
             title="No hay plantillas disponibles"
             description="No existe una plantilla activa para los tipos de documento de este objeto."
           />
@@ -144,7 +144,7 @@ export function GenerarDocumentoDialog({
             loading={generar.isPending}
             onClick={handleSubmit}
           >
-            {!generar.isPending && <Icon name="download" size={18} />}
+            {!generar.isPending && <Download size={18} />}
             Descargar
           </Button>
         </DialogFooter>

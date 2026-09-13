@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
+import { AlertTriangle, Info, Loader2 } from 'lucide-react'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -33,6 +33,7 @@ export function ConfirmDialog({
   onConfirm,
 }: ConfirmDialogProps) {
   const isDestructive = variant === 'destructive'
+  const IconComp = isDestructive ? AlertTriangle : Info
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,12 +46,7 @@ export function ConfirmDialog({
                 : 'bg-primary-container text-on-primary-container'
             }`}
           >
-            <Icon
-              name={isDestructive ? 'warning' : 'info'}
-              filled
-              size={30}
-              className="currentColor"
-            />
+            <IconComp size={30} />
           </div>
           <DialogHeader className="items-center text-center">
             <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
@@ -66,7 +62,7 @@ export function ConfirmDialog({
             {cancelLabel}
           </Button>
           <Button variant={variant} disabled={loading} onClick={onConfirm}>
-            {loading && <Icon name="progress_activity" className="animate-spin mr-2" />}
+            {loading && <Loader2 className="animate-spin mr-2" size={16} />}
             {confirmLabel}
           </Button>
         </DialogFooter>

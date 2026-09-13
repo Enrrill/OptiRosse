@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Icon } from '@/components/Icon'
+import { Loader2 } from 'lucide-react'
 import { FieldError } from './FieldError'
 
 interface MotivoDialogProps {
@@ -80,7 +80,7 @@ export function MotivoDialog({
             Cancelar
           </Button>
           <Button variant="destructive" disabled={loading} onClick={handleSubmit}>
-            {loading && <Icon name="progress_activity" className="mr-2 animate-spin" />}
+            {loading && <Loader2 className="mr-2 animate-spin" size={16} />}
             {confirmLabel}
           </Button>
         </DialogFooter>

@@ -1,43 +1,45 @@
 import type { ReactNode } from 'react'
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  type ColumnDef,
+  type SortingState,
+  type VisibilityState,
+} from '@tanstack/react-table'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { SkeletonRows } from './SkeletonRows'
 import { ErrorState } from './ErrorState'
 import { EmptyState } from './EmptyState'
 
-export interface Column<T> {
-  key: string
-  header: string
-  headerClassName?: string
-  className?: string
-  align?: 'left' | 'center' | 'right'
-  cell?: (row: T) => ReactNode
-}
-
-interface DataTableProps<T> {
-  columns: Column<T>[]
-  data: T[]
-  rowKey: (row: T) => string | number
-  loading?: boolean
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  isLoading?: boolean
   error?: string | null
   onRetry?: () => void
   emptyTitle?: string
   emptyDescription?: string
   emptyAction?: ReactNode
-  onRowClick?: (row: T) => void
+  onRowClick?: (row: TData) => void
   toolbar?: ReactNode
   footer?: ReactNode
   className?: string
   embedded?: boolean
+  enableSorting?: boolean
+  enableColumnVisibility?: boolean
+  enableRowSelection?: boolean
+  columnCount?: number
 }
 
-export function DataTable<T>({
+export function DataTable<TData, TValue>({
   columns,
   data,
-  rowKey,
-  loading,
+  isLoading,
   error,
   onRetry,
-  emptyTitle,
+  emptyTitle = 'No hay resultados',
   emptyDescription,
   emptyAction,
   onRowClick,
@@ -45,8 +47,30 @@ export function DataTable<T>({
   footer,
   className,
   embedded = false,
-}: DataTableProps<T>) {
-  const alignClass = { left: 'text-left', center: 'text-center', right: 'text-right' }
+  enableSorting = false,
+  enableColumnVisibility = false,
+  enableRowSelection = false,
+  columnCount,
+}: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    onSortingChange: enableSorting ? setSorting : undefined,
+    onColumnVisibilityChange: enableColumnVisibility ? setColumnVisibility : undefined,
+    onRowSelectionChange: enableRowSelection ? setRowSelection : undefined,
+    state: {
+      sorting: enableSorting ? sorting : undefined,
+      columnVisibility: enableColumnVisibility ? columnVisibility : undefined,
+      rowSelection: enableRowSelection ? rowSelection : undefined,
+    },
+  })
+
+  const colCount = columnCount ?? columns.length
 
   return (
     <div
@@ -58,8 +82,8 @@ export function DataTable<T>({
       )}
     >
       {toolbar}
-      {loading ? (
-        <SkeletonRows columns={columns.length} />
+      {isLoading ? (
+        <SkeletonRows columns={colCount} />
       ) : error ? (
         <ErrorState message={error} onRetry={onRetry} />
       ) : data.length === 0 ? (
@@ -68,43 +92,47 @@ export function DataTable<T>({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-outline-variant/30 bg-surface-container-low/50">
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    className={cn(
-                      'px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant/80',
-                      alignClass[col.align ?? 'left'],
-                      col.headerClassName,
-                    )}
-                  >
-                    {col.header}
-                  </th>
-                ))}
-              </tr>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr
+                  key={headerGroup.id}
+                  className="border-b border-outline-variant/30 bg-surface-container-low/50"
+                >
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      className={cn(
+                        'px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant/80',
+                        header.column.columnDef.meta?.className,
+                      )}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </th>
+                  ))}
+                </tr>
+              ))}
             </thead>
             <tbody className="divide-y divide-outline-variant/30">
-              {data.map((row) => (
+              {table.getRowModel().rows.map((row) => (
                 <tr
-                  key={rowKey(row)}
+                  key={row.id}
                   className={cn(
                     'transition-colors hover:bg-surface-container-low/50',
                     onRowClick && 'cursor-pointer',
+                    row.getIsSelected() && 'bg-primary-container/10',
                   )}
-                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                 >
-                  {columns.map((col) => (
+                  {row.getVisibleCells().map((cell) => (
                     <td
-                      key={col.key}
+                      key={cell.id}
                       className={cn(
                         'px-6 py-3.5 text-sm text-on-surface',
-                        alignClass[col.align ?? 'left'],
-                        col.className,
+                        cell.column.columnDef.meta?.className,
                       )}
                     >
-                      {col.cell
-                        ? col.cell(row)
-                        : ((row as unknown as Record<string, ReactNode>)[col.key] as ReactNode)}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
                 </tr>

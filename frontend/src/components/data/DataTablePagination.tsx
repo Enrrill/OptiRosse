@@ -1,4 +1,4 @@
-import { Icon } from '@/components/Icon'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -23,7 +23,7 @@ export interface PaginationProps {
   className?: string
 }
 
-export function Pagination({
+export function DataTablePagination({
   page,
   pageSize,
   count,
@@ -55,12 +55,11 @@ export function Pagination({
         className,
       )}
     >
-      {/* Información de la paginación y selector de filas */}
       <div className="flex flex-wrap items-center gap-4">
         <p className="text-xs text-on-surface-variant font-medium">
           Mostrando{' '}
           <span className="font-semibold text-on-surface">{from}–{to}</span> de{' '}
-          <span className="font-semibold text-on-surface">{count}</span> resultados
+          <span className="font-semibold text-on-surface">{count}</span> registros
         </p>
 
         {showPageSizeSelector && onPageSizeChange && (
@@ -88,33 +87,29 @@ export function Pagination({
         )}
       </div>
 
-      {/* Controles de navegación */}
       <div className="flex items-center gap-1.5">
-        {/* Ir a la primera página */}
         <Button
           variant="outline"
           size="sm"
           disabled={page <= 1}
           onClick={() => onPageChange(1)}
           title="Primera página"
-          className="h-8 w-8 p-0 rounded-lg border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40 disabled:hover:bg-surface-container-lowest"
+          className="h-8 w-8 p-0 rounded-lg border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40"
         >
-          <Icon name="first_page" size={18} />
+          <ChevronsLeft size={16} />
         </Button>
 
-        {/* Página anterior */}
         <Button
           variant="outline"
           size="sm"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
           title="Página anterior"
-          className="h-8 w-8 p-0 rounded-lg border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40 disabled:hover:bg-surface-container-lowest"
+          className="h-8 w-8 p-0 rounded-lg border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40"
         >
-          <Icon name="chevron_left" size={18} />
+          <ChevronLeft size={16} />
         </Button>
 
-        {/* Números de página */}
         <div className="flex items-center gap-1">
           {paginationRange.map((item, idx) => {
             if (item === 'ellipsis') {
@@ -150,28 +145,26 @@ export function Pagination({
           })}
         </div>
 
-        {/* Página siguiente */}
         <Button
           variant="outline"
           size="sm"
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
           title="Página siguiente"
-          className="h-8 w-8 p-0 rounded-lg border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40 disabled:hover:bg-surface-container-lowest"
+          className="h-8 w-8 p-0 rounded-lg border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40"
         >
-          <Icon name="chevron_right" size={18} />
+          <ChevronRight size={16} />
         </Button>
 
-        {/* Ir a la última página */}
         <Button
           variant="outline"
           size="sm"
           disabled={page >= totalPages}
           onClick={() => onPageChange(totalPages)}
           title="Última página"
-          className="h-8 w-8 p-0 rounded-lg border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40 disabled:hover:bg-surface-container-lowest"
+          className="h-8 w-8 p-0 rounded-lg border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40"
         >
-          <Icon name="last_page" size={18} />
+          <ChevronsRight size={16} />
         </Button>
       </div>
     </div>

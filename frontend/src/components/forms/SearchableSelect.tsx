@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/Icon'
+import { Check, ChevronDown, X } from 'lucide-react'
 import {
   Command,
   CommandEmpty,
@@ -94,10 +94,10 @@ export function SearchableSelect<T>({
                   }
                 }}
               >
-                <Icon name="close" size={14} />
+                <X size={14} />
               </span>
             )}
-            <Icon name="expand_more" size={18} className="text-on-surface-variant" />
+            <ChevronDown size={18} className="text-on-surface-variant" />
           </span>
         </Button>
       </PopoverTrigger>
@@ -140,7 +140,7 @@ export function SearchableSelect<T>({
                 </div>
                 {value != null &&
                   formatSelected(value) === option.label && (
-                    <Icon name="check" size={18} className="shrink-0 text-primary" />
+                    <Check size={18} className="shrink-0 text-primary" />
                   )}
               </CommandItem>
             ))}

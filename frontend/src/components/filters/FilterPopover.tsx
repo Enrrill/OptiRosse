@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Icon } from '@/components/Icon'
+import { SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
@@ -29,7 +29,7 @@ export function FilterPopover({
             className,
           )}
         >
-          <Icon name="tune" size={16} className={activeCount > 0 ? 'text-primary' : 'text-on-surface-variant'} />
+          <SlidersHorizontal size={16} className={activeCount > 0 ? 'text-primary' : 'text-on-surface-variant'} />
           <span>Filtros</span>
           {activeCount > 0 && (
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-on-primary">
@@ -44,7 +44,7 @@ export function FilterPopover({
       >
         <div className="flex items-center justify-between border-b border-outline-variant/40 pb-2.5">
           <div className="flex items-center gap-2">
-            <Icon name="tune" size={18} className="text-primary" />
+            <SlidersHorizontal size={18} className="text-primary" />
             <h4 className="text-sm font-semibold text-on-surface">Filtros de la tabla</h4>
             {activeCount > 0 && (
               <span className="rounded-full bg-primary-container px-2 py-0.5 text-[11px] font-medium text-on-primary-container">

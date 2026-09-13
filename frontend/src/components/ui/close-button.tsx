@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Icon } from '@/components/Icon'
+import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface CloseButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -62,7 +62,7 @@ export const CloseButton = React.forwardRef<HTMLButtonElement, CloseButtonProps>
         )}
         {...props}
       >
-        <Icon name="close" size={finalIconSize} />
+        <X size={finalIconSize} />
         <span className="sr-only">{label}</span>
       </button>
     )

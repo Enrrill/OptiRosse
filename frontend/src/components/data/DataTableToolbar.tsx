@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react'
-import { Icon } from '@/components/Icon'
+import { Search, SlidersHorizontal, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { CloseButton } from '@/components/ui/close-button'
 import { ActiveFilterChips, type ActiveFilterItem } from '@/components/filters/ActiveFilterChips'
 import { FilterPopover } from '@/components/filters/FilterPopover'
 import { cn } from '@/lib/utils'
@@ -43,11 +42,7 @@ export function DataTableToolbar({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {hasSearch && (
           <div className="relative w-full sm:max-w-sm shrink-0">
-            <Icon
-              name="search"
-              size={18}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-            />
+            <Search size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <Input
               id={searchId}
               name="search"
@@ -57,12 +52,13 @@ export function DataTableToolbar({
               className="pl-9 pr-8 bg-surface-container-lowest border-outline-variant/70 focus:border-primary"
             />
             {search && (
-              <CloseButton
-                size="xs"
-                label="Limpiar búsqueda"
+              <button
                 onClick={() => onSearchChange('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2"
-              />
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
+                aria-label="Limpiar búsqueda"
+              >
+                <X size={12} />
+              </button>
             )}
           </div>
         )}
@@ -83,7 +79,7 @@ export function DataTableToolbar({
               onClick={onClearFilters}
               className="h-8 px-2.5 text-xs text-on-surface-variant hover:text-error hover:bg-error-container/20 transition-colors"
             >
-              <Icon name="filter_alt_off" size={14} className="mr-1" />
+              <SlidersHorizontal size={14} className="mr-1" />
               Limpiar
             </Button>
           )}
