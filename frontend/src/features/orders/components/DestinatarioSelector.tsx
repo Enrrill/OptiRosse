@@ -53,7 +53,7 @@ export function DestinatarioSelector({
 
   return (
     <div className="space-y-2">
-      <Label>Destinatario *</Label>
+      <Label htmlFor="destinatario">Destinatario *</Label>
 
       <div className="flex gap-1 rounded-lg border border-outline-variant/60 bg-surface-container-low p-1">
         <button

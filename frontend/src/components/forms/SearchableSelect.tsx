@@ -64,6 +64,7 @@ export function SearchableSelect<T>({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={keyId}
           variant="outline"
           role="combobox"
           aria-expanded={open}
