@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable } from '@/components/data/DataTable'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
@@ -54,55 +55,55 @@ export function ClientesTable({
   const navigate = useNavigate()
   const canManage = useAuthStore((s) => s.user?.rol) === 'administrador'
 
-  const columns: Column<Cliente>[] = [
+  const columns: ColumnDef<Cliente>[] = [
     {
-      key: 'nombre_comercial',
+      accessorKey: 'nombre_comercial',
       header: 'Cliente',
-      cell: (row) => (
+      cell: ({row}) => (
         <div>
-          <p className="font-medium text-on-surface">{formatName(row.nombre_comercial)}</p>
-          <p className="text-xs text-on-surface-variant">{formatName(row.razon_social)}</p>
+          <p className="font-medium text-on-surface">{formatName(row.original.nombre_comercial)}</p>
+          <p className="text-xs text-on-surface-variant">{formatName(row.original.razon_social)}</p>
         </div>
       ),
     },
     {
-      key: 'identificacion_fiscal',
+      accessorKey: 'identificacion_fiscal',
       header: 'RIF',
-      cell: (row) => <span className="font-mono text-xs font-semibold">{formatRIF(row.identificacion_fiscal)}</span>,
+      cell: ({row}) => <span className="font-mono text-xs font-semibold">{formatRIF(row.original.identificacion_fiscal)}</span>,
     },
     {
-      key: 'correo',
+      accessorKey: 'correo',
       header: 'Correo',
-      cell: (row) => <span className="block max-w-[320px] truncate text-on-surface-variant">{formatEmail(row.correo)}</span>,
+      cell: ({row}) => <span className="block max-w-[320px] truncate text-on-surface-variant">{formatEmail(row.original.correo)}</span>,
     },
     {
-      key: 'telefono',
+      accessorKey: 'telefono',
       header: 'Teléfono',
-      cell: (row) => <span className="text-on-surface-variant whitespace-nowrap">{formatPhone(row.telefono)}</span>,
+      cell: ({row}) => <span className="text-on-surface-variant whitespace-nowrap">{formatPhone(row.original.telefono)}</span>,
     },
     {
-      key: 'limite_credito',
+      accessorKey: 'limite_credito',
       header: 'Límite de crédito',
-      align: 'right',
-      cell: (row) => row.limite_credito != null ? formatMoney(row.limite_credito) : '—',
+      meta: { className: 'text-right' },
+      cell: ({row}) => row.original.limite_credito != null ? formatMoney(row.original.limite_credito) : '—',
     },
     {
-      key: 'dias_credito',
+      accessorKey: 'dias_credito',
       header: 'Días de crédito',
-      align: 'right',
-      cell: (row) => row.dias_credito != null ? formatNumber(row.dias_credito) : '—',
+      meta: { className: 'text-right' },
+      cell: ({row}) => row.original.dias_credito != null ? formatNumber(row.original.dias_credito) : '—',
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+      cell: ({row}) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
-    { key: 'creado_en', header: 'Creado', cell: (row) => formatDate(row.creado_en) },
+    { accessorKey: 'creado_en', header: 'Creado', cell: ({row}) => formatDate(row.original.creado_en) },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) => (
+      meta: { className: 'text-right' },
+      cell: ({row}) => (
         <div className="flex items-center justify-end gap-0.5">
           <TooltipProvider delayDuration={150}>
             <Tooltip>
@@ -113,7 +114,7 @@ export function ClientesTable({
                   aria-label="Ver cliente"
                   onClick={(e) => {
                     e.stopPropagation()
-                    navigate(`/clientes/${row.id}`)
+                    navigate(`/clientes/${row.original.id}`)
                   }}
                 >
                   <Eye size={18} />
@@ -132,7 +133,7 @@ export function ClientesTable({
                     aria-label="Editar cliente"
                     onClick={(e) => {
                       e.stopPropagation()
-                      onEdit(row)
+                      onEdit(row.original)
                     }}
                   >
                     <Pencil size={18} />
@@ -145,16 +146,16 @@ export function ClientesTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={row.activo ? 'Desactivar cliente' : 'Reactivar cliente'}
+                    aria-label={row.original.activo ? 'Desactivar cliente' : 'Reactivar cliente'}
                     onClick={(e) => {
                       e.stopPropagation()
-                      onToggleEstado(row)
+                      onToggleEstado(row.original)
                     }}
                   >
-                    {row.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
+                    {row.original.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+                <TooltipContent>{row.original.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -167,8 +168,7 @@ export function ClientesTable({
     <DataTable<Cliente>
       columns={columns}
       data={clientes}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar los clientes') : null}
       onRetry={onRetry}
       emptyTitle={showInactivos ? 'No hay clientes inactivos' : 'No hay clientes'}

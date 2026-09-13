@@ -1,7 +1,8 @@
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable } from '@/components/data/DataTable'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import {
   Select,
   SelectContent,
@@ -62,83 +63,83 @@ export function LibroMayorTable({
 }: LibroMayorTableProps) {
   const esCredito = (row: LibroMayorAsiento) => row.tipo_asiento === 'credito'
 
-  const columns: Column<LibroMayorAsiento>[] = [
+  const columns: ColumnDef<LibroMayorAsiento>[] = [
     {
-      key: 'fecha',
+      accessorKey: 'fecha',
       header: 'Fecha',
-      cell: (row) => <span className="whitespace-nowrap text-on-surface-variant">{formatDateTime(row.creado_en)}</span>,
+      cell: ({row}) => <span className="whitespace-nowrap text-on-surface-variant">{formatDateTime(row.original.creado_en)}</span>,
     },
     {
-      key: 'cliente',
+      accessorKey: 'cliente',
       header: 'Destinatario',
-      cell: (row) => (
+      cell: ({row}) => (
         <span className="font-medium text-on-surface">
-          {row.cliente_detalle?.nombre_comercial
-            ?? row.paciente_detalle?.nombre_completo
+          {row.original.cliente_detalle?.nombre_comercial
+            ?? row.original.paciente_detalle?.nombre_completo
             ?? '—'}
         </span>
       ),
     },
     {
-      key: 'descripcion',
+      accessorKey: 'descripcion',
       header: 'Descripción',
-      cell: (row) => <span className="text-on-surface-variant">{row.descripcion}</span>,
+      cell: ({row}) => <span className="text-on-surface-variant">{row.original.descripcion}</span>,
     },
     {
-      key: 'tipo',
+      accessorKey: 'tipo',
       header: 'Tipo',
-      cell: (row) => {
-        const display = choice(TIPO_ASIENTO, row.tipo_asiento)
+      cell: ({row}) => {
+        const display = choice(TIPO_ASIENTO, row.original.tipo_asiento)
         return (
           <span
             className={
-              esCredito(row)
+              esCredito(row.original)
                 ? 'font-medium text-green-700 dark:text-green-400'
                 : 'font-medium text-error'
             }
           >
-            {display?.label ?? row.tipo_asiento_display}
+            {display?.label ?? row.original.tipo_asiento_display}
           </span>
         )
       },
     },
     {
-      key: 'monto',
+      accessorKey: 'monto',
       header: 'Monto',
-      align: 'right',
-      cell: (row) => (
-        <span className={esCredito(row) ? 'text-green-700 dark:text-green-400' : 'text-error'}>
-          {esCredito(row) ? '+' : '−'}
-          {formatMoney(row.monto)}
+      meta: { className: 'text-right' },
+      cell: ({row}) => (
+        <span className={esCredito(row.original) ? 'text-green-700 dark:text-green-400' : 'text-error'}>
+          {esCredito(row.original) ? '+' : '−'}
+          {formatMoney(row.original.monto)}
         </span>
       ),
     },
     {
-      key: 'pedido',
+      accessorKey: 'pedido',
       header: 'Pedido',
-      cell: (row) =>
-        row.pedido_numero ? (
-          <span className="font-mono text-sm text-primary">{row.pedido_numero}</span>
+      cell: ({row}) =>
+        row.original.pedido_numero ? (
+          <span className="font-mono text-sm text-primary">{row.original.pedido_numero}</span>
         ) : (
           <span className="text-on-surface-variant">—</span>
         ),
     },
     {
-      key: 'pago',
+      accessorKey: 'pago',
       header: 'Pago',
-      cell: (row) =>
-        row.pago != null ? (
-          <span className="font-mono text-sm text-primary">Pago #{row.pago}</span>
+      cell: ({row}) =>
+        row.original.pago != null ? (
+          <span className="font-mono text-sm text-primary">Pago #{row.original.pago}</span>
         ) : (
           <span className="text-on-surface-variant">—</span>
         ),
     },
     {
-      key: 'saldo_posterior',
+      accessorKey: 'saldo_posterior',
       header: 'Saldo posterior',
-      align: 'right',
-      cell: (row) => {
-        const saldo = Number(row.saldo_posterior)
+      meta: { className: 'text-right' },
+      cell: ({row}) => {
+        const saldo = Number(row.original.saldo_posterior)
         return (
           <span
             className={
@@ -209,8 +210,7 @@ export function LibroMayorTable({
     <DataTable<LibroMayorAsiento>
       columns={columns}
       data={asientos}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar el libro mayor') : null}
       onRetry={onRetry}
       emptyTitle={hayFiltros ? 'No hay asientos con estos filtros' : 'No hay movimientos'}
@@ -278,7 +278,7 @@ export function LibroMayorTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

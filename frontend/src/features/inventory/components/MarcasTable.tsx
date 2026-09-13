@@ -1,8 +1,8 @@
 import { Pencil, EyeOff, RotateCcw, Plus } from 'lucide-react'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable, type ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -50,24 +50,24 @@ export function MarcasTable({
   onToggleEstado,
   onNuevo,
 }: MarcasTableProps) {
-  const columns: Column<Marca>[] = [
-    { key: 'nombre', header: 'Nombre', cell: (row) => <span className="font-medium">{row.nombre}</span> },
+  const columns: ColumnDef<Marca>[] = [
+    { accessorKey: 'nombre', header: 'Nombre', cell: ({ row }) => <span className="font-medium">{row.original.nombre}</span> },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+      cell: ({ row }) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) =>
+      meta: { className: 'text-right' },
+      cell: ({ row }) =>
         canManage ? (
           <div className="flex items-center justify-end gap-0.5">
             <TooltipProvider delayDuration={150}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Editar marca" onClick={() => onEdit(row)}>
+                  <Button variant="ghost" size="icon" aria-label="Editar marca" onClick={() => onEdit(row.original)}>
                     <Pencil size={18} />
                   </Button>
                 </TooltipTrigger>
@@ -78,13 +78,13 @@ export function MarcasTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={row.activo ? 'Desactivar marca' : 'Reactivar marca'}
-                    onClick={() => onToggleEstado(row)}
+                    aria-label={row.original.activo ? 'Desactivar marca' : 'Reactivar marca'}
+                    onClick={() => onToggleEstado(row.original)}
                   >
-                    {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
+                    {row.original.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+                <TooltipContent>{row.original.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -96,8 +96,7 @@ export function MarcasTable({
     <DataTable<Marca>
       columns={columns}
       data={marcas}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar las marcas') : null}
       onRetry={onRetry}
       emptyTitle={showInactivas ? 'No hay marcas inactivas' : 'No hay marcas'}
@@ -129,7 +128,7 @@ export function MarcasTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

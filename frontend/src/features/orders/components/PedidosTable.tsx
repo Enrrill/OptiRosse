@@ -1,4 +1,5 @@
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable } from '@/components/data/DataTable'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
@@ -74,52 +75,52 @@ export function PedidosTable({
   onEliminar,
   onNuevo,
 }: PedidosTableProps) {
-  const columns: Column<Pedido>[] = [
+  const columns: ColumnDef<Pedido>[] = [
     {
-      key: 'numero_pedido',
+      accessorKey: 'numero_pedido',
       header: 'N.º pedido',
-      cell: (row) => (
-        <span className="font-mono text-sm font-medium text-on-surface">{row.numero_pedido}</span>
+      cell: ({row}) => (
+        <span className="font-mono text-sm font-medium text-on-surface">{row.original.numero_pedido}</span>
       ),
     },
     {
-      key: 'cliente',
+      accessorKey: 'cliente',
       header: 'Destinatario',
-      cell: (row) => (
+      cell: ({row}) => (
         <span className="font-medium text-on-surface">
-          {row.cliente_detalle?.nombre_comercial
-            ?? row.paciente_detalle?.nombre_completo
+          {row.original.cliente_detalle?.nombre_comercial
+            ?? row.original.paciente_detalle?.nombre_completo
             ?? '—'}
         </span>
       ),
     },
     {
-      key: 'usuario',
+      accessorKey: 'usuario',
       header: 'Usuario',
-      cell: (row) => <span className="text-on-surface-variant">{row.usuario_nombre}</span>,
+      cell: ({row}) => <span className="text-on-surface-variant">{row.original.usuario_nombre}</span>,
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={choice(ESTADO_PEDIDO, row.estado)} />,
+      cell: ({row}) => <StatusBadge display={choice(ESTADO_PEDIDO, row.original.estado)} />,
     },
     {
-      key: 'total',
+      accessorKey: 'total',
       header: 'Total',
-      align: 'right',
-      cell: (row) => <span className="font-medium">{formatMoney(row.total)}</span>,
+      meta: { className: 'text-right' },
+      cell: ({row}) => <span className="font-medium">{formatMoney(row.original.total)}</span>,
     },
     {
-      key: 'creado_en',
+      accessorKey: 'creado_en',
       header: 'Fecha',
-      cell: (row) => <span className="text-on-surface-variant">{formatDate(row.creado_en)}</span>,
+      cell: ({row}) => <span className="text-on-surface-variant">{formatDate(row.original.creado_en)}</span>,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) => {
-        const editable = canManage && row.estado === 'borrador'
+      meta: { className: 'text-right' },
+      cell: ({row}) => {
+        const editable = canManage && row.original.estado === 'borrador'
         return (
           <div className="flex items-center justify-end gap-0.5">
             <TooltipProvider delayDuration={150}>
@@ -131,7 +132,7 @@ export function PedidosTable({
                     aria-label="Ver pedido"
                     onClick={(e) => {
                       e.stopPropagation()
-                      onVer(row)
+                      onVer(row.original)
                     }}
                   >
                     <Eye size={18} />
@@ -149,7 +150,7 @@ export function PedidosTable({
                         aria-label="Editar pedido"
                         onClick={(e) => {
                           e.stopPropagation()
-                          onEditar(row)
+                          onEditar(row.original)
                         }}
                       >
                         <Pencil size={18} />
@@ -166,7 +167,7 @@ export function PedidosTable({
                         className="text-error hover:bg-error-container/40 hover:text-error"
                         onClick={(e) => {
                           e.stopPropagation()
-                          onEliminar(row)
+                          onEliminar(row.original)
                         }}
                       >
                         <Trash2 size={18} />
@@ -238,8 +239,7 @@ export function PedidosTable({
     <DataTable<Pedido>
       columns={columns}
       data={pedidos}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar los pedidos') : null}
       onRetry={onRetry}
       onRowClick={onVer}

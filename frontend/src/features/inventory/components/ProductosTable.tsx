@@ -1,7 +1,7 @@
 import { Pencil, EyeOff, RotateCcw, Plus } from 'lucide-react'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable, type ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -73,53 +73,53 @@ export function ProductosTable({
   onToggleEstado,
   onNuevo,
 }: ProductosTableProps) {
-  const columns: Column<Producto>[] = [
+  const columns: ColumnDef<Producto>[] = [
     {
-      key: 'marca',
+      accessorKey: 'marca',
       header: 'Producto',
-      cell: (row) => (
+      cell: ({ row }) => (
         <div>
           <p className="font-medium text-on-surface">
-            {row.marca} <span className="font-mono text-on-surface-variant">{row.codigo_modelo}</span>
+            {row.original.marca} <span className="font-mono text-on-surface-variant">{row.original.codigo_modelo}</span>
           </p>
-          <p className="max-w-[260px] truncate text-xs text-on-surface-variant">{row.descripcion}</p>
+          <p className="max-w-[260px] truncate text-xs text-on-surface-variant">{row.original.descripcion}</p>
         </div>
       ),
     },
     {
-      key: 'categoria_detalle',
+      accessorKey: 'categoria_detalle',
       header: 'Categoría',
-      cell: (row) => <span>{row.categoria_detalle.nombre}</span>,
+      cell: ({ row }) => <span>{row.original.categoria_detalle.nombre}</span>,
     },
     {
-      key: 'tipo',
+      accessorKey: 'tipo',
       header: 'Tipo',
-      cell: (row) => (
-        <StatusBadge display={choice(TIPO_PRODUCTO, row.categoria_detalle.tipo_producto)} />
+      cell: ({ row }) => (
+        <StatusBadge display={choice(TIPO_PRODUCTO, row.original.categoria_detalle.tipo_producto)} />
       ),
     },
     {
-      key: 'variantes_count',
+      accessorKey: 'variantes_count',
       header: 'Variantes',
-      align: 'right',
-      cell: (row) => (
+      meta: { className: 'text-right' },
+      cell: ({ row }) => (
         <div className="text-right">
           <span className="font-mono text-sm font-semibold">
-            {formatNumber(row.variantes.length)}
+            {formatNumber(row.original.variantes.length)}
           </span>
         </div>
       ),
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+      cell: ({ row }) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) =>
+      meta: { className: 'text-right' },
+      cell: ({ row }) =>
         canManage ? (
           <div className="flex items-center justify-end gap-0.5">
             <TooltipProvider delayDuration={150}>
@@ -129,7 +129,7 @@ export function ProductosTable({
                     variant="ghost"
                     size="icon"
                     aria-label="Editar producto"
-                    onClick={() => onEdit(row)}
+                    onClick={() => onEdit(row.original)}
                   >
                     <Pencil size={18} />
                   </Button>
@@ -141,13 +141,13 @@ export function ProductosTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={row.activo ? 'Desactivar producto' : 'Reactivar producto'}
-                    onClick={() => onToggleEstado(row)}
+                    aria-label={row.original.activo ? 'Desactivar producto' : 'Reactivar producto'}
+                    onClick={() => onToggleEstado(row.original)}
                   >
-                    {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
+                    {row.original.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+                <TooltipContent>{row.original.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -198,8 +198,7 @@ export function ProductosTable({
     <DataTable<Producto>
       columns={columns}
       data={productos}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar los productos') : null}
       onRetry={onRetry}
       emptyTitle={showInactivos ? 'No hay productos inactivos' : 'No hay productos'}
@@ -289,7 +288,7 @@ export function ProductosTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

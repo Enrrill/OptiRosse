@@ -1,6 +1,7 @@
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable } from '@/components/data/DataTable'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Plus, Pencil, RotateCcw, UserX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -65,41 +66,41 @@ export function UsuariosTable({
   const nombreCompleto = (usuario: Usuario) =>
     formatName([usuario.nombre, usuario.apellido].filter(Boolean).join(' '))
 
-  const columns: Column<Usuario>[] = [
+  const columns: ColumnDef<Usuario>[] = [
     {
-      key: 'nombre_usuario',
+      accessorKey: 'nombre_usuario',
       header: 'Usuario',
-      cell: (row) => (
+      cell: ({row}) => (
         <div>
-          <p className="font-mono text-sm font-medium text-on-surface">@{row.nombre_usuario}</p>
-          <p className="text-xs text-on-surface-variant">{nombreCompleto(row) || '—'}</p>
+          <p className="font-mono text-sm font-medium text-on-surface">@{row.original.nombre_usuario}</p>
+          <p className="text-xs text-on-surface-variant">{nombreCompleto(row.original) || '—'}</p>
         </div>
       ),
     },
     {
-      key: 'correo',
+      accessorKey: 'correo',
       header: 'Correo',
-      cell: (row) => (
-        <span className="block max-w-[320px] truncate text-on-surface-variant">{formatEmail(row.correo)}</span>
+      cell: ({row}) => (
+        <span className="block max-w-[320px] truncate text-on-surface-variant">{formatEmail(row.original.correo)}</span>
       ),
     },
     {
-      key: 'rol',
+      accessorKey: 'rol',
       header: 'Rol',
-      cell: (row) => <StatusBadge display={choice(ROLES, row.rol)} />,
+      cell: ({row}) => <StatusBadge display={choice(ROLES, row.original.rol)} />,
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+      cell: ({row}) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
-    { key: 'creado_en', header: 'Creado', cell: (row) => formatDate(row.creado_en) },
+    { accessorKey: 'creado_en', header: 'Creado', cell: ({row}) => formatDate(row.original.creado_en) },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) => {
-        const esMismoUsuario = row.id === currentUserId
+      meta: { className: 'text-right' },
+      cell: ({row}) => {
+        const esMismoUsuario = row.original.id === currentUserId
         return (
           <div className="flex items-center justify-end gap-0.5">
             <TooltipProvider delayDuration={150}>
@@ -111,7 +112,7 @@ export function UsuariosTable({
                     aria-label="Editar usuario"
                     onClick={(e) => {
                       e.stopPropagation()
-                      onEdit(row)
+                      onEdit(row.original)
                     }}
                   >
                     <Pencil size={18} />
@@ -126,20 +127,20 @@ export function UsuariosTable({
                       variant="ghost"
                       size="icon"
                       disabled={esMismoUsuario}
-                      aria-label={row.activo ? 'Desactivar usuario' : 'Reactivar usuario'}
+                      aria-label={row.original.activo ? 'Desactivar usuario' : 'Reactivar usuario'}
                       onClick={(e) => {
                         e.stopPropagation()
-                        onToggleEstado(row)
+                        onToggleEstado(row.original)
                       }}
                     >
-                      {row.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
+                      {row.original.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
                     </Button>
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
                   {esMismoUsuario
                     ? 'No puedes desactivar tu propia cuenta'
-                    : row.activo
+                    : row.original.activo
                       ? 'Desactivar'
                       : 'Reactivar'}
                 </TooltipContent>
@@ -172,8 +173,7 @@ export function UsuariosTable({
     <DataTable<Usuario>
       columns={columns}
       data={usuarios}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar los usuarios') : null}
       onRetry={onRetry}
       emptyTitle={showInactivos ? 'No hay usuarios inactivos' : 'No hay usuarios'}
@@ -225,7 +225,7 @@ export function UsuariosTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

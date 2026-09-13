@@ -1,5 +1,6 @@
 import { Pencil, UserX, RotateCcw, Plus } from 'lucide-react'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable } from '@/components/data/DataTable'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
@@ -58,50 +59,50 @@ export function RecetasTable({
   onToggleEstado,
   onNuevo,
 }: RecetasTableProps) {
-  const columns: Column<RecetaOptica>[] = [
+  const columns: ColumnDef<RecetaOptica>[] = [
     {
-      key: 'id',
+      accessorKey: 'id',
       header: '# Receta',
-      cell: (row) => <span className="font-mono text-sm font-medium text-on-surface">#{row.id}</span>,
+      cell: ({row}) => <span className="font-mono text-sm font-medium text-on-surface">#{row.original.id}</span>,
     },
     {
-      key: 'paciente',
+      accessorKey: 'paciente',
       header: 'Paciente',
-      cell: (row) => (
+      cell: ({row}) => (
         <span className="font-medium text-on-surface">
-          {row.paciente_detalle?.nombre_completo || 'Sin paciente'}
+          {row.original.paciente_detalle?.nombre_completo || 'Sin paciente'}
         </span>
       ),
     },
     {
-      key: 'od',
+      accessorKey: 'od',
       header: 'OD resumen',
-      cell: (row) => (
+      cell: ({row}) => (
         <span className="font-mono text-xs text-on-surface-variant">
-          {formatGradienteCompleto(row.od_esfera, row.od_cilindro, row.od_eje)}
+          {formatGradienteCompleto(row.original.od_esfera, row.original.od_cilindro, row.original.od_eje)}
         </span>
       ),
     },
     {
-      key: 'oi',
+      accessorKey: 'oi',
       header: 'OI resumen',
-      cell: (row) => (
+      cell: ({row}) => (
         <span className="font-mono text-xs text-on-surface-variant">
-          {formatGradienteCompleto(row.oi_esfera, row.oi_cilindro, row.oi_eje)}
+          {formatGradienteCompleto(row.original.oi_esfera, row.original.oi_cilindro, row.original.oi_eje)}
         </span>
       ),
     },
-    { key: 'distancia_pupilar', header: 'DP', cell: (row) => formatDp(row.distancia_pupilar) },
+    { accessorKey: 'distancia_pupilar', header: 'DP', cell: ({row}) => formatDp(row.original.distancia_pupilar) },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+      cell: ({row}) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) => {
+      meta: { className: 'text-right' },
+      cell: ({row}) => {
         if (!canEdit) return null
         return (
           <div className="flex items-center justify-end gap-0.5">
@@ -114,7 +115,7 @@ export function RecetasTable({
                     aria-label="Editar receta"
                     onClick={(e) => {
                       e.stopPropagation()
-                      onEdit(row)
+                      onEdit(row.original)
                     }}
                   >
                     <Pencil size={18} />
@@ -127,16 +128,16 @@ export function RecetasTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={row.activo ? 'Desactivar receta' : 'Reactivar receta'}
+                    aria-label={row.original.activo ? 'Desactivar receta' : 'Reactivar receta'}
                     onClick={(e) => {
                       e.stopPropagation()
-                      onToggleEstado(row)
+                      onToggleEstado(row.original)
                     }}
                   >
-                    {row.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
+                    {row.original.activo ? <UserX size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+                <TooltipContent>{row.original.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -149,8 +150,7 @@ export function RecetasTable({
     <DataTable<RecetaOptica>
       columns={columns}
       data={recetas}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar las recetas') : null}
       onRetry={onRetry}
       emptyTitle={showInactivos ? 'No hay recetas inactivas' : 'No hay recetas'}

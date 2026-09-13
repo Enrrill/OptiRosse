@@ -1,8 +1,8 @@
 import { Pencil, EyeOff, RotateCcw, Plus } from 'lucide-react'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable, type ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -50,23 +50,23 @@ export function CategoriasTable({
   onToggleEstado,
   onNuevo,
 }: CategoriasTableProps) {
-  const columns: Column<Categoria>[] = [
-    { key: 'nombre', header: 'Nombre', cell: (row) => <span className="font-medium">{row.nombre}</span> },
+  const columns: ColumnDef<Categoria>[] = [
+    { accessorKey: 'nombre', header: 'Nombre', cell: ({ row }) => <span className="font-medium">{row.original.nombre}</span> },
     {
-      key: 'tipo_producto',
+      accessorKey: 'tipo_producto',
       header: 'Tipo',
-      cell: (row) => <StatusBadge display={choice(TIPO_PRODUCTO, row.tipo_producto)} />,
+      cell: ({ row }) => <StatusBadge display={choice(TIPO_PRODUCTO, row.original.tipo_producto)} />,
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+      cell: ({ row }) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) =>
+      meta: { className: 'text-right' },
+      cell: ({ row }) =>
         canManage ? (
           <div className="flex items-center justify-end gap-0.5">
             <TooltipProvider delayDuration={150}>
@@ -76,7 +76,7 @@ export function CategoriasTable({
                     variant="ghost"
                     size="icon"
                     aria-label="Editar categoría"
-                    onClick={() => onEdit(row)}
+                    onClick={() => onEdit(row.original)}
                   >
                     <Pencil size={18} />
                   </Button>
@@ -88,13 +88,13 @@ export function CategoriasTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={row.activo ? 'Desactivar categoría' : 'Reactivar categoría'}
-                    onClick={() => onToggleEstado(row)}
+                    aria-label={row.original.activo ? 'Desactivar categoría' : 'Reactivar categoría'}
+                    onClick={() => onToggleEstado(row.original)}
                   >
-                    {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
+                    {row.original.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+                <TooltipContent>{row.original.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -106,8 +106,7 @@ export function CategoriasTable({
     <DataTable<Categoria>
       columns={columns}
       data={categorias}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar las categorías') : null}
       onRetry={onRetry}
       emptyTitle={showInactivas ? 'No hay categorías inactivas' : 'No hay categorías'}
@@ -139,7 +138,7 @@ export function CategoriasTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

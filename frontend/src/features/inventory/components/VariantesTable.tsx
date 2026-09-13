@@ -1,7 +1,7 @@
 import { ArrowUpDown } from 'lucide-react'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable, type ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StockBadge } from '@/components/data/StockBadge'
 import { Button } from '@/components/ui/button'
 import { FilterChip } from '@/components/ui/FilterChip'
@@ -71,57 +71,57 @@ export function VariantesTable({
     return encontrado ? `${encontrado.marca} ${encontrado.codigo_modelo}`.trim() : `Producto #${row.producto}`
   }
 
-  const columns: Column<VarianteProducto>[] = [
+  const columns: ColumnDef<VarianteProducto>[] = [
     {
-      key: 'stock',
+      accessorKey: 'stock',
       header: 'Stock',
-      cell: (row) => (
-        <StockBadge stock={row.stock} alertaMinima={row.alerta_stock_minimo} />
+      cell: ({ row }) => (
+        <StockBadge stock={row.original.stock} alertaMinima={row.original.alerta_stock_minimo} />
       ),
     },
     {
-      key: 'sku',
+      accessorKey: 'sku',
       header: 'SKU',
-      cell: (row) => <span className="font-mono text-xs font-semibold">{formatSKU(row.sku)}</span>,
+      cell: ({ row }) => <span className="font-mono text-xs font-semibold">{formatSKU(row.original.sku)}</span>,
     },
     {
-      key: 'producto',
+      accessorKey: 'producto',
       header: 'Producto',
-      cell: (row) => <span className="font-medium text-on-surface">{formatName(productoLabel(row))}</span>,
+      cell: ({ row }) => <span className="font-medium text-on-surface">{formatName(productoLabel(row.original))}</span>,
     },
     {
-      key: 'color_tamano',
+      accessorKey: 'color_tamano',
       header: 'Color / Tamaño',
-      cell: (row) => {
-        const color = formatName(row.color)
-        const tamano = formatName(row.tamano)
+      cell: ({ row }) => {
+        const color = formatName(row.original.color)
+        const tamano = formatName(row.original.tamano)
         const partes = [color !== '—' ? color : '', tamano !== '—' ? tamano : ''].filter(Boolean)
         const texto = partes.join(' · ') || '—'
         return <span className="text-on-surface-variant">{texto}</span>
       },
     },
     {
-      key: 'gradiente',
+      accessorKey: 'gradiente',
       header: 'Gradiente óptico',
-      cell: (row) => <span className="font-mono text-xs text-on-surface-variant">{gradiente(row)}</span>,
+      cell: ({ row }) => <span className="font-mono text-xs text-on-surface-variant">{gradiente(row.original)}</span>,
     },
     {
-      key: 'precio_al_mayor',
+      accessorKey: 'precio_al_mayor',
       header: 'Precio mayor',
-      align: 'right',
-      cell: (row) => formatMoney(row.precio_al_mayor),
+      meta: { className: 'text-right' },
+      cell: ({ row }) => formatMoney(row.original.precio_al_mayor),
     },
     {
-      key: 'precio_costo',
+      accessorKey: 'precio_costo',
       header: 'Precio costo',
-      align: 'right',
-      cell: (row) => formatMoney(row.precio_costo),
+      meta: { className: 'text-right' },
+      cell: ({ row }) => formatMoney(row.original.precio_costo),
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) =>
+      meta: { className: 'text-right' },
+      cell: ({ row }) =>
         canManage ? (
           <div className="flex items-center justify-end">
             <TooltipProvider delayDuration={150}>
@@ -130,7 +130,7 @@ export function VariantesTable({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onAjustarStock(row)}
+                    onClick={() => onAjustarStock(row.original)}
                   >
                     <ArrowUpDown size={16} /> Ajustar
                   </Button>
@@ -167,8 +167,7 @@ export function VariantesTable({
     <DataTable<VarianteProducto>
       columns={columns}
       data={variantes}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar las variantes') : null}
       onRetry={onRetry}
       emptyTitle={soloStockBajo ? 'Sin variantes con stock bajo' : 'No hay variantes'}
@@ -220,7 +219,7 @@ export function VariantesTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

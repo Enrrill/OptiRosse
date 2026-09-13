@@ -1,8 +1,9 @@
 import { Braces } from 'lucide-react'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable } from '@/components/data/DataTable'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -77,64 +78,64 @@ export function AuditoriaTable({
   onFechaHastaChange,
   onVerDetalle,
 }: AuditoriaTableProps) {
-  const columns: Column<RegistroAuditoria>[] = [
+  const columns: ColumnDef<RegistroAuditoria>[] = [
     {
-      key: 'fecha',
+      accessorKey: 'fecha',
       header: 'Fecha y hora',
-      cell: (row) => (
-        <span className="whitespace-nowrap text-on-surface-variant">{formatDateTime(row.creado_en)}</span>
+      cell: ({row}) => (
+        <span className="whitespace-nowrap text-on-surface-variant">{formatDateTime(row.original.creado_en)}</span>
       ),
     },
     {
-      key: 'usuario',
+      accessorKey: 'usuario',
       header: 'Usuario',
-      cell: (row) => (
+      cell: ({row}) => (
         <span className="font-medium text-on-surface">
-          {nombreUsuario(row)}
-          {row.usuario_detalle && (
-            <span className="ml-1.5 text-xs text-on-surface-variant">@{row.usuario_detalle.nombre_usuario}</span>
+          {nombreUsuario(row.original)}
+          {row.original.usuario_detalle && (
+            <span className="ml-1.5 text-xs text-on-surface-variant">@{row.original.usuario_detalle.nombre_usuario}</span>
           )}
         </span>
       ),
     },
     {
-      key: 'accion',
+      accessorKey: 'accion',
       header: 'Acción',
-      cell: (row) => <StatusBadge display={choice(ACCION_AUDITORIA, row.accion)} />,
+      cell: ({row}) => <StatusBadge display={choice(ACCION_AUDITORIA, row.original.accion)} />,
     },
     {
-      key: 'tabla',
+      accessorKey: 'tabla',
       header: 'Módulo',
-      cell: (row) => <StatusBadge display={choice(TABLA_AUDITORIA, row.tabla_afectada)} />,
+      cell: ({row}) => <StatusBadge display={choice(TABLA_AUDITORIA, row.original.tabla_afectada)} />,
     },
     {
-      key: 'objeto',
+      accessorKey: 'objeto',
       header: 'ID',
-      cell: (row) =>
-        row.objeto_id != null ? (
-          <span className="font-mono text-sm text-primary">#{row.objeto_id}</span>
+      cell: ({row}) =>
+        row.original.objeto_id != null ? (
+          <span className="font-mono text-sm text-primary">#{row.original.objeto_id}</span>
         ) : (
           <span className="text-on-surface-variant">—</span>
         ),
     },
     {
-      key: 'ip',
+      accessorKey: 'ip',
       header: 'IP',
-      cell: (row) => (
-        <span className="font-mono text-sm text-on-surface-variant">{row.direccion_ip || '—'}</span>
+      cell: ({row}) => (
+        <span className="font-mono text-sm text-on-surface-variant">{row.original.direccion_ip || '—'}</span>
       ),
     },
     {
-      key: 'detalle',
+      id: 'detalle',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) => (
+      meta: { className: 'text-right' },
+      cell: ({row}) => (
         <Button
           variant="ghost"
           size="sm"
           type="button"
-          onClick={() => onVerDetalle(row)}
-          aria-label={`Ver detalle del registro ${row.id}`}
+          onClick={() => onVerDetalle(row.original)}
+          aria-label={`Ver detalle del registro ${row.original.id}`}
         >
           <Braces size={18} />
         </Button>
@@ -207,8 +208,7 @@ export function AuditoriaTable({
     <DataTable<RegistroAuditoria>
       columns={columns}
       data={registros}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar la auditoría') : null}
       onRetry={onRetry}
       emptyTitle={hayFiltros ? 'No hay registros con estos filtros' : 'No hay registros de actividad'}
@@ -296,7 +296,7 @@ export function AuditoriaTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

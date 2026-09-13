@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { CloudUpload, Download, Eye, EyeOff, Pencil, RotateCcw, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable } from '@/components/data/DataTable'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { EmptyState } from '@/components/data/EmptyState'
 import { ErrorState } from '@/components/data/ErrorState'
 import { StatusBadge } from '@/components/data/StatusBadge'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { FilterChip } from '@/components/ui/FilterChip'
 import { ViewToggle, type ViewMode } from '@/components/ui/ViewToggle'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -118,11 +119,12 @@ export function DocumentosEmpresaGrid({
   }
 
   // Columnas para DataTable cuando viewMode === 'table'
-  const tableColumns: Column<DocumentoEmpresa>[] = [
+  const tableColumns: ColumnDef<DocumentoEmpresa>[] = [
     {
-      key: 'nombre',
+      accessorKey: 'nombre',
       header: 'Documento',
-      cell: (doc) => {
+      cell: ({row: originalRow}) => {
+        const doc = originalRow.original
         const fConfig = getFileConfig(doc.extension)
         const FileIcon = fConfig.icon
         return (
@@ -143,10 +145,10 @@ export function DocumentosEmpresaGrid({
       },
     },
     {
-      key: 'categoria',
+      accessorKey: 'categoria',
       header: 'Categoría',
-      cell: (doc) => {
-        const cConfig = getCategoriaBadge(doc.categoria)
+      cell: ({row}) => {
+        const cConfig = getCategoriaBadge(row.original.categoria)
         return (
           <span
             className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${cConfig.class}`}
@@ -157,106 +159,109 @@ export function DocumentosEmpresaGrid({
       },
     },
     {
-      key: 'version',
+      accessorKey: 'version',
       header: 'Versión',
-      cell: (doc) => <span className="font-mono text-xs text-on-surface-variant">v{doc.version}</span>,
+      cell: ({row}) => <span className="font-mono text-xs text-on-surface-variant">v{row.original.version}</span>,
     },
     {
-      key: 'tamano_bytes',
+      accessorKey: 'tamano_bytes',
       header: 'Tamaño',
-      cell: (doc) => (
+      cell: ({row}) => (
         <span className="font-mono text-xs text-on-surface-variant">
-          {formatBytes(doc.tamano_bytes)}
+          {formatBytes(row.original.tamano_bytes)}
         </span>
       ),
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (doc) => <StatusBadge display={estadoActivo(doc.activo)} />,
+      cell: ({row}) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (doc) => (
-        <div className="flex items-center justify-end gap-1">
-          <TooltipProvider delayDuration={150}>
-            {doc.es_plantilla_generable && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-primary hover:bg-primary/10"
-                    onClick={() => onGenerar(doc)}
-                  >
-                    <Wand2 size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Generar documento</TooltipContent>
-              </Tooltip>
-            )}
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    if (doc.archivo_url) window.open(doc.archivo_url, '_blank')
-                  }}
-                >
-                  <Download size={18} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Descargar original</TooltipContent>
-            </Tooltip>
-
-            {['pdf', 'png', 'jpg', 'jpeg'].includes(doc.extension.toLowerCase()) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={() => onPrevisualizar(doc)}>
-                    <Eye size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Vista previa</TooltipContent>
-              </Tooltip>
-            )}
-
-            {canEdit && (
-              <>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" onClick={() => onEdit(doc)}>
-                      <Pencil size={18} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Editar metadatos</TooltipContent>
-                </Tooltip>
-
+      meta: { className: 'text-right' },
+      cell: ({row}) => {
+        const doc = row.original
+        return (
+          <div className="flex items-center justify-end gap-1">
+            <TooltipProvider delayDuration={150}>
+              {doc.es_plantilla_generable && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={
-                        doc.activo
-                          ? 'text-error hover:bg-error-container/20'
-                          : 'text-success hover:bg-success-container/20'
-                      }
-                      onClick={() => onToggleEstado(doc)}
+                      className="text-primary hover:bg-primary/10"
+                      onClick={() => onGenerar(doc)}
                     >
-                      {doc.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
+                      <Wand2 size={18} />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>{doc.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+                  <TooltipContent>Generar documento</TooltipContent>
                 </Tooltip>
-              </>
-            )}
-          </TooltipProvider>
-        </div>
-      ),
+              )}
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      if (doc.archivo_url) window.open(doc.archivo_url, '_blank')
+                    }}
+                  >
+                    <Download size={18} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Descargar original</TooltipContent>
+              </Tooltip>
+
+              {['pdf', 'png', 'jpg', 'jpeg'].includes(doc.extension.toLowerCase()) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={() => onPrevisualizar(doc)}>
+                      <Eye size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Vista previa</TooltipContent>
+                </Tooltip>
+              )}
+
+              {canEdit && (
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={() => onEdit(doc)}>
+                        <Pencil size={18} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Editar metadatos</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={
+                          doc.activo
+                            ? 'text-error hover:bg-error-container/20'
+                            : 'text-success hover:bg-success-container/20'
+                        }
+                        onClick={() => onToggleEstado(doc)}
+                      >
+                        {doc.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{doc.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+                  </Tooltip>
+                </>
+              )}
+            </TooltipProvider>
+          </div>
+        )
+      },
     },
   ]
 
@@ -328,8 +333,7 @@ export function DocumentosEmpresaGrid({
       <DataTable<DocumentoEmpresa>
         columns={tableColumns}
         data={documentos}
-        rowKey={(row) => row.id}
-        loading={isLoading}
+        isLoading={isLoading}
         error={isError ? (errorMessage ?? 'Error al cargar los documentos') : null}
         onRetry={onRetry}
         emptyTitle={hayFiltros ? 'No hay documentos con estos filtros' : 'No hay documentos'}
@@ -347,7 +351,7 @@ export function DocumentosEmpresaGrid({
         }
         toolbar={toolbarComponent}
         footer={
-          <Pagination
+          <DataTablePagination
             page={page}
             pageSize={pageSize}
             count={count}
@@ -415,7 +419,7 @@ export function DocumentosEmpresaGrid({
             ))}
           </div>
 
-          <Pagination
+          <DataTablePagination
             variant="card"
             page={page}
             pageSize={pageSize}

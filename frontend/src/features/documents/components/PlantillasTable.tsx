@@ -1,7 +1,8 @@
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable } from '@/components/data/DataTable'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { StatusBadge } from '@/components/data/StatusBadge'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { Plus, Pencil, EyeOff, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -58,34 +59,34 @@ export function PlantillasTable({
 }: PlantillasTableProps) {
   const hayFiltros = search !== '' || tipoFiltro !== '' || showInactivos
 
-  const columns: Column<PlantillaDocumento>[] = [
+  const columns: ColumnDef<PlantillaDocumento>[] = [
     {
-      key: 'tipo_documento',
+      accessorKey: 'tipo_documento',
       header: 'Tipo de documento',
-      cell: (row) => (
-        <StatusBadge display={choice(TIPO_DOCUMENTO, row.tipo_documento)} />
+      cell: ({row}) => (
+        <StatusBadge display={choice(TIPO_DOCUMENTO, row.original.tipo_documento)} />
       ),
     },
     {
-      key: 'nombre',
+      accessorKey: 'nombre',
       header: 'Nombre',
-      cell: (row) => <span className="font-medium">{row.nombre}</span>,
+      cell: ({row}) => <span className="font-medium">{row.original.nombre}</span>,
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+      cell: ({row}) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
     {
-      key: 'actualizado_en',
+      accessorKey: 'actualizado_en',
       header: 'Última actualización',
-      cell: (row) => <span className="text-on-surface-variant">{formatDate(row.actualizado_en)}</span>,
+      cell: ({row}) => <span className="text-on-surface-variant">{formatDate(row.original.actualizado_en)}</span>,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) =>
+      meta: { className: 'text-right' },
+      cell: ({row}) =>
         canEdit ? (
           <div className="flex items-center justify-end gap-0.5">
             <TooltipProvider delayDuration={150}>
@@ -95,7 +96,7 @@ export function PlantillasTable({
                     variant="ghost"
                     size="icon"
                     aria-label="Editar plantilla"
-                    onClick={() => onEdit(row)}
+                    onClick={() => onEdit(row.original)}
                   >
                     <Pencil size={18} />
                   </Button>
@@ -107,13 +108,13 @@ export function PlantillasTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={row.activo ? 'Desactivar plantilla' : 'Reactivar plantilla'}
-                    onClick={() => onToggleEstado(row)}
+                    aria-label={row.original.activo ? 'Desactivar plantilla' : 'Reactivar plantilla'}
+                    onClick={() => onToggleEstado(row.original)}
                   >
-                    {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
+                    {row.original.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+                <TooltipContent>{row.original.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -144,8 +145,7 @@ export function PlantillasTable({
     <DataTable<PlantillaDocumento>
       columns={columns}
       data={plantillas}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar las plantillas') : null}
       onRetry={onRetry}
       emptyTitle={hayFiltros ? 'No hay plantillas con estos filtros' : 'No hay plantillas'}
@@ -200,7 +200,7 @@ export function PlantillasTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

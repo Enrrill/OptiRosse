@@ -1,7 +1,7 @@
 import { Pencil, EyeOff, RotateCcw } from 'lucide-react'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable, type ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -47,29 +47,29 @@ export function MetodosTable({
   onEdit,
   onToggleEstado,
 }: MetodosTableProps) {
-  const columns: Column<MetodoPago>[] = [
-    { key: 'nombre', header: 'Nombre', cell: (row) => <span className="font-medium">{row.nombre}</span> },
-    { key: 'moneda', header: 'Moneda', cell: (row) => <span className="text-on-surface-variant">{row.moneda}</span> },
+  const columns: ColumnDef<MetodoPago>[] = [
+    { accessorKey: 'nombre', header: 'Nombre', cell: ({ row }) => <span className="font-medium">{row.original.nombre}</span> },
+    { accessorKey: 'moneda', header: 'Moneda', cell: ({ row }) => <span className="text-on-surface-variant">{row.original.moneda}</span> },
     {
-      key: 'requiere_referencia',
+      accessorKey: 'requiere_referencia',
       header: 'Requiere referencia',
-      cell: (row) =>
-        row.requiere_referencia ? (
+      cell: ({ row }) =>
+        row.original.requiere_referencia ? (
           <Badge variant="neutral" className="bg-secondary-container/25 text-secondary">Sí</Badge>
         ) : (
           <Badge variant="neutral" className="bg-surface-variant/40 text-on-surface-variant">No</Badge>
         ),
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={estadoActivo(row.activo)} />,
+      cell: ({ row }) => <StatusBadge display={estadoActivo(row.original.activo)} />,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) => (
+      meta: { className: 'text-right' },
+      cell: ({ row }) => (
         <div className="flex items-center justify-end gap-0.5">
           <TooltipProvider delayDuration={150}>
             <Tooltip>
@@ -78,7 +78,7 @@ export function MetodosTable({
                   variant="ghost"
                   size="icon"
                   aria-label="Editar método de pago"
-                  onClick={() => onEdit(row)}
+                  onClick={() => onEdit(row.original)}
                 >
                   <Pencil size={18} />
                 </Button>
@@ -90,13 +90,13 @@ export function MetodosTable({
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label={row.activo ? 'Desactivar método de pago' : 'Reactivar método de pago'}
-                  onClick={() => onToggleEstado(row)}
+                  aria-label={row.original.activo ? 'Desactivar método de pago' : 'Reactivar método de pago'}
+                  onClick={() => onToggleEstado(row.original)}
                 >
-                  {row.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
+                  {row.original.activo ? <EyeOff size={18} /> : <RotateCcw size={18} />}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{row.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
+              <TooltipContent>{row.original.activo ? 'Desactivar' : 'Reactivar'}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
@@ -108,8 +108,7 @@ export function MetodosTable({
     <DataTable<MetodoPago>
       columns={columns}
       data={metodos}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar los métodos de pago') : null}
       onRetry={onRetry}
       emptyTitle={showInactivos ? 'No hay métodos de pago inactivos' : 'No hay métodos de pago'}
@@ -130,7 +129,7 @@ export function MetodosTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}

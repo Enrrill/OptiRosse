@@ -1,8 +1,8 @@
 import { Eye, CheckCircle, XCircle, Plus } from 'lucide-react'
-import { DataTable, type Column } from '@/components/data/DataTable'
+import { DataTable, type ColumnDef } from '@/components/data/DataTable'
 import { DataTableToolbar } from '@/components/data/DataTableToolbar'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
-import { Pagination } from '@/components/data/Pagination'
+import { DataTablePagination } from '@/components/data/DataTablePagination'
 import { StatusBadge } from '@/components/data/StatusBadge'
 import { Button } from '@/components/ui/button'
 import {
@@ -78,70 +78,70 @@ export function PagosTable({
   onRechazar,
   onNuevo,
 }: PagosTableProps) {
-  const columns: Column<Pago>[] = [
+  const columns: ColumnDef<Pago>[] = [
     {
-      key: 'cliente',
+      accessorKey: 'cliente',
       header: 'Destinatario',
-      cell: (row) => (
+      cell: ({ row }) => (
         <span className="font-medium text-on-surface">
-          {row.cliente_detalle?.nombre_comercial
-            ?? row.paciente_detalle?.nombre_completo
+          {row.original.cliente_detalle?.nombre_comercial
+            ?? row.original.paciente_detalle?.nombre_completo
             ?? '—'}
         </span>
       ),
     },
     {
-      key: 'pedido_numero',
+      accessorKey: 'pedido_numero',
       header: 'N.º pedido',
-      cell: (row) =>
-        row.pedido_numero ? (
-          <span className="font-mono text-sm text-primary">{row.pedido_numero}</span>
+      cell: ({ row }) =>
+        row.original.pedido_numero ? (
+          <span className="font-mono text-sm text-primary">{row.original.pedido_numero}</span>
         ) : (
           <span className="text-on-surface-variant">—</span>
         ),
     },
     {
-      key: 'metodo',
+      accessorKey: 'metodo',
       header: 'Método',
-      cell: (row) => <span className="text-on-surface-variant">{row.metodo_pago_detalle}</span>,
+      cell: ({ row }) => <span className="text-on-surface-variant">{row.original.metodo_pago_detalle}</span>,
     },
     {
-      key: 'monto',
+      accessorKey: 'monto',
       header: 'Monto',
-      align: 'right',
-      cell: (row) => <span className="font-medium">{formatMoney(row.monto)}</span>,
+      meta: { className: 'text-right' },
+      cell: ({ row }) => <span className="font-medium">{formatMoney(row.original.monto)}</span>,
     },
     {
-      key: 'tasa_cambio',
+      accessorKey: 'tasa_cambio',
       header: 'Tasa',
-      align: 'right',
-      cell: (row) => <span className="text-on-surface-variant">{Number(row.tasa_cambio)}</span>,
+      meta: { className: 'text-right' },
+      cell: ({ row }) => <span className="text-on-surface-variant">{Number(row.original.tasa_cambio)}</span>,
     },
     {
-      key: 'numero_referencia',
+      accessorKey: 'numero_referencia',
       header: 'Referencia',
-      cell: (row) =>
-        row.numero_referencia ? (
-          <span className="font-mono text-xs text-on-surface">{row.numero_referencia}</span>
+      cell: ({ row }) =>
+        row.original.numero_referencia ? (
+          <span className="font-mono text-xs text-on-surface">{row.original.numero_referencia}</span>
         ) : (
           <span className="text-on-surface-variant">—</span>
         ),
     },
     {
-      key: 'estado',
+      accessorKey: 'estado',
       header: 'Estado',
-      cell: (row) => <StatusBadge display={choice(ESTADO_PAGO, row.estado)} />,
+      cell: ({ row }) => <StatusBadge display={choice(ESTADO_PAGO, row.original.estado)} />,
     },
     {
-      key: 'fecha_pago',
+      accessorKey: 'fecha_pago',
       header: 'Fecha',
-      cell: (row) => <span className="text-on-surface-variant">{formatDateTime(row.fecha_pago)}</span>,
+      cell: ({ row }) => <span className="text-on-surface-variant">{formatDateTime(row.original.fecha_pago)}</span>,
     },
     {
-      key: 'acciones',
+      id: 'acciones',
       header: 'Acciones',
-      align: 'right',
-      cell: (row) => (
+      meta: { className: 'text-right' },
+      cell: ({ row }) => (
         <div className="flex items-center justify-end gap-0.5">
           <TooltipProvider delayDuration={150}>
             <Tooltip>
@@ -152,7 +152,7 @@ export function PagosTable({
                   aria-label="Ver pago"
                   onClick={(e) => {
                     e.stopPropagation()
-                    onVer(row)
+                    onVer(row.original)
                   }}
                 >
                   <Eye size={18} />
@@ -160,7 +160,7 @@ export function PagosTable({
               </TooltipTrigger>
               <TooltipContent>Ver detalle</TooltipContent>
             </Tooltip>
-            {row.estado === 'pendiente' && (
+            {row.original.estado === 'pendiente' && (
               <>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -171,7 +171,7 @@ export function PagosTable({
                       className="text-green-600 hover:bg-green-500/10 hover:text-green-700 dark:text-green-400"
                       onClick={(e) => {
                         e.stopPropagation()
-                        onAprobar(row)
+                        onAprobar(row.original)
                       }}
                     >
                       <CheckCircle size={18} />
@@ -188,7 +188,7 @@ export function PagosTable({
                       className="text-error hover:bg-error-container/40 hover:text-error"
                       onClick={(e) => {
                         e.stopPropagation()
-                        onRechazar(row)
+                        onRechazar(row.original)
                       }}
                     >
                       <XCircle size={18} />
@@ -269,8 +269,7 @@ export function PagosTable({
     <DataTable<Pago>
       columns={columns}
       data={pagos}
-      rowKey={(row) => row.id}
-      loading={isLoading}
+      isLoading={isLoading}
       error={isError ? (errorMessage ?? 'Ocurrió un error al cargar los pagos') : null}
       onRetry={onRetry}
       onRowClick={onVer}
@@ -364,7 +363,7 @@ export function PagosTable({
         />
       }
       footer={
-        <Pagination
+        <DataTablePagination
           page={page}
           pageSize={pageSize}
           count={count}
