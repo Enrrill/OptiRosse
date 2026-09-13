@@ -28,7 +28,7 @@ import {
   type ProductoFormValues,
 } from './productoSchema'
 import { VariantesEditor } from './VariantesEditor'
-import { MarcaFormDialog } from './MarcaFormDialog'
+import { MarcaFormDialog } from '@/features/inventory/components/MarcaFormDialog'
 import {
   INDICES_REFRACCION,
   MATERIALES_CRISTAL,
