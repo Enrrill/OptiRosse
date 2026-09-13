@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
-import { Calendar, Eye, EyeOff, Key, LogOut, LockReset, Mail, Phone, Shield, User } from 'lucide-react'
+import { Calendar, Eye, EyeOff, Key, LogOut, KeyRound, Mail, Phone, Shield, User } from 'lucide-react'
 import { apiClient } from '@/lib/api/client'
 import { AUTH_ENDPOINTS } from '@/lib/api/endpoints'
 import { ApiError } from '@/lib/api/errors'
@@ -148,7 +148,7 @@ function PasswordForm() {
           La contraseña debe contener al menos 8 caracteres.
         </p>
         <Button type="submit" loading={loading} className="rounded-xl px-5">
-          {!loading && <LockReset size={18} />}
+          {!loading && <KeyRound size={18} />}
           <span>Cambiar contraseña</span>
         </Button>
       </div>
