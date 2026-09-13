@@ -12,7 +12,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: 'dashboard', end: true },
   { to: '/clientes', label: 'Clientes', icon: 'groups' },
-  { to: '/inventario', label: 'Inventario', icon: 'inventory_2' },
+  { to: '/inventario', label: 'Catálogos', icon: 'inventory_2' },
   { to: '/recetas', label: 'Recetas', icon: 'description' },
   { to: '/pedidos', label: 'Pedidos', icon: 'shopping_cart' },
   { to: '/finanzas', label: 'Finanzas', icon: 'payments', roles: ['administrador', 'empleado'] },

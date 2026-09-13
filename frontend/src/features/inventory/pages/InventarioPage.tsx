@@ -5,8 +5,8 @@ export default function InventarioPage() {
   return (
     <div>
       <PageHeader
-        title="Inventario"
-        description="Categorías, productos y control de stock."
+        title="Catálogos"
+        description="Categorías, marcas y variantes de productos."
       />
       <InventarioTabs />
     </div>
