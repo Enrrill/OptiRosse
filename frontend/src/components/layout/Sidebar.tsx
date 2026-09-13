@@ -29,7 +29,6 @@ import {
   User,
   Sun,
   Moon,
-  Menu,
 } from 'lucide-react'
 import { useTheme } from '@/app/ThemeProvider'
 
@@ -233,7 +232,6 @@ function SidebarNav({ collapsed, onNavigate }: SidebarNavProps) {
 
 export function Sidebar() {
   const collapsed = useUIStore((s) => s.sidebarCollapsed)
-  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const mobileOpen = useUIStore((s) => s.mobileOpen)
   const closeMobile = useUIStore((s) => s.closeMobile)
 
@@ -265,15 +263,6 @@ export function Sidebar() {
         )}
       >
         <SidebarNav collapsed={collapsed} />
-
-        {/* Collapse toggle - desktop only */}
-        <button
-          onClick={toggleSidebar}
-          className="mt-3 flex w-full items-center justify-center rounded-xl py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors"
-          aria-label={collapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
-        >
-          <Menu size={18} className={cn('transition-transform', collapsed && 'rotate-180')} />
-        </button>
       </aside>
     </>
   )
